@@ -110,7 +110,7 @@ export  PATH=$PATH:$ZK_HOME/bin:$JAVA_HOME/bin
 > 方案2：  
 > 在 zookeeper 环境变量后面加上 $JAVA_HOME/bin  
 > 
-> 本文的采用方案2
+> 这里采用方案2
 
 刷新环境变量：
 ``` shell
@@ -176,6 +176,8 @@ echo 3 > /opt/apps/zookeeper/data/myid
 ## 8.启动与测试
 在所有节点上执行此命令启动 zookeeper：
 ``` shell
+# zkServer.sh 支持下列参数：
+# start | start-foreground | stop | restart | status | upgrade | print-cmd
 zkServer.sh start
 ```
 
