@@ -55,7 +55,7 @@ systemctl status mysqld.service
 
 ---
 
-## 3.配置 MySQL 用户名和密码
+## 3.配置 MySQL
 MySQL启动时，会在 /var/log/mysqld.log 输出日志。默认密码就在日志中。  
 
 使用 grep 命令查找日志中的密码：
