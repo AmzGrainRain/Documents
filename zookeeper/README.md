@@ -1,4 +1,4 @@
-# zookeeper 搭建文档
+# ZOOKEEPER 搭建文档
 
 ## 前提条件
 - 已经成功部署 Hadoop

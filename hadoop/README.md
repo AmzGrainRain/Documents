@@ -1,4 +1,4 @@
-# Hadoop搭建文档
+# HADOOP 搭建文档
 
 ## 1.前提条件
 - CentOS-7-x86_64-Minimal-2009.iso

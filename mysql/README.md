@@ -1,4 +1,4 @@
-# Mysql 搭建文档
+# MYSQL 搭建文档
 
 ## 前提条件
 - mysql-community-client-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
