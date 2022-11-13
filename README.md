@@ -5,5 +5,10 @@
 [zookeeper 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/zookeeper)  
 [mysql 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/mysql)  
 
+## 一键直达（码云）
+[hadoop 搭建文档](https://gitee.com/kihanlee/B3D/tree/main/hadoop)  
+[zookeeper 搭建文档](https://gitee.com/kihanlee/B3D/tree/main/pzookeeper)  
+[mysql 搭建文档](https://gitee.com/kihanlee/B3D/tree/main/mysql)  
+
 ## 小建议
 ![tile](./images/tile.jpg)
