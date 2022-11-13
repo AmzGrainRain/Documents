@@ -1,19 +1,19 @@
-# Hadoop搭建文档
+# zookeeper 搭建文档
 
-## 1.前提条件
+## 前提条件
 - 已经成功部署 Hadoop
 - zookeeper-3.4.5.tar.gz（位于 /opt/tar/）
 
 ---
 
-## 2.假设
+## 1.假设
 第一台服务器的IP: 192.168.56.101（主机名 master）  
 第二台服务器的IP: 192.168.56.102（主机名 slave1）   
 第三台服务器的IP: 192.168.56.103（主机名 slave2）
 
 ---
 
-## 3.解压 zookeeper
+## 2.解压 zookeeper
 ``` shell
 # 进入 /opt/apps 目录
 cd /opt/apps/
@@ -27,7 +27,7 @@ mv ./zookeeper-3.4.5 ./zookeeper
 
 ---
 
-## 4.配置 zookeeper
+## 3.配置 zookeeper
 创建 data 目录用于存储数据：
 ``` shell
 mkdir /opt/apps/zookeeper/data
@@ -88,7 +88,7 @@ clientPort=2181
 
 ---
 
-## 5.配置环境变量
+## 4.配置环境变量
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -125,7 +125,7 @@ zkServer.sh
 
 ---
 
-## 6.分发文件
+## 5.分发文件
 下发 zookeeper：
 ``` shell
 scp -r /opt/apps/zookeeper slave1:/opt/apps/
@@ -145,7 +145,7 @@ source ~/.bashrc
 
 ---
 
-## 7.配置 myid
+## 6.配置 myid
 每台服务器的 myid 对应着 [zoo.cfg](#zoo-cfg) 最下方的数字：
 ``` shell
 # master 节点的 myid 必须是 1
@@ -173,7 +173,7 @@ echo 3 > /opt/apps/zookeeper/data/myid
 
 ---
 
-## 8.启动与测试
+## 7.启动与测试
 在所有节点上执行此命令启动 zookeeper：
 ``` shell
 # zkServer.sh 支持下列参数：

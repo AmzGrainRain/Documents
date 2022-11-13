@@ -1,6 +1,6 @@
-# Mysql搭建文档
+# Mysql 搭建文档
 
-## 1.前提条件
+## 前提条件
 - mysql-community-client-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
 - mysql-community-libs-5.7.16-1.el7.x86_64.rpm  （位于 /opt/tar/MySQL/）
 - mysql-community-common-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
@@ -8,7 +8,7 @@
 
 ---
 
-## 2.安装软件包
+## 1.安装软件包
 进入 /opt/tar/MySQL/ 目录内：
 ``` shell
 cd /opt/tar/MySQL/
@@ -36,7 +36,7 @@ rpm -ivh ./* --force --nodeps
 
 ---
 
-## 3.启动MySQL & 设置开机自启
+## 2.启动MySQL & 设置开机自启
 通过 systemctl 启动 mysqld 守护服务：
 ``` shell
 systemctl start mysqld.service
@@ -55,7 +55,7 @@ systemctl status mysqld.service
 
 ---
 
-## 4.配置 MySQL 用户名和密码
+## 3.配置 MySQL 用户名和密码
 MySQL启动时，会在 /var/log/mysqld.log 输出日志。默认密码就在日志中。  
 
 使用 grep 命令查找日志中的密码：
