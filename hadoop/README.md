@@ -239,7 +239,7 @@ vi hdfs-site.xml
     <value>file:/opt/apps/hadoop/tmp/dfs/data</value>
   </property>
   <property>
-    <name>dfs.secondary.http.address<name>
+    <name>dfs.secondary.http.address</name>
     <value>127.0.0.1:50090</value>
   </property>
 </configuration>
@@ -267,7 +267,7 @@ vi mapred-site.xml
 
 <configuration>
   <property>
-    <name>mapreduce.framework.name<name>
+    <name>mapreduce.framework.name</name>
     <value>yarn</value>
   </property>
 </configuration>
