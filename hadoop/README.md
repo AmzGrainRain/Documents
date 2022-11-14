@@ -352,11 +352,11 @@ source ~/.bashrc
 hdfs namenode -format
 ```
 
-> 如果多次执行了此命令，可以清空前面在 [core-site.xml](#core-site-xml) 里配置的缓存目录解决异常或警告：
+> <span id="hdfs-error">如果多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 nomenode 解决：</span>
 >``` shell
 > rm -rf /opt/apps/hadoop/tmp/*
 > ```
-> 然后再次执行依次格式化即可：
+> 再次执行格式化：
 > ``` shell
 > hdfs namenode -format
 > ```

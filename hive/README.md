@@ -23,8 +23,8 @@ mv ./apache-hive-2.3.4-bin ./hive
 ---
 
 ## 2.放入 MySQL 驱动包
+因为 hive 需要操作 mysql，所以需要将 java 连接 mysql 需要用到的驱动复制到 hive/lib/ 下：
 ``` shell
-# 将 mysql 驱动包移动到 hive/lib 目录下
 cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
 ```
 
@@ -211,4 +211,84 @@ hive
 成功：
 ![结果](./images/7_2.png)
 
-> 至此 hive 配置完毕
+---
+
+## 8.使用 hive
+目的：使用 hive 处理存储在 hdfs 内的结构化数据，使得我们可以通过 SQL 语句操作这些数据。  
+
+我们先来创建一个结构化的数据：
+``` shell
+# 进入根目录
+cd ~
+
+# 新建一个文本文件
+vi test.txt
+```
+
+写入这些东西：
+```
+老王,28
+老李,25
+老张,31
+老刘,29
+```
+![文本内容](./images/8_1.png)
+
+在 hdfs 里创建一个 test_hive 目录：
+``` shell
+# hdfs dfs -命令 值
+hdfs dfs -mkdir /test_hive
+```
+
+把我们刚刚写的 test.txt 发送到 hdfs 文件系统的 /test_hive 目录里 ：
+``` shell
+hdfs dfs -put ~/test.txt /test_hive/test.txt
+```
+如果发送文件到 hdfs 时遇到错误，请尝试以下方法：
+1. 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录
+2. 重新格式化 namenode
+3. 具体请参考[这里](../hadoop/README.md#hdfs-error)
+
+cat 一下，证明已经发送到 hdfs 里了：
+![文本内容](./images/8_2.png)
+
+
+启动 hive ：
+``` shell
+hive
+```
+
+执行这段指令：
+- 创建一个数据表 test。
+- 这个表的有两个字段 name 和 age。
+- 这个表的行格式：
+	-	以 “,” 分隔字段
+	- 换行符结尾
+``` shell
+create table test (name string, age int) row format delimited fields terminated by ",";
+```
+![文本内容](./images/8_3.png)
+
+从 hdfs 导入 /test_hive/test.txt 	内的数据到 test 数据表：
+``` shell
+# load data inpath 'hdfs 路径' into table 表名;
+load data inpath '/test_hive/test.txt' into table test;
+```
+![文本内容](./images/8_4.png)
+
+执行一个大家熟悉的命令来验证下：
+``` shell
+select * from test;
+```
+![文本内容](./images/8_5.png)
+
+输入 exit 或按下 ctrl + d 退出 hive 控制台：
+``` shell
+exit
+```
+
+在 hdfs 里可查看到 hive 的数据表信息：
+``` shell
+hdfs dfs -cat /user/hive/warehouse/test/test.txt
+```
+![文本内容](./images/8_6.png)
