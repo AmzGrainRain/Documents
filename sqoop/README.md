@@ -76,7 +76,7 @@ bind-address = 127.0.0.1
 mysql -u root -p
 ```
 
-依照我们之前在[ mysql 搭建文档 ](../mysql/README.md)说过的方法，完全允许 root 远程连接 mysql ：
+依照我们之前在[ mysql 搭建文档 ](../mysql/README.md)说过的方法，完全允许 root 远程连接 mysql ：  
 命令解释：
   - GRANT：赋权命令
   - ALL PRIVILEGES：当前用户的所有权限
