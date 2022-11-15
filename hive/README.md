@@ -1,4 +1,4 @@
-# HIVE 搭建文档
+# <span id="top">HIVE 搭建文档</span>
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -247,7 +247,7 @@ hdfs dfs -put ~/test.txt /test_hive/test.txt
 如果发送文件到 hdfs 时遇到错误，请尝试以下方法：
 1. 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录
 2. 重新格式化 namenode
-3. 具体请参考[这里](../hadoop/README.md#hdfs-error)
+3. 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分
 
 cat 一下，证明已经发送到 hdfs 里了：
 ![文本内容](./images/8_2.png)
@@ -292,3 +292,9 @@ exit
 hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ```
 ![文本内容](./images/8_6.png)
+
+---
+
+## 快速跳转
+[回到顶部](#top)  
+[SQOOP 部署文档](../sqoop/README.md)

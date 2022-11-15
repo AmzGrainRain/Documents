@@ -1,4 +1,4 @@
-# ZOOKEEPER 搭建文档
+# <span id="top">ZOOKEEPER 搭建文档</span>
 
 ## 前提条件
 - 已经成功部署 Hadoop
@@ -206,3 +206,9 @@ get /test
 ![master zookeeper cli](./images/8_3.png)
 
 slave1 与 slave2 均出现 "hello" 即视为部署成功。
+
+---
+
+## 快速跳转
+[回到顶部](#top)  
+[MYSQL 部署文档](../mysql/README.md)

@@ -1,4 +1,4 @@
-# HADOOP 搭建文档
+# HADOOP 搭建文档<span id="top">HADOOP 搭建文档</span>
 
 ## 1.前提条件
 - CentOS-7-x86_64-Minimal-2009.iso
@@ -420,3 +420,9 @@ hadoop jar hadoop-mapreduce-examples-2.6.0.jar pi 10 10
 ``` shell
 hdfs dfsadmin -report
 ```
+
+---
+
+## 快速跳转
+[回到顶部](#top)  
+[ZOOKEEPER 部署文档](../zookeeper/README.md)

@@ -1,4 +1,4 @@
-# MYSQL 搭建文档
+# <span id="top">MYSQL 搭建文档</span>
 
 ## 前提条件
 - mysql-community-client-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
@@ -98,15 +98,29 @@ alter user 'root'@'localhost' identified by '新密码';
 create user 'root'@'%' identified by '用户的密码';
 ```
 
-完全允许远程连接：
+完全允许 root 远程连接：  
+命令解释：
+  - GRANT：赋权命令
+  - ALL PRIVILEGES：当前用户的所有权限
+  - ON：介词
+  - \*.\*：当前用户对所有数据库和表的操作权限
+  - TO：介词
+  - 'root'@'%'：权限赋给 root 用户，所有 ip 都能连接
+  - WITH GRANT OPTION：允许级联赋权
 ``` sql
 /*
-  在开发环境建议这么做，在生产环境上是很危险的操作
+  在开发环境建议这么做，在生产环境上是很危险的操作。
 */
-grant all privileges on *.* to 'root'@'%' with grant option;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 ```
 
 刷新权限：
 ``` sql
 flush privileges;
 ```
+
+---
+
+## 快速跳转
+[回到顶部](#top)  
+[HIVE 部署文档](../hive/README.md)
