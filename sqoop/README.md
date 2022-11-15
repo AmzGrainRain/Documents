@@ -25,6 +25,8 @@ tar -zxf /opt/tar/sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz
 mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
 ```
 
+---
+
 ## 2.放入 MySQL 驱动包：
 因为我们要通过 sqoop 操作 mysql，所以需要将java 连接 mysql 需要用到的驱动复制到 sqoop/lib 下：
 ``` shell
@@ -49,6 +51,8 @@ export PATH=$PATH:$SQOOP_HOME/bin
 ``` shell
 source ~/.bashrc
 ```
+
+---
 
 ## 4.验证安装
 执行这条指令：
