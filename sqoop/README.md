@@ -143,8 +143,167 @@ metastore|记录 Sqoop job 的元数据信息，如果不启动 Metastore 实例
 help|打印 sqoop 帮助信息
 version|打印 sqoop 版本信息
 
+---
+
+## 7.测试 sqoop 连接 mysql
+
+使用 sqoop 打印 mysql 内所有数据库名：
+> 通过 `sqoop help list-databases` 命令打印帮助信息。
+``` shell
+sqoop list-databases --connect jdbc:mysql://localhost:3306 --username root -P
+```
+![数据库名](./images/7_1.png)
+
+使用 sqoop 打印 sqoop_test 内所有数据表名：
+> 通过 `sqoop help list-tables` 命令打印帮助信息。
+``` shell
+sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P
+```
+![数据库名](./images/7_2.png)
+
+---
+
+## 8.导入 mysql 数据表到 hdfs
+> 通过 `sqoop help import` 命令打印帮助信息。
+``` shell
+sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
+```
+如果遇到这个错误： 
+![错误信息](./images/8_1.png)
+不要慌，虽然任务执行结果显示的是失败，但实际上**已经成功导入数据表到 hdfs 了**。出现这个问题的原因是 mysql wait_timeout 参数时长设置过短或 mysql 地址出问题了。
+
+有两个解决方法：
+- 在 mysql 上修改 wait_timeout 时长
+- 将 url 中localhost 修改为当前这台节点的内网 ip（非 127.0.0.1）。 
+
+我们采用后面的方法。
+删除之前导入的数据表：
+``` shell
+hdfs dfs -rm -r /user/root/test
+```
+
+再次导入：
+``` shell
+sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
+```
+![更换 ip](./images/8_2.png)
+
+超详细的终端输出信息：（选择性查看）
+``` diff
++ [root@master ~]# hdfs dfs -rm -r /user/root/test
+22/11/15 04:49:30 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
+Deleted /user/root/test
++ [root@master ~]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 08:00:27:da:9d:73 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.56.101/24 brd 192.168.56.255 scope global noprefixroute dynamic enp0s3
+       valid_lft 557sec preferred_lft 557sec
+    inet6 fe80::9aa0:7dd0:a0b3:9e2a/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+    inet6 fe80::8959:dba1:e466:f86b/64 scope link tentative noprefixroute dadfailed
+       valid_lft forever preferred_lft forever
+    inet6 fe80::ea0f:cee1:31ba:ed17/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
++ [root@master ~]# sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
+Warning: /usr/lib/hbase does not exist! HBase imports will fail.
+Please set $HBASE_HOME to the root of your HBase installation.
+Enter password:
+22/11/15 04:49:42 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
+22/11/15 04:49:42 INFO tool.CodeGenTool: Beginning code generation
+22/11/15 04:49:42 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test` AS t LIMIT 1
+22/11/15 04:49:42 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test` AS t LIMIT 1
+22/11/15 04:49:42 INFO orm.CompilationManager: HADOOP_MAPRED_HOME is /opt/apps/hadoop
+Note: /tmp/sqoop-root/compile/99b67d991132af624d961b23f0d7934e/test.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+22/11/15 04:49:43 INFO orm.CompilationManager: Writing jar file: /tmp/sqoop-root/compile/99b67d991132af624d961b23f0d7934e/test.jar
+22/11/15 04:49:43 WARN manager.MySQLManager: It looks like you are importing from mysql.
+22/11/15 04:49:43 WARN manager.MySQLManager: This transfer can be faster! Use the --direct
+22/11/15 04:49:43 WARN manager.MySQLManager: option to exercise a MySQL-specific fast path.
+22/11/15 04:49:43 INFO manager.MySQLManager: Setting zero DATETIME behavior to convertToNull (mysql)
+22/11/15 04:49:43 INFO mapreduce.ImportJobBase: Beginning import of test
+22/11/15 04:49:43 INFO Configuration.deprecation: mapred.jar is deprecated. Instead, use mapreduce.job.jar
+22/11/15 04:49:43 INFO Configuration.deprecation: mapred.map.tasks is deprecated. Instead, use mapreduce.job.maps
+22/11/15 04:49:43 INFO client.RMProxy: Connecting to ResourceManager at master/192.168.56.101:8032
+22/11/15 04:49:45 INFO mapreduce.JobSubmitter: number of splits:1
+22/11/15 04:49:45 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1668504563799_0005
+22/11/15 04:49:45 INFO impl.YarnClientImpl: Submitted application application_1668504563799_0005
+22/11/15 04:49:45 INFO mapreduce.Job: The url to track the job: http://master:8088/proxy/application_1668504563799_0005/
+22/11/15 04:49:45 INFO mapreduce.Job: Running job: job_1668504563799_0005
+22/11/15 04:49:49 INFO mapreduce.Job: Job job_1668504563799_0005 running in uber mode : false
+22/11/15 04:49:49 INFO mapreduce.Job:  map 0% reduce 0%
+22/11/15 04:49:53 INFO mapreduce.Job:  map 100% reduce 0%
+22/11/15 04:49:53 INFO mapreduce.Job: Job job_1668504563799_0005 completed successfully
+22/11/15 04:49:53 INFO mapreduce.Job: Counters: 30
+        File System Counters
+                FILE: Number of bytes read=0
+                FILE: Number of bytes written=113471
+                FILE: Number of read operations=0
+                FILE: Number of large read operations=0
+                FILE: Number of write operations=0
+                HDFS: Number of bytes read=87
+                HDFS: Number of bytes written=40
+                HDFS: Number of read operations=4
+                HDFS: Number of large read operations=0
+                HDFS: Number of write operations=2
+        Job Counters
+                Launched map tasks=1
+                Other local map tasks=1
+                Total time spent by all maps in occupied slots (ms)=1796
+                Total time spent by all reduces in occupied slots (ms)=0
+                Total time spent by all map tasks (ms)=1796
+                Total vcore-seconds taken by all map tasks=1796
+                Total megabyte-seconds taken by all map tasks=1839104
+        Map-Reduce Framework
+                Map input records=4
+                Map output records=4
+                Input split bytes=87
+                Spilled Records=0
+                Failed Shuffles=0
+                Merged Map outputs=0
+                GC time elapsed (ms)=48
+                CPU time spent (ms)=480
+                Physical memory (bytes) snapshot=158457856
+                Virtual memory (bytes) snapshot=2096713728
+                Total committed heap usage (bytes)=81788928
+        File Input Format Counters
+                Bytes Read=0
+        File Output Format Counters
+                Bytes Written=40
+22/11/15 04:49:53 INFO mapreduce.ImportJobBase: Transferred 40 bytes in 9.9949 seconds (4.002 bytes/sec)
+22/11/15 04:49:53 INFO mapreduce.ImportJobBase: Retrieved 4 records.
+[root@master ~]#
+```
+
+查看导入结果：
+``` shell
+hdfs dfs -cat /user/root/test/part-m-00000
+```
+![hdfs 内的数据表](./images/8_3.png)
 
 
+---
+
+## 9.导入 hdfs 数据表到 mysql
+进入 mysql 创建一个表：
+``` sql
+CREATE TABLE `test_from_hdfs` (
+  `name` VARCHAR(50),
+  `age` INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+导入数据：
+``` shell
+sqoop export --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
+```
+
+---
 
 ## 快速跳转
 [回到顶部](#top)  
