@@ -250,6 +250,9 @@ hdfs dfs -put ~/test.txt /test_hive/test.txt
 3. 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分
 
 cat 一下，证明已经发送到 hdfs 里了：
+```shell
+hdfs dfs -cat /test_hive/test.txt
+```
 ![文本内容](./images/8_2.png)
 
 

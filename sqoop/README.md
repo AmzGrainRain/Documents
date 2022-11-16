@@ -188,17 +188,16 @@ hdfs dfs -rm -r /user/root/test
 
 再次导入：
 ``` shell
-# master 节点的内网 IP 是 192.168.56.101
 sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
 ```
 ![更换 ip](./images/8_2.png)
 
 超详细的终端输出信息：（选择性查看）
-```
-[root@master ~]# hdfs dfs -rm -r /user/root/test
+``` diff
++ [root@master ~]# hdfs dfs -rm -r /user/root/test
 22/11/15 04:49:30 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
 Deleted /user/root/test
-[root@master ~]# ip a
++ [root@master ~]# ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -215,7 +214,7 @@ Deleted /user/root/test
        valid_lft forever preferred_lft forever
     inet6 fe80::ea0f:cee1:31ba:ed17/64 scope link noprefixroute
        valid_lft forever preferred_lft forever
-[root@master ~]# sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
++ [root@master ~]# sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
 Warning: /usr/lib/hbase does not exist! HBase imports will fail.
 Please set $HBASE_HOME to the root of your HBase installation.
 Enter password:
@@ -302,154 +301,14 @@ CREATE TABLE `test_from_hdfs` (
   `age` INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
-![创建表](./images/9_1.png)
 
 导入数据：
 ``` shell
-sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
-```
-![导入数据：](./images/9_2.png)
-
-超详细的终端输出信息：（选择性查看）
-```
-[root@master apps]# sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by "," --username root -P                                                                             Warning: /usr/lib/hbase does not exist! HBase imports will fail.
-Please set $HBASE_HOME to the root of your HBase installation.
-Enter password:
-22/11/15 08:05:50 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
-22/11/15 08:05:50 INFO tool.CodeGenTool: Beginning code generation
-22/11/15 08:05:50 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
-22/11/15 08:05:50 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
-22/11/15 08:05:50 INFO orm.CompilationManager: HADOOP_MAPRED_HOME is /opt/apps/hadoop
-Note: /tmp/sqoop-root/compile/317eb183b19ebf387845c80e913a3a2a/test_from_hdfs.java uses or overrides a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-22/11/15 08:05:51 INFO orm.CompilationManager: Writing jar file: /tmp/sqoop-root/compile/317eb183b19ebf387845c80e913a3a2a/test_from_hdfs.jar
-22/11/15 08:05:51 INFO mapreduce.ExportJobBase: Beginning export of test_from_hdfs
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.jar is deprecated. Instead, use mapreduce.job.jar
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.reduce.tasks.speculative.execution is deprecated. Instead, use mapreduce.reduce.speculative
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.map.tasks.speculative.execution is deprecated. Instead, use mapreduce.map.speculative
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.map.tasks is deprecated. Instead, use mapreduce.job.maps
-22/11/15 08:05:51 INFO client.RMProxy: Connecting to ResourceManager at master/192.168.56.101:8032
-22/11/15 08:05:53 INFO input.FileInputFormat: Total input paths to process : 1
-22/11/15 08:05:53 INFO input.FileInputFormat: Total input paths to process : 1
-22/11/15 08:05:53 INFO mapreduce.JobSubmitter: number of splits:1
-22/11/15 08:05:53 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1668514459196_0002
-22/11/15 08:05:53 INFO impl.YarnClientImpl: Submitted application application_1668514459196_0002
-22/11/15 08:05:53 INFO mapreduce.Job: The url to track the job: http://master:8088/proxy/application_1668514459196_0002/
-22/11/15 08:05:53 INFO mapreduce.Job: Running job: job_1668514459196_0002
-22/11/15 08:05:57 INFO mapreduce.Job: Job job_1668514459196_0002 running in uber mode : false
-22/11/15 08:05:57 INFO mapreduce.Job:  map 0% reduce 0%
-22/11/15 08:06:01 INFO mapreduce.Job:  map 100% reduce 0%
-22/11/15 08:06:02 INFO mapreduce.Job: Job job_1668514459196_0002 completed successfully
-22/11/15 08:06:02 INFO mapreduce.Job: Counters: 30
-        File System Counters
-                FILE: Number of bytes read=0
-                FILE: Number of bytes written=113330
-                FILE: Number of read operations=0
-                FILE: Number of large read operations=0
-                FILE: Number of write operations=0
-                HDFS: Number of bytes read=152
-                HDFS: Number of bytes written=0
-                HDFS: Number of read operations=4
-                HDFS: Number of large read operations=0
-                HDFS: Number of write operations=0
-        Job Counters
-                Launched map tasks=1
-                Data-local map tasks=1
-                Total time spent by all maps in occupied slots (ms)=2100
-                Total time spent by all reduces in occupied slots (ms)=0
-                Total time spent by all map tasks (ms)=2100
-                Total vcore-seconds taken by all map tasks=2100
-                Total megabyte-seconds taken by all map tasks=2150400
-        Map-Reduce Framework
-                Map input records=4
-                Map output records=4
-                Input split bytes=109
-                Spilled Records=0
-                Failed Shuffles=0
-                Merged Map outputs=0
-                GC time elapsed (ms)=67
-                CPU time spent (ms)=440
-                Physical memory (bytes) snapshot=167534592
-                Virtual memory (bytes) snapshot=2097709056
-                Total committed heap usage (bytes)=84934656
-        File Input Format Counters
-                Bytes Read=0
-        File Output Format Counters
-                Bytes Written=0
-22/11/15 08:06:02 INFO mapreduce.ExportJobBase: Transferred 152 bytes in 10.8975 seconds (13.9481 bytes/sec)
-22/11/15 08:06:02 INFO mapreduce.ExportJobBase: Exported 4 records.
-[root@master apps]#
-```
-
-来查看下我们前面创建的 test_from_hdfs 表：
-![导入的数据](./images/9_3.png)
-可以看到数据导入成功了，但是有一个新的问题。那就是所有的汉字都显示成了问号，篇幅原因我们放在下一节一一道来。
-
----
-
-## 10.解决从 hdfs 导入到 mysql 中的数据中，中文变问号的问题
-进入 mysql ：
-``` shell
-mysql -u root -p
-```
-
-查看编码信息：
-``` sql
-SHOW VARIABLES LIKE 'character%'; 
-```
-![编码信息](./images/10_1.png)
-可以看到有些地方的编码是 latin1，这种编码并不能显示中文。
-
-编辑 my.cnf ：
-``` shell
-vi /etc/my.cnf
-```
-
-添加这两行到末尾：
-```
-character-set-server=utf8
-init_connect='SET NAMES utf8'
-```
-
-修改后的 my.cnf ：
-``` diff
-# For advice on how to change settings please see
-# http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html
-
-[mysqld]
-#
-# Remove leading # and set to the amount of RAM for the most important data
-# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
-# innodb_buffer_pool_size = 128M
-#
-# Remove leading # to turn on a very important data integrity option: logging
-# changes to the binary log between backups.
-# log_bin
-#
-# Remove leading # to set options mainly useful for reporting servers.
-# The server defaults are faster for transactions and fast SELECTs.
-# Adjust sizes as needed, experiment to find the optimal values.
-# join_buffer_size = 128M
-# sort_buffer_size = 2M
-# read_rnd_buffer_size = 2M
-datadir=/var/lib/mysql
-socket=/var/lib/mysql/mysql.sock
-# Disabling symbolic-links is recommended to prevent assorted security risks
-symbolic-links=0
-
-log-error=/var/log/mysqld.log
-pid-file=/var/run/mysqld/mysqld.pid
-+ character-set-server=utf8
-+ init_connect='SET NAMES utf8'
-```
-
-重启 mysql 服务：
-``` shell
-systemctl restart mysqld.service
+sqoop export --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
 ```
 
 ---
 
 ## 快速跳转
 [回到顶部](#top)  
-[HBASE 部署文档](../kafaka/README.md)
+[Hbase 部署文档](../hbase/README.md)
