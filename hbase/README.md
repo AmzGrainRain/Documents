@@ -70,7 +70,7 @@ vi hbase-env.sh
 ```
 
 注释以下配置：
->目前使用jdk版本为jdk1.8，无须配置此项，故注释（不注释会出错）
+>目前使用 jdk 版本为 jdk1.8，无须配置此项，故注释（不注释会出错）
 ```shell
 # Configure PermSize. Only needed in JDK7. You can safely remove it for JDK8+
 #export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -XX:PermSize=128m -XX:MaxPermSize=128m"
