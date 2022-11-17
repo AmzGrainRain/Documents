@@ -472,8 +472,15 @@ pid-file=/var/run/mysqld/mysqld.pid
 systemctl restart mysqld.service
 ```
 
-删除先前从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第十步操作即可。
-![正常的输出](./images/10_2.png)
+查看编码信息：
+``` sql
+SHOW VARIABLES LIKE 'character%'; 
+```
+![编码信息](./images/10_2.png)
+可以看到编码全是 utf8 了。
+
+删除我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第九步操作即可。
+![正常的输出](./images/10_3.png)
 
 ---
 
