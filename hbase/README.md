@@ -4,6 +4,7 @@
 - hadoop 集群已经启动
 - mysql 已部署完毕
 - hive 已部署完毕
+- zookeeper 已经启动
 - hbase-1.2.0-bin.tar.gz（位于/opt/tar下）
 
 ---
@@ -57,7 +58,7 @@ vi hbase-env.sh
 ```
 
 取消注释并修改:
->因为使用的zookeeper是手动安装的，并非自带的，所以修改为false
+> 因为使用的 zookeeper 是手动安装的，并非自带的，所以修改 HBASE_MANAGES_ZK 为 false
 ```diff
 # The java implementation to use.  Java 1.7+ required.
 - export JAVA_HOME=/usr/java/jdk1.6.0/
@@ -83,32 +84,32 @@ vi hbase-site.xml
 
 配置如下：
 ```xml
-<!--hbase的数据保存在hdfs对应目录下-->
+<!-- hbase 的数据保存在 hdfs 对应目录下 -->
 <property>
 	<name>hbase.rootdir</name>
 	<value>hdfs://master:9000/hbase</value>
 </property>
-<!--是否是分布式环境-->
+<!-- 是否是分布式环境 -->
 <property> 
 	<name>hbase.cluster.distributed</name> 
 	<value>true</value> 
 </property> 
-<!--冗余度-->
+<!-- 冗余度 -->
 <property>
 	<name>dfs.replication</name>
 	<value>2</value>
 </property>
-<!--链接zookeeper-->
+<!-- 连接 zookeeper -->
 <property>
 	<name>hbase.zookeeper.property.clientPort</name>
 	<value>2181</value>
 </property>
-<!--zookeeper数据目录-->
+<!-- zookeeper 数据目录 -->
 <property> 
 	<name>hbase.zookeeper.property.dataDir</name> 
 	<value>/opt/apps/hbase</value>       
 </property>
-<!--配置zk的地址，三个节点都启动-->
+<!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
 <property> 
 	<name>hbase.zookeeper.quorum</name> 
 	<value>master,slave1,slave2</value>     
@@ -125,33 +126,30 @@ vi regionservers
 slave1
 slave2
 ```
-
-如图所示:  
 ![img_3.png](images/3_1.png)
 
 ---
 
 ## 4.分发文件
-分发：
+分发文件到 slave1、slave2 ：
 ```shell
-scp -r /opt/apps/hbase @slave1:/opt/apps/
-scp -r /opt/apps/hbase @slave2:/opt/apps/
+scp -r /opt/apps/hbase slave1:/opt/apps/
+scp -r /opt/apps/hbase slave2:/opt/apps/
 ```
 
-修改slave1、slave2下regionservers文件：
+修改 slave1、slave2 下 regionservers 文件：
+> 分别在 slave1、slave2 节点执行此步骤  
+> 附属节点的 regionservers 文件需要包含 master 节点
+
 ```shell
-vi /opt/apps/hbase/conf/regionservers
+echo "master" >> /opt/apps/hbase/conf/regionservers
 ```
-
->添加master节点
-
-如图所示：  
 ![img.png](images/4_1.png)
 
 ---
 
 ## 5.启动测试
-master节点上启动：
+master 节点上启动：
 ```shell
 start-hbase.sh
 ```
@@ -161,40 +159,58 @@ start-hbase.sh
 jps
 ```
 
-> master节点从出现Hmaster进程  
-> slave1,slave2上出现HregionServer进程
-
-如图所示：  
-![img.png](images/5_1.png)  
-![img.png](images/5_2.png)
+master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 进程：
+![img.png](images/5_1.png)
 
 ---
 
 ## 6.Hbase shell
-使用hbase shell命令进入shell命令行：
+进入 hbase 命令行：
+> 确保您已经启动了 hadoop 和 zookeeper
 ```shell
 hbase shell
 ```
 
-shell常用命令：
->表操作：
+常用命令 - 表操作：
+行为|命令
+-|-
+创建表|`create '表名', '列簇名1', '列簇名2', '列簇名N'`
+添加列簇|`alter '表名', '列簇名'`
+删除列簇|`alter '表名', {NAME=>'列簇名', METHOD=>'delete'}`
+启用/禁用表|`enable/disable '表名'`
+是否启用/禁用|`is_enabled/is_disabled`
+删除表|仅能删除已被禁用的表：`drop '表名'`
+查看表结构|`describe '表名'`
+检查表是否存在|`exists '表名'`
 
-![img.png](images/6_1.png)
+常用命令 - 增删改查：
+行为|命令
+-|-
+添加记录|`put '表名', '行键', '列簇:列名', '值'`
+删除记录|`delete '表名', '行键', '列簇:列名'`
+删除整行的值|`deleteall '表名', '行键'`
+更新记录|再添加一次，覆盖原来的（put）
+查看记录|`get '表名', '行键'`
+查看表中记录数|`count '表名'`
 
->增删改查：  
+常用命令 - 搜索：
+行为|命令
+-|-
+扫描整张表|`scan '表名'`
+扫描整个列簇|`scan '表名', {COLUMN=>'列簇'}`
+查看某表某列所有数据|`scan '表名', {COLUMN=>'列簇:列名'}`
+限制查询结果行数（先根据 RowKey 定位 Region，再向后扫描）|`scan '表名', {STARTROW=>'起始行名', LIMIT=>行数, VERSIONS=>版本数}`
+限制查询结果行数（先根据 RowKey 定位 Region，再向后扫描）|`scan '表名', {STARTROW=>'起始行名', STOPROW=>终止行名, VERSIONS=>版本数}`
+限制查询结果行数（先根据 RowKey 定位 Region，再向后扫描）|`scan '表名', {TIMERANGE=>[起始时间戳（毫秒）, 终止时间戳（毫秒）], VERSIONS=>版本数}`
+使用等值过滤进行搜索|`scan '表名', FILTER=>"ValueFilter(=, 'binary': 值)"`
+使用值包含子串过滤进行搜索|`scan '表名', FILTER=>"ValueFilter(=, 'subsreing': 字串)"`
+使用列名的前缀进行搜索|`scan '表名', FILTER=>"ColumnPrefixFilter('前缀')"`
+使用 RowKey 的前缀进行搜索|`scan '表名', FILTER=>"PrefixFilter('前缀')"`
 
-![img.png](images/6_2.png)
-
->搜索：
-
-![img.png](images/6_3.png)
-
-退出hbase shell:
+退出 hbase 命令行:
 ```shell
 exit
 ```
-
->至此Hbase配置完毕
 
 ---
 
