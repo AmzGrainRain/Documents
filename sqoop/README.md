@@ -484,4 +484,4 @@ SHOW VARIABLES LIKE 'character%';
 
 ## 快速跳转
 [回到顶部](#top)  
-[Hbase 部署文档](../hbase/README.md)
+[HBASE 部署文档](../hbase/README.md)
