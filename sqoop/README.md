@@ -312,38 +312,62 @@ sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username ro
 
 超详细的终端输出信息：（选择性查看）
 ```
-[root@master apps]# sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by "," --username root -P                                                                             Warning: /usr/lib/hbase does not exist! HBase imports will fail.
+[root@master ~]# hdfs dfs -ls /user/root/test
+Found 2 items
+-rw-r--r--   2 root supergroup          0 2022-11-15 04:49 /user/root/test/_SUCCESS
+-rw-r--r--   2 root supergroup         40 2022-11-15 04:49 /user/root/test/part-m-00000
+[root@master ~]# hdfs dfs -cat /user/root/test/part*
+张三,20
+李四,24
+王五,22
+王五,22
+[root@master ~]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 08:00:27:da:9d:73 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.56.101/24 brd 192.168.56.255 scope global noprefixroute dynamic enp0s3
+       valid_lft 469sec preferred_lft 469sec
+    inet6 fe80::8959:dba1:e466:f86b/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+    inet6 fe80::9aa0:7dd0:a0b3:9e2a/64 scope link tentative noprefixroute dadfailed
+       valid_lft forever preferred_lft forever
+[root@master ~]# sqoop export --export-dir /user/root/test --table test_from_hdfs --m 1 --input-fields-terminated-by "," --connect jdbc:mysql://192.168.56.101/sqoop_test --username root -P                                                                                                                                                Warning: /usr/lib/hbase does not exist! HBase imports will fail.
 Please set $HBASE_HOME to the root of your HBase installation.
 Enter password:
-22/11/15 08:05:50 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
-22/11/15 08:05:50 INFO tool.CodeGenTool: Beginning code generation
-22/11/15 08:05:50 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
-22/11/15 08:05:50 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
-22/11/15 08:05:50 INFO orm.CompilationManager: HADOOP_MAPRED_HOME is /opt/apps/hadoop
-Note: /tmp/sqoop-root/compile/317eb183b19ebf387845c80e913a3a2a/test_from_hdfs.java uses or overrides a deprecated API.
+22/11/16 21:11:50 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
+22/11/16 21:11:50 INFO tool.CodeGenTool: Beginning code generation
+22/11/16 21:11:51 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
+22/11/16 21:11:51 INFO manager.SqlManager: Executing SQL statement: SELECT t.* FROM `test_from_hdfs` AS t LIMIT 1
+22/11/16 21:11:51 INFO orm.CompilationManager: HADOOP_MAPRED_HOME is /opt/apps/hadoop
+Note: /tmp/sqoop-root/compile/88fbe0f910ce613250687e9188cf2240/test_from_hdfs.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
-22/11/15 08:05:51 INFO orm.CompilationManager: Writing jar file: /tmp/sqoop-root/compile/317eb183b19ebf387845c80e913a3a2a/test_from_hdfs.jar
-22/11/15 08:05:51 INFO mapreduce.ExportJobBase: Beginning export of test_from_hdfs
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.jar is deprecated. Instead, use mapreduce.job.jar
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.reduce.tasks.speculative.execution is deprecated. Instead, use mapreduce.reduce.speculative
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.map.tasks.speculative.execution is deprecated. Instead, use mapreduce.map.speculative
-22/11/15 08:05:51 INFO Configuration.deprecation: mapred.map.tasks is deprecated. Instead, use mapreduce.job.maps
-22/11/15 08:05:51 INFO client.RMProxy: Connecting to ResourceManager at master/192.168.56.101:8032
-22/11/15 08:05:53 INFO input.FileInputFormat: Total input paths to process : 1
-22/11/15 08:05:53 INFO input.FileInputFormat: Total input paths to process : 1
-22/11/15 08:05:53 INFO mapreduce.JobSubmitter: number of splits:1
-22/11/15 08:05:53 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1668514459196_0002
-22/11/15 08:05:53 INFO impl.YarnClientImpl: Submitted application application_1668514459196_0002
-22/11/15 08:05:53 INFO mapreduce.Job: The url to track the job: http://master:8088/proxy/application_1668514459196_0002/
-22/11/15 08:05:53 INFO mapreduce.Job: Running job: job_1668514459196_0002
-22/11/15 08:05:57 INFO mapreduce.Job: Job job_1668514459196_0002 running in uber mode : false
-22/11/15 08:05:57 INFO mapreduce.Job:  map 0% reduce 0%
-22/11/15 08:06:01 INFO mapreduce.Job:  map 100% reduce 0%
-22/11/15 08:06:02 INFO mapreduce.Job: Job job_1668514459196_0002 completed successfully
-22/11/15 08:06:02 INFO mapreduce.Job: Counters: 30
+22/11/16 21:11:52 INFO orm.CompilationManager: Writing jar file: /tmp/sqoop-root/compile/88fbe0f910ce613250687e9188cf2240/test_from_hdfs.jar
+22/11/16 21:11:52 INFO mapreduce.ExportJobBase: Beginning export of test_from_hdfs
+22/11/16 21:11:52 INFO Configuration.deprecation: mapred.jar is deprecated. Instead, use mapreduce.job.jar
+22/11/16 21:11:52 INFO Configuration.deprecation: mapred.reduce.tasks.speculative.execution is deprecated. Instead, use mapreduce.reduce.speculative
+22/11/16 21:11:52 INFO Configuration.deprecation: mapred.map.tasks.speculative.execution is deprecated. Instead, use mapreduce.map.speculative
+22/11/16 21:11:52 INFO Configuration.deprecation: mapred.map.tasks is deprecated. Instead, use mapreduce.job.maps
+22/11/16 21:11:52 INFO client.RMProxy: Connecting to ResourceManager at master/192.168.56.101:8032
+22/11/16 21:11:54 INFO input.FileInputFormat: Total input paths to process : 1
+22/11/16 21:11:54 INFO input.FileInputFormat: Total input paths to process : 1
+22/11/16 21:11:54 INFO mapreduce.JobSubmitter: number of splits:1
+22/11/16 21:11:54 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1668650823029_0001
+22/11/16 21:11:55 INFO impl.YarnClientImpl: Submitted application application_1668650823029_0001
+22/11/16 21:11:55 INFO mapreduce.Job: The url to track the job: http://master:8088/proxy/application_1668650823029_0001/
+22/11/16 21:11:55 INFO mapreduce.Job: Running job: job_1668650823029_0001
+22/11/16 21:12:01 INFO mapreduce.Job: Job job_1668650823029_0001 running in uber mode : false
+22/11/16 21:12:01 INFO mapreduce.Job:  map 0% reduce 0%
+22/11/16 21:12:06 INFO mapreduce.Job:  map 100% reduce 0%
+22/11/16 21:12:07 INFO mapreduce.Job: Job job_1668650823029_0001 completed successfully
+22/11/16 21:12:07 INFO mapreduce.Job: Counters: 30
         File System Counters
                 FILE: Number of bytes read=0
-                FILE: Number of bytes written=113330
+                FILE: Number of bytes written=113325
                 FILE: Number of read operations=0
                 FILE: Number of large read operations=0
                 FILE: Number of write operations=0
@@ -355,11 +379,11 @@ Note: Recompile with -Xlint:deprecation for details.
         Job Counters
                 Launched map tasks=1
                 Data-local map tasks=1
-                Total time spent by all maps in occupied slots (ms)=2100
+                Total time spent by all maps in occupied slots (ms)=3062
                 Total time spent by all reduces in occupied slots (ms)=0
-                Total time spent by all map tasks (ms)=2100
-                Total vcore-seconds taken by all map tasks=2100
-                Total megabyte-seconds taken by all map tasks=2150400
+                Total time spent by all map tasks (ms)=3062
+                Total vcore-seconds taken by all map tasks=3062
+                Total megabyte-seconds taken by all map tasks=3135488
         Map-Reduce Framework
                 Map input records=4
                 Map output records=4
@@ -367,18 +391,18 @@ Note: Recompile with -Xlint:deprecation for details.
                 Spilled Records=0
                 Failed Shuffles=0
                 Merged Map outputs=0
-                GC time elapsed (ms)=67
-                CPU time spent (ms)=440
-                Physical memory (bytes) snapshot=167534592
-                Virtual memory (bytes) snapshot=2097709056
-                Total committed heap usage (bytes)=84934656
+                GC time elapsed (ms)=69
+                CPU time spent (ms)=480
+                Physical memory (bytes) snapshot=166281216
+                Virtual memory (bytes) snapshot=2098913280
+                Total committed heap usage (bytes)=85983232
         File Input Format Counters
                 Bytes Read=0
         File Output Format Counters
                 Bytes Written=0
-22/11/15 08:06:02 INFO mapreduce.ExportJobBase: Transferred 152 bytes in 10.8975 seconds (13.9481 bytes/sec)
-22/11/15 08:06:02 INFO mapreduce.ExportJobBase: Exported 4 records.
-[root@master apps]#
+22/11/16 21:12:07 INFO mapreduce.ExportJobBase: Transferred 152 bytes in 14.6849 seconds (10.3508 bytes/sec)
+22/11/16 21:12:07 INFO mapreduce.ExportJobBase: Exported 4 records.
+[root@master ~]#
 ```
 
 来查看下我们前面创建的 test_from_hdfs 表：
@@ -447,6 +471,9 @@ pid-file=/var/run/mysqld/mysqld.pid
 ``` shell
 systemctl restart mysqld.service
 ```
+
+删除先前从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第十步操作即可。
+![正常的输出](./images/10_2.png)
 
 ---
 
