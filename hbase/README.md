@@ -48,12 +48,12 @@ source ~/.bashrc
 
 ## 3.修改配置文件
 进入配置文件目录：
-```shell
+``` shell
 cd /opt/apps/hbase/conf/
 ```
 
-修改hbase-env.sh：
-```shell
+修改 hbase-env.sh：
+``` shell
 vi hbase-env.sh
 ```
 
@@ -70,20 +70,20 @@ vi hbase-env.sh
 ```
 
 注释以下配置：
->目前使用 jdk 版本为 jdk1.8，无须配置此项，故注释（不注释会出错）
-```shell
+> 目前使用 jdk 版本为 jdk1.8，无须配置此项，故注释（不注释会出错）
+``` shell
 # Configure PermSize. Only needed in JDK7. You can safely remove it for JDK8+
 #export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -XX:PermSize=128m -XX:MaxPermSize=128m"
 #export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -XX:PermSize=128m -XX:MaxPermSize=128m"
 ```
 
-配置hbase-site.xml：
-```shell
+配置 hbase-site.xml：
+``` shell
 vi hbase-site.xml
 ```
 
 配置如下：
-```xml
+``` xml
 <!-- hbase 的数据保存在 hdfs 对应目录下 -->
 <property>
 	<name>hbase.rootdir</name>
@@ -116,13 +116,13 @@ vi hbase-site.xml
 </property>
 ```
 
-修改配置文件(master节点)：
-```shell
+修改配置文件（master 节点）：
+``` shell
 vi regionservers
 ```
 
 将内容改为：
-```shell
+``` shell
 slave1
 slave2
 ```
@@ -132,7 +132,7 @@ slave2
 
 ## 4.分发文件
 分发文件到 slave1、slave2 ：
-```shell
+``` shell
 scp -r /opt/apps/hbase slave1:/opt/apps/
 scp -r /opt/apps/hbase slave2:/opt/apps/
 ```
@@ -140,8 +140,7 @@ scp -r /opt/apps/hbase slave2:/opt/apps/
 修改 slave1、slave2 下 regionservers 文件：
 > 分别在 slave1、slave2 节点执行此步骤  
 > 附属节点的 regionservers 文件需要包含 master 节点
-
-```shell
+``` shell
 echo "master" >> /opt/apps/hbase/conf/regionservers
 ```
 ![img.png](images/4_1.png)
@@ -150,12 +149,12 @@ echo "master" >> /opt/apps/hbase/conf/regionservers
 
 ## 5.启动测试
 master 节点上启动：
-```shell
+``` shell
 start-hbase.sh
 ```
 
 检查进程（三个节点）：
-```shell
+``` shell
 jps
 ```
 
@@ -167,7 +166,7 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ## 6.Hbase shell
 进入 hbase 命令行：
 > 确保您已经启动了 hadoop 和 zookeeper
-```shell
+``` shell
 hbase shell
 ```
 
@@ -208,7 +207,7 @@ hbase shell
 使用 RowKey 的前缀进行搜索|`scan '表名', FILTER=>"PrefixFilter('前缀')"`
 
 退出 hbase 命令行:
-```shell
+``` shell
 exit
 ```
 
