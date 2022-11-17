@@ -188,17 +188,16 @@ hdfs dfs -rm -r /user/root/test
 
 再次导入：
 ``` shell
-# master 节点的内网 IP 是 192.168.56.101
 sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
 ```
 ![更换 ip](./images/8_2.png)
 
 超详细的终端输出信息：（选择性查看）
-```
-[root@master ~]# hdfs dfs -rm -r /user/root/test
+``` diff
++ [root@master ~]# hdfs dfs -rm -r /user/root/test
 22/11/15 04:49:30 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
 Deleted /user/root/test
-[root@master ~]# ip a
++ [root@master ~]# ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -215,7 +214,7 @@ Deleted /user/root/test
        valid_lft forever preferred_lft forever
     inet6 fe80::ea0f:cee1:31ba:ed17/64 scope link noprefixroute
        valid_lft forever preferred_lft forever
-[root@master ~]# sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
++ [root@master ~]# sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
 Warning: /usr/lib/hbase does not exist! HBase imports will fail.
 Please set $HBASE_HOME to the root of your HBase installation.
 Enter password:
@@ -302,7 +301,6 @@ CREATE TABLE `test_from_hdfs` (
   `age` INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
-![创建表](./images/9_1.png)
 
 导入数据：
 ``` shell
@@ -486,4 +484,4 @@ SHOW VARIABLES LIKE 'character%';
 
 ## 快速跳转
 [回到顶部](#top)  
-[HBASE 部署文档](../kafaka/README.md)
+[Hbase 部署文档](../hbase/README.md)
