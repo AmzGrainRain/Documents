@@ -6,14 +6,15 @@
 
 ---
 
-## 1.假设
+## 假设
 第一台服务器的IP: 192.168.56.101（主机名 master）  
 第二台服务器的IP: 192.168.56.102（主机名 slave1）   
 第三台服务器的IP: 192.168.56.103（主机名 slave2）
 
 ---
 
-## 2.解压 zookeeper
+## 1.解压 zookeeper
+> 以下内容均在 master 节点上操作
 ``` shell
 # 进入 /opt/apps 目录
 cd /opt/apps/
@@ -27,7 +28,9 @@ mv ./zookeeper-3.4.5 ./zookeeper
 
 ---
 
-## 3.配置 zookeeper
+## 2.配置 zookeeper
+> 以下内容均在 master 节点上操作
+
 创建 data 目录用于存储数据：
 ``` shell
 mkdir /opt/apps/zookeeper/data
@@ -88,7 +91,9 @@ clientPort=2181
 
 ---
 
-## 4.配置环境变量
+## 3.配置环境变量
+> 以下内容均在 master 节点上操作
+
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -126,6 +131,8 @@ zkServer.sh
 ---
 
 ## 5.分发文件
+> 以下内容均在 master 节点上操作
+
 下发 zookeeper：
 ``` shell
 scp -r /opt/apps/zookeeper slave1:/opt/apps/
@@ -138,14 +145,25 @@ scp ~/.bashrc slave1:~/.bashrc
 scp ~/.bashrc slave2:~/.bashrc
 ```
 
-在 slave1 和 slave2 节点上执行此命令刷新环境变量：
+## 6.生效环境变量：
+> 以下内容均在 master 节点上操作
+
 ``` shell
+# 生效本机的环境变量
 source ~/.bashrc
+
+# 生效 slave1 的环境变量
+ssh slave1 "source ~/.bashrc"
+
+# 生效 slave2 的环境变量
+ssh slave2 "source ~/.bashrc"
 ```
 
 ---
 
 ## 6.配置 myid
+> 以下内容均在 master 节点上操作
+
 每台服务器的 myid 对应着 [zoo.cfg](#zoo-cfg) 最下方的数字：
 ``` shell
 # master 节点的 myid 必须是 1
@@ -156,34 +174,43 @@ server.2=slave1:2888:3888
 server.3=slave2:2888:3888
 ```
 
-在 master 节点上设置 myid：
+设置 master 节点的 myid：
 ``` shell
 echo 1 > /opt/apps/zookeeper/data/myid
 ```
 
-在 slave1 节点上设置 myid：
+设置 slave1 节点的 myid：
 ``` shell
-echo 2 > /opt/apps/zookeeper/data/myid
+ssh slave1 "echo 2 > /opt/apps/zookeeper/data/myid"
 ```
 
-在 slave2 节点上设置 myid：
+设置 slave2 节点的 myid：
 ``` shell
-echo 3 > /opt/apps/zookeeper/data/myid
+ssh slave2 "echo 3 > /opt/apps/zookeeper/data/myid"
 ```
 
 ---
 
 ## 7.启动与测试
+> 以下内容均在 master 节点上操作
+
 在所有节点上执行此命令启动 zookeeper：
 ``` shell
 # zkServer.sh 支持下列参数：
 # start | start-foreground | stop | restart | status | upgrade | print-cmd
+
+# 启动 master 节点上的 zookeeper ：
 zkServer.sh start
+
+# 启动 slave1 节点上的 zookeeper ：
+ssh slave1 "zkServer.sh start"
+
+# 启动 slave2 节点上的 zookeeper ：
+ssh slave2 "zkServer.sh start"
 ```
 
-打开所有节点的 zookeeper cli：
+打开 master 节点的 zookeeper cli：
 ``` shell
-# 记得按几下回车
 zkCli.sh
 ```
 
@@ -193,11 +220,21 @@ create /test "hello"
 ```
 ![master zookeeper cli](./images/8_1.png)
 
+打开 slave1 节点的 zookeeper cli：
+``` shell
+zkCli.sh
+```
+
 在 slave1 节点的 zookeeper cli 执行此命令：
 ``` shell
 get /test
 ```
 ![master zookeeper cli](./images/8_2.png)
+
+打开 slave2 节点的 zookeeper cli：
+``` shell
+zkCli.sh
+```
 
 在 slave2 节点的 zookeeper cli 执行此命令：
 ``` shell

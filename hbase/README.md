@@ -10,6 +10,8 @@
 ---
 
 ## 1.解压
+> 以下内容均在 master 节点上操作
+
 进入 /opt/app/ 目录内：
 ``` shell
 cd /opt/apps
@@ -28,6 +30,8 @@ mv ./hbase-1.2.0 ./hbase
 ---
 
 ## 2.配置环境变量
+> 以下内容均在 master 节点上操作
+
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -39,14 +43,18 @@ export HBASE_HOME=/opt/apps/hbase
 export PATH=$PATH:$HBASE_HOME/bin
 ```
 
-生效环境变量：
+## 3.生效环境变量
+> 以下内容均在 master 节点上操作
+
 ``` shell
 source ~/.bashrc
 ```
 
 ---
 
-## 3.修改配置文件
+## 4.修改配置文件
+> 以下内容均在 master 节点上操作
+
 进入配置文件目录：
 ``` shell
 cd /opt/apps/hbase/conf/
@@ -130,7 +138,9 @@ slave2
 
 ---
 
-## 4.分发文件
+## 5.分发文件
+> 以下内容均在 master 节点上操作
+
 分发文件到 slave1、slave2 ：
 ``` shell
 scp -r /opt/apps/hbase slave1:/opt/apps/
@@ -138,16 +148,18 @@ scp -r /opt/apps/hbase slave2:/opt/apps/
 ```
 
 修改 slave1、slave2 下 regionservers 文件：
-> 分别在 slave1、slave2 节点执行此步骤  
 > 附属节点的 regionservers 文件需要包含 master 节点
 ``` shell
-echo "master" >> /opt/apps/hbase/conf/regionservers
+ssh slave1 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
+ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ```
 ![img.png](images/4_1.png)
 
 ---
 
-## 5.启动测试
+## 6.启动测试
+> 以下内容均在 master 节点上操作
+
 master 节点上启动：
 ``` shell
 start-hbase.sh
@@ -164,6 +176,8 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ---
 
 ## 6.Hbase shell
+> 以下内容均在 master 节点上操作
+
 进入 hbase 命令行：
 > 确保您已经启动了 hadoop 和 zookeeper
 ``` shell
@@ -215,4 +229,4 @@ exit
 
 ## 快速跳转
 [回到顶部](#top)  
-[KAFAKA 部署文档](../kafaka/README.md)
+[SCALA & SPARK 部署文档](../scala&spark/README.md)

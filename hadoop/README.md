@@ -1,6 +1,6 @@
 # HADOOP 搭建文档<span id="top">HADOOP 搭建文档</span>
 
-## 1.前提条件
+## 前提条件
 - CentOS-7-x86_64-Minimal-2009.iso
 - jdk-8u191-linux-x64.tar.gz（位于 /opt/tar/）
 - hadoop-2.6.0.tar.gz（位于 /opt/tar/）
@@ -8,14 +8,14 @@
 
 ---
 
-## 2.假设
+## 假设
 第一台服务器的IP: 192.168.56.101  
 第二台服务器的IP: 192.168.56.102   
 第三台服务器的IP: 192.168.56.103
 
 ---
 
-## 3.修改主机名
+## 1.修改主机名
 修改主机名主要是为了在集群中分辨主次  
 
 在第一台服务器上操作：
@@ -41,7 +41,7 @@ hostnamectl set-hostname slave2
 
 ---
 
-## 4.修改 hosts 规则
+## 2.修改 hosts 规则
 > 以下内容均在 master 节点上操作  
 > hosts 有什么作用请自行百度
 
@@ -56,7 +56,7 @@ vi /etc/hosts
 
 ---
 
-## 5.同步 hosts 规则
+## 3.同步 hosts 规则
 > 以下内容均在 master 节点上操作
 
 通过 scp 命令将 master 节点上已经修改过的 hosts 文件发送到 slave1 和 slave2：
@@ -66,7 +66,7 @@ scp /etc/hosts slave1:/etc/hosts
 scp /etc/hosts slave1:/etc/hosts
 ```
 
-## 6.关闭防火墙
+## 4.关闭防火墙
 > 以下内容须在所有节点上操作操作一次
 
 systemctl 用于控制服务，使用 systemctl 关闭防火墙：
@@ -88,7 +88,7 @@ systemctl status firewalld.service
 
 ---
 
-## 7.配置 SSH 免密登录
+## 5.配置 SSH 免密登录
 > 以下内容均在 master 节点上操作
 
 生成一个 RSA 密钥，一直回车即可。
@@ -114,7 +114,7 @@ ssh-copy-id slave2
 
 ---
 
-## 8.Hadoop 集群部署
+## 6.Hadoop 集群部署
 > 以下内容均在 master 节点上操作
 ``` shell
 # 切换到 opt 目录
@@ -134,7 +134,8 @@ mv ./hadoop-2.6.0 ./apps/hadoop
 mv ./jdk1.8.0_191 ./apps/jdk
 ```
 
-### 配置环境变量
+## 7.配置环境变量
+> 以下内容均在 master 节点上操作
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -167,7 +168,8 @@ whereis hdfs
 
 ---
 
-## 9.Hadoop 集群配置
+## 8.Hadoop 集群配置
+> 以下内容均在 master 节点上操作
 进入到 hadoop 配置文件的目录下：
 ``` shell
 cd /opt/apps/hadoop/etc/hadoop/
@@ -324,7 +326,7 @@ slave2
 
 ---
 
-## 10.从主节点分发文件
+## 9.从主节点分发文件
 > 以下内容均在 master 节点上操作
 
 下发 apps 目录到 slave1 和 slave2 节点：
@@ -333,15 +335,23 @@ scp -r /opt/apps slave1:/opt/
 scp -r /opt/apps slave2:/opt/
 ```
 
-下发环境变量配置文件到 slave1 和 slave2 节点：
+下发环境变量文件到 slave1 和 slave2 节点：
 ``` shell
 scp ~/.bashrc slave1:~/.bashrc
 scp ~/.bashrc slave2:~/.bashrc
 ```
 
-在所有节点上执行这个命令：
+## 10.生效环境变量：
+> 以下内容均在 master 节点上操作
 ``` shell
+# 生效本机的环境变量
 source ~/.bashrc
+
+# 生效 slave1 的环境变量
+ssh slave1 "source ~/.bashrc"
+
+# 生效 slave2 的环境变量
+ssh slave2 "source ~/.bashrc"
 ```
 
 ## 11.启动 Hadoop 集群
@@ -373,6 +383,8 @@ start-dfs.sh && start-yarn.sh
 ---
 
 ## 12.检查启动情况
+> 以下内容均在 master 节点上操作
+
 检查 hadoop ：
 ``` shell
 jps
@@ -399,6 +411,8 @@ jps
 
 
 ## 13.测试 Hadoop
+> 以下内容均在 master 节点上操作
+
 关闭安全模式：
 ``` shell
 hdfs dfsadmin -safemode leave
