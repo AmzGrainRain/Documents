@@ -7,6 +7,7 @@
 [hive 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/hive/README.md)  
 [hbase 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/hbase/README.md)  
 [scala & spark 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/scala&spark/README.md)  
+[flume 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/flume/README.md)  
 
 ## 一键直达（码云）
 [hadoop 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hadoop/README.md)  
@@ -15,3 +16,4 @@
 [hive 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hive/README.md)  
 [hbase 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hbase/README.md)  
 [scala & spark 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/scala&spark/README.md)  
+[flume 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/flume/README.md)  
