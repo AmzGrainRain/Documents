@@ -187,7 +187,7 @@ mkdir ~/flume_test_hdfs
 vi /opt/apps/flume/agent/test_hdfs.conf
 ```
 
-test.conf 的内容是这样的：
+test_hdfs.conf 的内容是这样的：
 > 大坑：自定义 Agent 名称不能有下划线
 ``` conf
 # 其中 test_hdfs 为任务名
@@ -225,7 +225,7 @@ test_hdfs.sinks.testHDFSSink.hdfs.rollCount = 0
 test_hdfs.sinks.testHDFSSink.hdfs.rollSize = 134217728
 
 # 每隔 60 秒生成一个新的 hdfs 文件
-agent2.sinks.sink2.hdfs.rollInterval = 60
+test_hdfs.sinks.sink2.hdfs.rollInterval = 60
 ```
 
 启动 flume agent :
