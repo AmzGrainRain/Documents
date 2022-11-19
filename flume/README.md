@@ -77,7 +77,7 @@ flume-ng version
 
 进入配置文件目录：
 ``` shell
-cd /opt/apps/flume/conf/
+cd /opt/apps/flume/conf
 ```
 
 使用预置模板：
@@ -253,4 +253,4 @@ ls ~/flume_test
 
 ## 快速跳转
 [回到顶部](#top)  
-[FLINK 部署文档](../flink/README.md)
+[KAFKA 部署文档](../kafka/README.md)
