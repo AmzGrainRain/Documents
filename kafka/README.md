@@ -175,7 +175,7 @@ kafka-server-start.sh -daemon /opt/apps/kafka/config/server.properties &
 ## 9.测试
 新建一个名为 test 的 Topic ：
 ``` shell
-kafka-topics.sh --create --zookeeper master:2181 --topic test --partitions 2 --replication-factor 1
+kafka-topics.sh --create --zookeeper master:2181 --partitions 2 --replication-factor 1 --topic test
 ```
 ![新建Topic](./images/9_1.png)
 
@@ -189,14 +189,14 @@ kafka-topics.sh --list --zookeeper master:2181
 > 在 master 节点上执行
 ``` shell
 # 生产者发送消息
-kafka-console-producer.sh --broker-list master:9092 --topic yc
+kafka-console-producer.sh --broker-list master:9092 --topic test
 ```
 
 接收消息：
 > 在 master 以外的任意节点上执行：
 ``` shell
 # --from-beginning 同步历史消息
-kafka-console-consumer.sh --bootstrap-server master:9092 --topic yc --from-beginning
+kafka-console-consumer.sh --bootstrap-server master:9092 --topic test --from-beginning
 ```
 
 在生产者终端输入一些内容按下回车，就会发现消费者终端已经接收到了来自生产者的消息（其中 asd 消息是之前发送过的历史消息，因为我们加了 --from-beginning 参数，所以也被同步回来了）：

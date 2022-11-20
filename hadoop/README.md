@@ -15,6 +15,38 @@
 
 ---
 
+## 介绍
+Hadoop 是一个由 Apache 基金会所开发的分布式系统基础架构。广义上来说，Hadoop 通常是指一个更广泛的概念——Hadoop 生态圈。
+### HDFS
+HDFS 是一个分布式文件系统。
+#### NameNode
+存储文件的元数据，如文件名，文件目录结构，文件属性（生成时间、副本数、文件权限），以及每个文件的块列表和块所在的 DataNode 等。
+#### DataNode
+在本地文件系统存储文件块数据，以及块数据的校验和。
+#### Secondary NameNode
+每隔一段时间对 NameNode 元数据备份。并非 NameNode 的热备。当 NameNode 挂掉的时候，它并不能马上替换 NameNode 并提供服务。
+### YARN
+YARN 是一种资源协调者，是 Hadoop 的资源管理器。
+#### ResourceManager
+整个集群资源（内存、CPU等）的老大。
+#### ApplicationMaster
+单个任务运行的老大。
+#### NodeManager
+单个节点服务器资源老大。
+#### Container
+容器，相当一台独立的服务器，里面封装了任务运行所需要的资源，如内存、CPU、磁盘、网络等。
+### HDFS、Yarn、MapReduce 三者的关系图
+![关系图](./images/overview_1.png)
+### MapReduce
+![MapReduce](./images/overview_2.png)
+
+---
+
+## 大数据技术生态体系图
+![System](./images/overview_3.png)
+
+---
+
 ## 1.修改主机名
 修改主机名主要是为了在集群中分辨主次  
 
