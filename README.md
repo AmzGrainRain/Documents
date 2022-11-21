@@ -12,7 +12,7 @@
 
 ## 一键直达（码云）
 [hadoop 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hadoop/README.md)  
-[zookeeper 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/pzookeeper/README.md)  
+[zookeeper 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/zookeeper/README.md)  
 [mysql 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/mysql/README.md)  
 [hive 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hive/README.md)  
 [hbase 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hbase/README.md)  
