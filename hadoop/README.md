@@ -1,4 +1,4 @@
-# HADOOP 搭建文档<span id="top">HADOOP 搭建文档</span>
+# <span id="top">HADOOP 搭建文档</span>
 
 ## 前提条件
 - CentOS-7-x86_64-Minimal-2009.iso
