@@ -157,7 +157,7 @@ ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ---
 
 ## 5.生效环境变量
-> 以下内容在 master 节点上操作
+> 以下内容在所有节点上操作
 ``` shell
 source ~/.bashrc
 ```
