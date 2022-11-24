@@ -180,7 +180,7 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 
 ---
 
-## 6.Hbase shell
+## 7.Hbase shell
 > 以下内容在 master 节点上操作
 
 进入 hbase 命令行：
