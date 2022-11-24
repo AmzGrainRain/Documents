@@ -4,10 +4,13 @@
 - hadoop 集群已经启动
 - scala-2.11.8.tgz（位于/opt/tar下）
 - spark-2.0.0-bin-hadoop2.6.tgz（位于/opt/tar下）
+- 分布式搭建
 
 ---
 
 ## 1.解压
+> 以下内容在 master 节点上操作
+
 进入 /opt/app/ 目录内：
 ``` shell
 cd /opt/apps
@@ -28,6 +31,8 @@ mv ./spark-2.0.0-bin-hadoop2.6 ./spark
 ---
 
 ## 2.配置环境变量
+> 以下内容在 master 节点上操作
+
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -40,14 +45,11 @@ export SCALA_HOME=/opt/apps/scala
 export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin:$SCALA_HOME/bin
 ```
 
-生效环境变量：
-``` shell
-source ~/.bashrc
-```
-
 ---
 
 ## 3.配置 spark-env.sh
+> 以下内容在 master 节点上操作
+
 进入配置目录：
 ``` shell
 cd /opt/apps/spark/conf
@@ -81,6 +83,8 @@ export SPARK_WORKER_PORT=7078
 ---
 
 ## 4.配置 slaves
+> 以下内容在 master 节点上操作
+
 使用预置模板：
 ``` shell
 cp ./slaves.template ./slaves
@@ -101,6 +105,8 @@ slave2
 ---
 
 ## 5.分发文件
+> 以下内容在 master 节点上操作
+
 分发 scala 到 slave1、slave2 ：
 ``` shell
 scp -r /opt/apps/scala slave1:/opt/apps/
@@ -122,20 +128,16 @@ scp ~/.bashrc slave2:~/
 ---
 
 ## 6.生效环境变量
+> 以下内容在所有节点上操作
 ``` shell
-# 生效本机的环境变量
 source ~/.bashrc
-
-# 生效 slave1 的环境变量
-ssh slave1 "source ~/.bashrc"
-
-# 生效 slave2 的环境变量
-ssh slave2 "source ~/.bashrc"
 ```
 
 ---
 
 ## 7.启动与测试
+> 以下内容在 master 节点上操作
+
 由于环境变量所映射的目录内存在同名文件，所以我们需要进入目录去执行脚本来启动某些服务。
 
 启动 spark ：

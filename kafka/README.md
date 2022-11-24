@@ -4,6 +4,7 @@
 - hadoop 集群已经启动
 - zookeeper 已经启动
 - kafka_2.11-1.0.0.tgz（位于/opt/tar下）
+- 分布式搭建
 
 ---
 
@@ -34,7 +35,7 @@ KAFKA 工作在此模式下，发布者发送到 Topic 的消息，只有订阅�
 ---
 
 ## 1.解压
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
 ``` shell
@@ -54,7 +55,7 @@ mv ./kafka_2.11-1.0.0 ./kafka
 ---
 
 ## 2.配置环境变量
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
@@ -68,8 +69,7 @@ export PATH=$PATH:$KAFKA_HOME/bin
 ```
 
 ## 3.生效环境变量
-> 以下内容均在 master 节点上操作
-
+> 以下内容在 master 节点上操作
 ``` shell
 source ~/.bashrc
 ```
@@ -77,7 +77,7 @@ source ~/.bashrc
 ---
 
 ## 4.修改配置文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 进入配置文件目录：
 ``` shell
@@ -106,7 +106,7 @@ zookeeper.connect=master:2181,slave1:2181,slave2:2181
 ---
 
 ## 5.分发文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 下发 kafka 目录到 slave1 和 slave2 节点：
 ``` shell
@@ -122,7 +122,7 @@ scp ~/.bashrc slave2:~/.bashrc
 ---
 
 ## 6.生效环境变量：
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 ``` shell
 # 生效本机的环境变量
 source ~/.bashrc

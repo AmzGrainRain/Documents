@@ -3,6 +3,7 @@
 ## 前提条件
 - hadoop 集群已经启动
 - apache-flume-1.6.0-bin.tar.gz（位于/opt/tar下）
+- 非分布式搭建
 
 ---
 
@@ -24,8 +25,6 @@ Source 可以搭配多个 Channel；但一个 Sink 只能搭配一个 Channel。
 ---
 
 ## 1.解压
-> 以下内容均在 master 节点上操作
-
 进入 /opt/app/ 目录内：
 ``` shell
 cd /opt/apps
@@ -44,8 +43,6 @@ mv ./apache-flume-1.6.0-bin ./flume
 ---
 
 ## 2.配置环境变量
-> 以下内容均在 master 节点上操作
-
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -58,8 +55,6 @@ export PATH=$PATH:$FLUME_HOME/bin
 ```
 
 ## 3.生效环境变量
-> 以下内容均在 master 节点上操作
-
 ``` shell
 source ~/.bashrc
 ```
@@ -73,8 +68,6 @@ flume-ng version
 ---
 
 ## 4.修改配置文件
-> 以下内容均在 master 节点上操作
-
 进入配置文件目录：
 ``` shell
 cd /opt/apps/flume/conf
@@ -98,8 +91,6 @@ export JAVA_HOME=/opt/apps/jdk
 ---
 
 ## 5.本地测试
-> 以下内容均在 master 节点上操作
-
 目的：监控指定目录，当目录有新的日志产生时，把日志一行行打印到控制台。
 
 创建用于测试的目录：
@@ -173,8 +164,6 @@ ls ~/flume_test
 ---
 
 ## 6.hdfs 测试
-> 以下内容均在 master 节点上操作
-
 目的：监控指定目录，当目录有新的日志产生时，把日志保存到 hdfs。
 
 创建用于测试的目录：

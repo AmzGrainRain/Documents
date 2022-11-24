@@ -6,12 +6,11 @@
 - hive 已部署完毕
 - mysql-connector-java-5.1.32.jar（位于/opt/tar下）
 - sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz（位于/opt/tar下）
+- 非分布式搭建
 
 ---
 
 ## 1.解压
-> 以下内容均在 master 节点上操作
-
 进入 /opt/app/ 目录内：
 ``` shell
 cd /opt/apps
@@ -30,8 +29,6 @@ mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
 ---
 
 ## 2.放入 MySQL 驱动包：
-> 以下内容均在 master 节点上操作
-
 因为我们要通过 sqoop 操作 mysql，所以需要将java 连接 mysql 需要用到的驱动复制到 sqoop/lib 下：
 ``` shell
 cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/sqoop/lib/
@@ -40,8 +37,6 @@ cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/sqoop/lib/
 ---
 
 ## 3.配置环境变量
-> 以下内容均在 master 节点上操作
-
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -54,8 +49,6 @@ export PATH=$PATH:$SQOOP_HOME/bin
 ```
 
 ## 4.生效环境变量
-> 以下内容均在 master 节点上操作
-
 ``` shell
 source ~/.bashrc
 ```
@@ -63,8 +56,6 @@ source ~/.bashrc
 ---
 
 ## 5.验证安装
-> 以下内容均在 master 节点上操作
-
 执行这条指令：
 ``` shell
 sqoop version
@@ -74,8 +65,6 @@ sqoop version
 ---
 
 ## 6.使用 sqoop 前的准备工作
-> 以下内容均在 master 节点上操作
-
 修改 mysql 的配置文件：
 ``` shell
 vi /etc/my.cnf
@@ -137,8 +126,6 @@ INSERT INTO test VALUES ("张三", 20), ("李四", 24), ("王五", 22), ("王五
 ---
 
 ## 7.sqoop 指令菜单
-> 以下内容均在 master 节点上操作
-
 查看 sqoop 指令帮助：
 ``` shell
 sqoop help
@@ -164,8 +151,6 @@ version|打印 sqoop 版本信息
 ---
 
 ## 8.测试 sqoop 连接 mysql
-> 以下内容均在 master 节点上操作
-
 使用 sqoop 打印 mysql 内所有数据库名：
 > 通过 `sqoop help list-databases` 命令打印帮助信息。
 ``` shell
@@ -183,7 +168,6 @@ sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username ro
 ---
 
 ## 9.导入 mysql 数据表到 hdfs
-> 以下内容均在 master 节点上操作
 > 通过 `sqoop help import` 命令打印帮助信息。
 ``` shell
 sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
@@ -227,8 +211,6 @@ hdfs dfs -cat /user/root/test/part-m-00000
 ---
 
 ## 10.导入 hdfs 数据表到 mysql
-> 以下内容均在 master 节点上操作
-
 进入 mysql 创建一个表：
 ``` sql
 CREATE TABLE `test_from_hdfs` (
@@ -345,8 +327,6 @@ Note: Recompile with -Xlint:deprecation for details.
 ---
 
 ## 11.解决从 hdfs 导入到 mysql 中的数据中，中文变问号的问题
-> 以下内容均在 master 节点上操作
-
 进入 mysql ：
 ``` shell
 mysql -u root -p

@@ -5,6 +5,7 @@
 - jdk-8u191-linux-x64.tar.gz（位于 /opt/tar/）
 - hadoop-2.6.0.tar.gz（位于 /opt/tar/）
 - 三台互通的虚拟机
+- 分布式搭建
 
 ---
 
@@ -74,7 +75,7 @@ hostnamectl set-hostname slave2
 ---
 
 ## 2.修改 hosts 规则
-> 以下内容均在 master 节点上操作  
+> 以下内容在 master 节点上操作  
 > hosts 有什么作用请自行百度
 
 通过 vi 修改 /etc/hosts 文件:
@@ -89,7 +90,7 @@ vi /etc/hosts
 ---
 
 ## 3.同步 hosts 规则
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 通过 scp 命令将 master 节点上已经修改过的 hosts 文件发送到 slave1 和 slave2：
 ``` shell
@@ -99,7 +100,7 @@ scp /etc/hosts slave1:/etc/hosts
 ```
 
 ## 4.关闭防火墙
-> 以下内容须在所有节点上操作操作一次
+> 以下内容在所有节点上操作一次
 
 systemctl 用于控制服务，使用 systemctl 关闭防火墙：
 ``` shell
@@ -121,7 +122,7 @@ systemctl status firewalld.service
 ---
 
 ## 5.配置 SSH 免密登录
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 生成一个 RSA 密钥，一直回车即可。
 ``` shell
@@ -147,7 +148,7 @@ ssh-copy-id slave2
 ---
 
 ## 6.Hadoop 集群部署
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 ``` shell
 # 切换到 opt 目录
 cd /opt
@@ -167,7 +168,7 @@ mv ./jdk1.8.0_191 ./jdk
 ```
 
 ## 7.配置环境变量
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
@@ -202,7 +203,7 @@ whereis hdfs
 ---
 
 ## 8.Hadoop 集群配置
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 进入到 hadoop 配置文件的目录下：
 ``` shell
 cd /opt/apps/hadoop/etc/hadoop/
@@ -359,7 +360,7 @@ slave2
 ---
 
 ## 9.分发文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 下发 apps 目录到 slave1 和 slave2 节点：
 ``` shell
@@ -374,20 +375,13 @@ scp ~/.bashrc slave2:~/.bashrc
 ```
 
 ## 10.生效环境变量：
-> 以下内容均在 master 节点上操作
+> 以下内容在所有节点上操作
 ``` shell
-# 生效本机的环境变量
 source ~/.bashrc
-
-# 生效 slave1 的环境变量
-ssh slave1 "source ~/.bashrc"
-
-# 生效 slave2 的环境变量
-ssh slave2 "source ~/.bashrc"
 ```
 
 ## 11.启动 Hadoop 集群
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 格式化元数据：（切记，千万不要多次执行此命令）
 ``` shell
@@ -419,7 +413,7 @@ hdfs dfsadmin -safemode leave
 ---
 
 ## 12.检查启动情况
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 检查 hadoop ：
 ``` shell
@@ -447,7 +441,7 @@ jps
 
 
 ## 13.测试 Hadoop
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 来一波计算测试：
 ``` shell

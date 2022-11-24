@@ -5,12 +5,11 @@
 - mysql 已部署完毕
 - apache-hive-2.3.4-bin.tar.gz（位于/opt/tar下）
 - mysql-connector-java-5.1.32.jar（位于/opt/tar下）
+- 非分布式搭建
 
 ---
 
 ## 1.解压 hive
-> 以下内容均在 master 节点上操作
-
 ``` shell
 # 进入 /opt/apps 目录
 cd /opt/apps/
@@ -25,8 +24,6 @@ mv ./apache-hive-2.3.4-bin ./hive
 ---
 
 ## 2.放入 MySQL 驱动包
-> 以下内容均在 master 节点上操作
-
 因为 hive 需要操作 mysql，所以需要将 java 连接 mysql 需要用到的驱动复制到 hive/lib/ 下：
 ``` shell
 cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
@@ -44,8 +41,6 @@ cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
 ---
 
 ## 3.配置环境变量
-> 以下内容均在 master 节点上操作
-
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -58,8 +53,6 @@ export PATH=$PATH:$HIVE_HOME/bin
 ```
 
 ## 4.生效环境变量
-> 以下内容均在 master 节点上操作
-
 ``` shell
 source ~/.bashrc
 ```
@@ -67,8 +60,6 @@ source ~/.bashrc
 ---
 
 ## 5.配置 hive-env.sh
-> 以下内容均在 master 节点上操作
-
 进入到 hive 配置文件的目录下：
 ``` shell
 cd /opt/apps/hive/conf
@@ -157,8 +148,6 @@ export HIVE_CONF_DIR=$HIVE_HOME/conf
 ---
 
 ## 6.配置 hive-site.xml
-> 以下内容均在 master 节点上操作
-
 拷贝模板：
 ``` shell
 cp ./hive-default.xml.template ./hive-site.xml
@@ -197,8 +186,6 @@ vi ./hive-site.xml
 ---
 
 ## 7.schema 格式化
-> 以下内容均在 master 节点上操作
-
 执行格式化：
 ``` shell
 schematool -dbType mysql -initSchema
@@ -208,8 +195,6 @@ schematool -dbType mysql -initSchema
 ---
 
 ## 8.启动 hive
-> 以下内容均在 master 节点上操作
-
 启动 hive ：
 ```shell
 hive
@@ -235,8 +220,6 @@ hive
 ---
 
 ## 9.使用 hive
-> 以下内容均在 master 节点上操作
-
 目的：使用 hive 处理存储在 hdfs 内的结构化数据，使得我们可以通过 SQL 语句操作这些数据。  
 
 我们先来创建一个结构化的数据：

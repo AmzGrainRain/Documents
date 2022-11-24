@@ -5,11 +5,11 @@
 - mysql-community-libs-5.7.16-1.el7.x86_64.rpm  （位于 /opt/tar/MySQL/）
 - mysql-community-common-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
 - mysql-community-server-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
+- 非分布式搭建
 
 ---
 
 ## 1.安装软件包
-> 以下内容均在 master 节点上操作
 
 进入 /opt/tar/MySQL/ 目录内：
 ``` shell
@@ -39,7 +39,6 @@ rpm -ivh ./* --force --nodeps
 ---
 
 ## 2.启动MySQL & 设置开机自启
-> 以下内容均在 master 节点上操作
 
 通过 systemctl 启动 mysqld 守护服务：
 ``` shell
@@ -60,7 +59,6 @@ systemctl status mysqld.service
 ---
 
 ## 3.配置 MySQL
-> 以下内容均在 master 节点上操作
 
 MySQL启动时，会在 /var/log/mysqld.log 输出日志。默认密码就在日志中。  
 

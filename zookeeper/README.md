@@ -3,6 +3,7 @@
 ## 前提条件
 - 已经成功部署 Hadoop
 - zookeeper-3.4.5.tar.gz（位于 /opt/tar/）
+- 分布式搭建
 
 ---
 
@@ -14,7 +15,7 @@
 ---
 
 ## 1.解压 zookeeper
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 ``` shell
 # 进入 /opt/apps 目录
 cd /opt/apps/
@@ -29,7 +30,7 @@ mv ./zookeeper-3.4.5 ./zookeeper
 ---
 
 ## 2.配置 zookeeper
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 创建 data 目录用于存储数据：
 ``` shell
@@ -92,7 +93,7 @@ clientPort=2181
 ---
 
 ## 3.配置环境变量
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
@@ -131,7 +132,7 @@ zkServer.sh
 ---
 
 ## 5.分发文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 下发 zookeeper：
 ``` shell
@@ -146,35 +147,27 @@ scp ~/.bashrc slave2:~/.bashrc
 ```
 
 ## 6.生效环境变量：
-> 以下内容均在 master 节点上操作
-
+> 以下内容在所有节点上操作
 ``` shell
-# 生效本机的环境变量
 source ~/.bashrc
-
-# 生效 slave1 的环境变量
-ssh slave1 "source ~/.bashrc"
-
-# 生效 slave2 的环境变量
-ssh slave2 "source ~/.bashrc"
 ```
 
 ---
 
 ## 6.配置 myid
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 每台服务器的 myid 必须与众不同。其实我们上一步已经为每一节点分配好了 myid！它在 [zoo.cfg](#zoo-cfg) 最下方：
 ``` shell
 # server.myid=主机名:2888:3888
 
-# master 节点的 myid 必须是 1
+# master 节点的 myid 是 1
 server.1=master:2888:3888
 
-# slave1 节点的 myid 必须是 2
+# slave1 节点的 myid 是 2
 server.2=slave1:2888:3888
 
-# slave2 节点的 myid 必须是 3
+# slave2 节点的 myid 是 3
 server.3=slave2:2888:3888
 ```
 
@@ -196,7 +189,7 @@ ssh slave2 "echo 3 > /opt/apps/zookeeper/data/myid"
 ---
 
 ## 7.启动与测试
-> 以下内容均在 master 节点上操作
+> 以下内容大部分在 master 节点上操作，小部分需要在所有节点上操作
 
 在所有节点上执行此命令启动 zookeeper：
 ``` shell

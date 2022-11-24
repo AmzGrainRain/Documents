@@ -6,11 +6,12 @@
 - hive 已部署完毕
 - zookeeper 已经启动
 - hbase-1.2.0-bin.tar.gz（位于/opt/tar下）
+- 分布式搭建
 
 ---
 
 ## 1.解压
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
 ``` shell
@@ -30,7 +31,7 @@ mv ./hbase-1.2.0 ./hbase
 ---
 
 ## 2.配置环境变量
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
@@ -44,8 +45,7 @@ export PATH=$PATH:$HBASE_HOME/bin
 ```
 
 ## 3.生效环境变量
-> 以下内容均在 master 节点上操作
-
+> 以下内容在 master 节点上操作
 ``` shell
 source ~/.bashrc
 ```
@@ -53,7 +53,7 @@ source ~/.bashrc
 ---
 
 ## 4.修改配置文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 进入配置文件目录：
 ``` shell
@@ -144,7 +144,7 @@ slave2
 ---
 
 ## 5.分发文件
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 分发文件到 slave1、slave2 ：
 ``` shell
@@ -163,7 +163,7 @@ ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ---
 
 ## 6.启动测试
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 master 节点上启动：
 ``` shell
@@ -181,7 +181,7 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ---
 
 ## 6.Hbase shell
-> 以下内容均在 master 节点上操作
+> 以下内容在 master 节点上操作
 
 进入 hbase 命令行：
 > 确保您已经启动了 hadoop 和 zookeeper
