@@ -69,6 +69,11 @@ source ~/.bashrc
 ## 5.配置 hive-env.sh
 > 以下内容均在 master 节点上操作
 
+进入到 hive 配置文件的目录下：
+``` shell
+cd /opt/apps/hive/conf
+```
+
 拷贝模板：
 ``` shell
 cp ./hive-env.sh.template ./hive-env.sh
@@ -216,7 +221,7 @@ hive
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 ``` shell
 # sed -i "s/要替换的/替换为/g" 文件路径
-sed -i "s/system://g" hive-site.xml
+sed -i "s/system://g" /opt/apps/hive/conf/hive-site.xml
 ```
 
 再次尝试启动 hive：
@@ -262,12 +267,25 @@ hdfs dfs -mkdir /test_hive
 ``` shell
 hdfs dfs -put ~/test.txt /test_hive/test.txt
 ```
-如果发送文件到 hdfs 时遇到错误，请尝试以下方法：
-1. 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录
-2. 重新格式化 namenode
-3. 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分
+如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop 。  
+```
+# 停止 hadoop 集群
+stop-yarn.sh && stop-dfs.sh
 
-cat 一下，证明已经发送到 hdfs 里了：
+# 启动 hadoop 集群
+start-dfs.sh && start-yarn.sh
+```
+如果还是不行，请尝试此方案：
+```
+# 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录
+rm -rf /opt/apps/hadoop/data/*
+
+# 重新格式化 namenode
+hdfs namenode -format
+```
+具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
+
+回到正题，cat 一下，证明已经发送到 hdfs 里了：
 ```shell
 hdfs dfs -cat /test_hive/test.txt
 ```
@@ -305,7 +323,7 @@ select * from test;
 
 输入 exit 或按下 ctrl + d 退出 hive 控制台：
 ``` shell
-exit
+exit;
 ```
 
 在 hdfs 里可查看到 hive 的数据表信息：

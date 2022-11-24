@@ -164,12 +164,16 @@ ssh slave2 "source ~/.bashrc"
 ## 6.配置 myid
 > 以下内容均在 master 节点上操作
 
-每台服务器的 myid 对应着 [zoo.cfg](#zoo-cfg) 最下方的数字：
+每台服务器的 myid 必须与众不同。其实我们上一步已经为每一节点分配好了 myid！它在 [zoo.cfg](#zoo-cfg) 最下方：
 ``` shell
+# server.myid=主机名:2888:3888
+
 # master 节点的 myid 必须是 1
 server.1=master:2888:3888
+
 # slave1 节点的 myid 必须是 2
 server.2=slave1:2888:3888
+
 # slave2 节点的 myid 必须是 3
 server.3=slave2:2888:3888
 ```

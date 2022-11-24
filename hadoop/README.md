@@ -160,14 +160,15 @@ tar -zxf /opt/tar/hadoop-2.6.0.tar.gz
 tar -zxf /opt/tar/jdk-8u191-linux-x64.tar.gz
 
 # 重命名 hadoop
-mv ./hadoop-2.6.0 ./apps/hadoop
+mv ./hadoop-2.6.0 ./hadoop
 
 # 重命名 jdk
-mv ./jdk1.8.0_191 ./apps/jdk
+mv ./jdk1.8.0_191 ./jdk
 ```
 
 ## 7.配置环境变量
 > 以下内容均在 master 节点上操作
+
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
 vi ~/.bashrc
@@ -215,7 +216,6 @@ vi hadoop-env.sh
 
 在尾部追加以下内容:
 ``` shell
-export HADOOP_IDENT_STRING=$USER
 export JAVA_HOME=/opt/apps/jdk
 ```
 
@@ -412,6 +412,10 @@ start-dfs.sh && start-yarn.sh
 ```
 ![正常输出](./images/11_2.png)
 
+关闭安全模式：
+``` shell
+hdfs dfsadmin -safemode leave
+```
 ---
 
 ## 12.检查启动情况
@@ -444,11 +448,6 @@ jps
 
 ## 13.测试 Hadoop
 > 以下内容均在 master 节点上操作
-
-关闭安全模式：
-``` shell
-hdfs dfsadmin -safemode leave
-```
 
 来一波计算测试：
 ``` shell

@@ -82,17 +82,17 @@ mysql -u root -p
 
 密码强度限制调整为低级：
 ``` sql
-set global validate_password_policy=0;
+SET GLOBAL validate_password_policy=0;
 ```
 
 调整密码最低长度限制：
 ``` sql
-set global validate_password_length=6;
+SET GLOBAL validate_password_length=6;
 ```
 
 修改 root@localhost（本地 root 登录） 的密码：
 ``` sql
-alter user 'root'@'localhost' identified by '新密码';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
 ```
 
 创建一个用于远程登陆的用户：
@@ -101,7 +101,7 @@ alter user 'root'@'localhost' identified by '新密码';
   在开发环境建议这么做，在生产环境上是很危险的操作
   'root'@'%' 表示任何主机的 root 账户
 */
-create user 'root'@'%' identified by '用户的密码';
+CREATE USER 'root'@'%' IDENTIFIED BY '用户的密码';
 ```
 
 完全允许 root 远程连接：  

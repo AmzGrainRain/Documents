@@ -90,38 +90,43 @@ vi hbase-env.sh
 vi hbase-site.xml
 ```
 
-配置如下：
+配置后：
 ``` xml
-<!-- hbase 的数据保存在 hdfs 对应目录下 -->
-<property>
-	<name>hbase.rootdir</name>
-	<value>hdfs://master:9000/hbase</value>
-</property>
-<!-- 是否是分布式环境 -->
-<property> 
-	<name>hbase.cluster.distributed</name> 
-	<value>true</value> 
-</property> 
-<!-- 冗余度 -->
-<property>
-	<name>dfs.replication</name>
-	<value>2</value>
-</property>
-<!-- 连接 zookeeper -->
-<property>
-	<name>hbase.zookeeper.property.clientPort</name>
-	<value>2181</value>
-</property>
-<!-- zookeeper 数据目录 -->
-<property> 
-	<name>hbase.zookeeper.property.dataDir</name> 
-	<value>/opt/apps/hbase</value>       
-</property>
-<!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
-<property> 
-	<name>hbase.zookeeper.quorum</name> 
-	<value>master,slave1,slave2</value>     
-</property>
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+	<!-- hbase 的数据保存在 hdfs 对应目录下 -->
+	<property>
+		<name>hbase.rootdir</name>
+		<value>hdfs://master:9000/hbase</value>
+	</property>
+	<!-- 是否是分布式环境 -->
+	<property> 
+		<name>hbase.cluster.distributed</name> 
+		<value>true</value> 
+	</property> 
+	<!-- 冗余度 -->
+	<property>
+		<name>dfs.replication</name>
+		<value>2</value>
+	</property>
+	<!-- 连接 zookeeper -->
+	<property>
+		<name>hbase.zookeeper.property.clientPort</name>
+		<value>2181</value>
+	</property>
+	<!-- zookeeper 数据目录 -->
+	<property> 
+		<name>hbase.zookeeper.property.dataDir</name> 
+		<value>/opt/apps/hbase</value>       
+	</property>
+	<!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
+	<property> 
+		<name>hbase.zookeeper.quorum</name> 
+		<value>master,slave1,slave2</value>     
+	</property>
+</configuration>
 ```
 
 修改配置文件（master 节点）：

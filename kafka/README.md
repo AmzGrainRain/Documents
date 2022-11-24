@@ -46,7 +46,7 @@ cd /opt/apps
 tar -zxf /opt/tar/kafka_2.11-1.0.0.tgz
 ```
 
-重命名 hbase ：
+重命名 kafka ：
 ``` shelll
 mv ./kafka_2.11-1.0.0 ./kafka
 ```

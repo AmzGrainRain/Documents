@@ -110,15 +110,15 @@ mkdir ~/flume_test
 创建并进入 jobs 目录：
 ``` shell
 # 创建
-mkdir /opt/apps/flume/jobs
+mkdir /opt/apps/flume/agent
 
 # 进入
-cd /opt/apps/flume/jobs
+cd /opt/apps/flume/agent
 ```
 
 在 jobs 目录内写一个我们自己的 agent 文件：
 ``` shell
-vi /opt/apps/flume/agent/test.conf
+vi ./test.conf
 ```
 
 test.conf 的内容是这样的：
@@ -150,7 +150,7 @@ test.sinks.testSink.type = logger
 > `-f` agent 文件路径
 > `-Dflume.root.logger=INFO,console` 运行时动态修改 `flume.root.logger` 参数属性值，并将控制台日志打印级别设置为 INFO 级别。
 ``` shell
-flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/jobs/test.conf -Dflume.root.logger=INFO.console
+flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO.console
 ```
 
 进入测试目录写一个日志：
@@ -184,7 +184,11 @@ mkdir ~/flume_test_hdfs
 
 在 jobs 目录内写一个新的 agent 文件：
 ``` shell
-vi /opt/apps/flume/agent/test_hdfs.conf
+# 进入 agent 目录
+cd /opt/apps/flume/agent/
+
+# 创建一个新的 agent
+vi ./test_hdfs.conf
 ```
 
 test_hdfs.conf 的内容是这样的：
@@ -230,7 +234,7 @@ test_hdfs.sinks.sink2.hdfs.rollInterval = 60
 
 启动 flume agent :
 ``` shell
-flume-ng agent -n test_hdfs -c /opt/apps/flume/conf -f /opt/apps/flume/jobs/test_hdfs.conf -Dflume.root.logger=INFO,console
+flume-ng agent -n test_hdfs -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test_hdfs.conf -Dflume.root.logger=INFO,console
 ```
 
 进入测试目录写一个日志：
@@ -244,9 +248,6 @@ echo "hello flume" > data.log
 ![写入日志](./images/6_1.png)
 
 查看 hdfs 目录变化：
-``` shell
-ls ~/flume_test
-```
 ![成功示例](./images/6_2.png)
 
 ---
