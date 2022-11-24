@@ -44,12 +44,6 @@ export HBASE_HOME=/opt/apps/hbase
 export PATH=$PATH:$HBASE_HOME/bin
 ```
 
-## 3.生效环境变量
-> 以下内容在 master 节点上操作
-``` shell
-source ~/.bashrc
-```
-
 ---
 
 ## 4.修改配置文件
@@ -139,7 +133,7 @@ vi regionservers
 slave1
 slave2
 ```
-![img_3.png](images/3_1.png)
+![img_3.png](images/4_1.png)
 
 ---
 
@@ -158,11 +152,17 @@ scp -r /opt/apps/hbase slave2:/opt/apps/
 ssh slave1 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ```
-![img.png](images/4_1.png)
+![img.png](images/5_1.png)
 
 ---
 
-## 6.启动测试
+## 6.生效环境变量
+> 以下内容在所有节点上操作
+``` shell
+source ~/.bashrc
+```
+
+## 7.启动测试
 > 以下内容在 master 节点上操作
 
 master 节点上启动：
@@ -176,7 +176,7 @@ jps
 ```
 
 master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 进程：
-![img.png](images/5_1.png)
+![img.png](images/7_1.png)
 
 ---
 
