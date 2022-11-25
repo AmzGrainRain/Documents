@@ -229,7 +229,7 @@ CREATE TABLE `test_from_hdfs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
-导入数据：
+退出 mysql，开始使用 sqoop 导入数据：
 ``` shell
 sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
 ```
