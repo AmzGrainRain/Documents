@@ -326,7 +326,7 @@ vi yarn-site.xml
 
 <configuration>
   <property>
-    <name>yarn.resourcemanagerhostname</name>
+    <name>yarn.resourcemanager.hostname</name>
     <value>master</value>
   </property>
   <property>
