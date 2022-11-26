@@ -388,12 +388,14 @@ source ~/.bashrc
 hdfs namenode -format
 ```
 
-> <span id="hdfs-error">如果多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 nomenode 解决：</span>
+> <span id="hdfs-error">如果多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 nomenode 解决：</span>
 >``` shell
+> # 在所有节点上执行
 > rm -rf /opt/apps/hadoop/tmp/*
 > ```
 > 再次执行格式化：
 > ``` shell
+> # 在主节点上执行
 > hdfs namenode -format
 > ```
 
@@ -451,7 +453,7 @@ cd /opt/apps/hadoop/share/hadoop/mapreduce/
 # 来一波 mapreduce 计算测试
 hadoop jar hadoop-mapreduce-examples-2.6.0.jar pi 10 10
 
-# 计算很漫长，鄙人的2核2G虚拟机跑了630秒。
+# 计算很漫长，速度虚拟机的配置。
 # 最终计算结果是 Estimated value of Pi is 3.20000000000000000000
 ```
 

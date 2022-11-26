@@ -95,7 +95,7 @@ cp ./slaves.template ./slaves
 vi ./slaves
 ```
 
-在文件内写入这些：
+删掉默认存在的 localhost，在末尾写入这些：
 ``` shell
 master
 slave1

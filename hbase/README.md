@@ -32,6 +32,7 @@ mv ./hbase-1.2.0 ./hbase
 
 ## 2.配置环境变量
 > 以下内容在 master 节点上操作
+> 仅 master 节点需要配置环境变量
 
 编辑用户根目录下的 .bashrc 文件：
 ``` shell
@@ -147,7 +148,7 @@ scp -r /opt/apps/hbase slave2:/opt/apps/
 ```
 
 修改 slave1、slave2 下 regionservers 文件：
-> 附属节点的 regionservers 文件需要包含 master 节点
+> master 节点以外的所有节点的 regionservers 文件需要包含 master 节点
 ``` shell
 ssh slave1 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"

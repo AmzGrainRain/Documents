@@ -178,7 +178,7 @@ sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --use
 
 有两个解决方法：
 - 在 mysql 上修改 wait_timeout 时长
-- 将 url 中localhost 修改为当前这台节点的内网 ip（非 127.0.0.1）。 
+- 将 url 中localhost 修改为当前这台节点的内网 IP 或 内网IP映射（非 127.0.0.1）。 
 
 我们采用后面的方法。
 删除之前导入的数据表：
@@ -188,7 +188,7 @@ hdfs dfs -rm -r /user/root/test
 
 再次导入：
 ``` shell
-sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
+sqoop import --connect jdbc:mysql://master:3306/sqoop_test --table test --username root -P --m 1
 ```
 ![更换 ip](./images/8_2.png)
 
@@ -231,12 +231,15 @@ CREATE TABLE `test_from_hdfs` (
 
 退出 mysql，开始使用 sqoop 导入数据：
 ``` shell
-sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
+sqoop export --connect jdbc:mysql://master:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
 ```
 ![导入数据：](./images/9_2.png)
 
 
 来查看下我们前面创建的 test_from_hdfs 表：
+``` shell
+SELECT * FROM sqoop_test.test_from_hdfs;
+```
 ![导入的数据](./images/9_3.png)
 可以看到数据导入成功了，但是有一个新的问题。那就是所有的汉字都显示成了问号，篇幅原因我们放在下一节一一道来。
 
@@ -266,41 +269,17 @@ character-set-server=utf8
 init_connect='SET NAMES utf8'
 ```
 
-修改后的 my.cnf ：
-``` diff
-# For advice on how to change settings please see
-# http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html
-
-[mysqld]
-#
-# Remove leading # and set to the amount of RAM for the most important data
-# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
-# innodb_buffer_pool_size = 128M
-#
-# Remove leading # to turn on a very important data integrity option: logging
-# changes to the binary log between backups.
-# log_bin
-#
-# Remove leading # to set options mainly useful for reporting servers.
-# The server defaults are faster for transactions and fast SELECTs.
-# Adjust sizes as needed, experiment to find the optimal values.
-# join_buffer_size = 128M
-# sort_buffer_size = 2M
-# read_rnd_buffer_size = 2M
-datadir=/var/lib/mysql
-socket=/var/lib/mysql/mysql.sock
-# Disabling symbolic-links is recommended to prevent assorted security risks
-symbolic-links=0
-
-log-error=/var/log/mysqld.log
-pid-file=/var/run/mysqld/mysqld.pid
-+ character-set-server=utf8
-+ init_connect='SET NAMES utf8'
-```
-
 重启 mysql 服务：
+
+> 直接重启服务大概率会卡住（不明原因）
+> systemctl restart mysqld.service
+> 所以我们还是先停止服务再启动服务吧
+
 ``` shell
-systemctl restart mysqld.service
+# 停止
+systemctl stop mysqld.service
+# 启动
+systemctl start mysqld.service
 ```
 
 进入 mysql 查看编码信息：
@@ -310,7 +289,7 @@ SHOW VARIABLES LIKE 'character%';
 ![编码信息](./images/10_2.png)
 可以看到编码全是 utf8 了。
 
-删除我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第九步操作即可。
+删除我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第十步操作即可。
 ![正常的输出](./images/10_3.png)
 
 ---
