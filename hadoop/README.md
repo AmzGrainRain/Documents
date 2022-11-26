@@ -96,7 +96,7 @@ vi /etc/hosts
 ``` shell
 # scp 源 目标 (如果目标已存在则覆盖)
 scp /etc/hosts slave1:/etc/hosts
-scp /etc/hosts slave1:/etc/hosts
+scp /etc/hosts slave2:/etc/hosts
 ```
 
 ## 4.关闭防火墙
