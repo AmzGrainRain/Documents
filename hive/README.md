@@ -258,13 +258,19 @@ stop-yarn.sh && stop-dfs.sh
 # 启动 hadoop 集群
 start-dfs.sh && start-yarn.sh
 ```
-如果还是不行，请尝试此方案：
+如果还是不行，请尝试此方案（会清空 hdfs 内所有的数据）：
 ```
-# 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录
+# 停止 hadoop 集群
+stop-yarn.sh && stop-dfs.sh
+
+# 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录（在所有节点上执行这句）
 rm -rf /opt/apps/hadoop/data/*
 
-# 重新格式化 namenode
+# 重新格式化 namenode（在 master 节点上执行这句）
 hdfs namenode -format
+
+# 启动 hadoop 集群
+start-dfs.sh && start-yarn.sh
 ```
 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
 

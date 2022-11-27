@@ -122,16 +122,9 @@ scp ~/.bashrc slave2:~/.bashrc
 ---
 
 ## 6.生效环境变量：
-> 以下内容在 master 节点上操作
+> 以下内容在所有节点上操作
 ``` shell
-# 生效本机的环境变量
 source ~/.bashrc
-
-# 生效 slave1 的环境变量
-ssh slave1 "source ~/.bashrc"
-
-# 生效 slave2 的环境变量
-ssh slave2 "source ~/.bashrc"
 ```
 
 ---

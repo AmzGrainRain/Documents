@@ -167,18 +167,23 @@ sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username ro
 
 ---
 
-## 9.导入 mysql 数据表到 hdfs
+## 9.导出 mysql 数据表到 hdfs
 > 通过 `sqoop help import` 命令打印帮助信息。
 ``` shell
 sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
 ```
 如果遇到这个错误： 
 ![错误信息](./images/8_1.png)
-不要慌，虽然任务执行结果显示的是失败，但实际上**已经成功导入数据表到 hdfs 了**。出现这个问题的原因是 mysql wait_timeout 参数时长设置过短或 mysql 地址出问题了。
+虽然任务执行结果显示的是失败，但实际上**已经成功导入数据表到 hdfs 了**。  
 
-有两个解决方法：
-- 在 mysql 上修改 wait_timeout 时长
-- 将 url 中localhost 修改为当前这台节点的内网 IP 或 内网IP映射（非 127.0.0.1）。 
+错误原因：
+- 使用了 localhost 或 127.0.0.1 作为数据库地址导致
+- mysql wait_timeout 参数时长设置过短
+- mysql 地址出错
+
+两个解决方案：
+- 修改 mysql 的 wait_timeout 时长
+- 将 url 中 localhost 或 127.0.0.1 修改为当前这台节点的内网 IP 或 内网IP映射（master）。 
 
 我们采用后面的方法。
 删除之前导入的数据表：
@@ -210,7 +215,7 @@ hdfs dfs -cat /user/root/test/part-m-00000
 
 ---
 
-## 10.导入 hdfs 数据表到 mysql
+## 10.导出 hdfs 数据表到 mysql
 进入 mysql ：
 ``` shell
 mysql -u root -p

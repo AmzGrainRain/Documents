@@ -288,7 +288,7 @@ dfs.namenode.name.dir|file://${hadoop.tmp.dir}/dfs/name|dfs名称节点存储位
 dfs.datanode.data.dir|file://${hadoop.tmp.dir}/dfs/data|dfs数据节点存储数据块的位置
 dfs.secondary.http.address|0.0.0.0:50090|hdfs对应的http服务器地址
 
-### 配置 mapred-queues.xml
+### 配置 mapred-site.xml
 使用模板配置：
 ``` shell
 cp ./mapred-site.xml.template ./mapred-site.xml
