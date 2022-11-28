@@ -168,13 +168,13 @@ sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username ro
 ---
 
 ## 9.导出 mysql 数据表到 hdfs
-> 通过 `sqoop help import` 命令打印帮助信息。
+> 通过 `sqoop help import` 命令打印帮助信息。  
+> 在此之前，请确保 Hadoop 已经启动。
 ``` shell
 sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
 ```
 如果遇到这个错误： 
 ![错误信息](./images/8_1.png)
-虽然任务执行结果显示的是失败，但实际上**已经成功导入数据表到 hdfs 了**。  
 
 错误原因：
 - 使用了 localhost 或 127.0.0.1 作为数据库地址导致
@@ -216,6 +216,8 @@ hdfs dfs -cat /user/root/test/part-m-00000
 ---
 
 ## 10.导出 hdfs 数据表到 mysql
+> 在此之前，请确保 Hadoop 已经启动。
+
 进入 mysql ：
 ``` shell
 mysql -u root -p
