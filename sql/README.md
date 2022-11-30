@@ -39,8 +39,8 @@ SHOW TABLES;
 #### 创建数据表
 ``` sql
 CREATE TABLE 表名(
-  字段 字段类型 约束条件,
-  字段 字段类型 约束条件
+  字段 字段类型 [约束条件],
+  字段 字段类型 [约束条件]
 )
 ```
 
@@ -58,7 +58,7 @@ DESC 表名;
 
 ##### 新增字段
 ``` sql
-ALTER TABLE 表名 ADD 字段 字段类型 约束条件;
+ALTER TABLE 表名 ADD 字段 字段类型 [约束条件];
 ```
 
 ##### 删除字段
@@ -69,12 +69,12 @@ ALTER TABLE 表名 DROP 字段;
 ##### 修改字段名
 修改字段名须重新指定字段的类型和默认值。
 ``` sql
-ALTER TABLE 表名 CHANGE 原字段名 新字段名 新字段类型 新字段约束条件;
+ALTER TABLE 表名 CHANGE 原字段名 新字段名 新字段类型 [新字段约束条件];
 ```
 
 ##### 修改字段类型
 ``` sql
-ALTER TABLE 表名 MODIFY 字段 字段类型 约束条件;
+ALTER TABLE 表名 MODIFY 字段 字段类型 [约束条件];
 ```
 
 ##### 重命名数据表
@@ -586,8 +586,8 @@ SET DEFAULT|父表有变更时，子表将外键列设置为默认值。（InnoD
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段);
 
 -- 删除
-ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
-ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
+ALTER TABLE 表名 DROP FOREIGN KEY 约束名; -- 删除外键
+ALTER TABLE 表名 DROP INDEX 约束名;       -- 删除索引
 ```
 
 #### 外键约束行为的添加与删除
@@ -596,6 +596,6 @@ ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段) ON UPDATE 更新时的行为 ON DELETE 删除时的行为;
 
 -- 删除
-ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
-ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
+ALTER TABLE 表名 DROP FOREIGN KEY 约束名; -- 删除外键
+ALTER TABLE 表名 DROP INDEX 约束名;       -- 删除索引
 ```
