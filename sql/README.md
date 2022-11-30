@@ -227,39 +227,39 @@ SELECT CONCAT(字段1, 字段2, '123', ...);
 #### 字母小写（LOWER）
 ``` sql
 SELECT LOWER('Hello');
-# 输出 "hello"
+-- 输出 "hello"
 ```
 
 #### 字母大写（UPPER）
 ``` sql
 SELECT UPPER('Hello');
-# 输出 "HELLO"
+-- 输出 "HELLO"
 ```
 
 #### 左填充（LPAD）
 给定一个长度，从左侧填充，直到长度等于或大于给定长度。
 ``` sql
 SELECT LPAD('hello', 7, '_');
-# 输出 "__hello"
+-- 输出 "__hello"
 ```
 
 #### 右填充（RPAD）
 给定一个长度，从右侧填充，直到长度等于或大于给定长度。
 ``` sql
 SELECT RPAD('hello', 7, '_');
-# 输出 "hello__"
+-- 输出 "hello__"
 ```
 
 #### 消除字符串首尾空格（TRIM）
 ``` sql
 SELECT TRIM('        hello mysql   ');
-# 输出 "hello mysql"
+-- 输出 "hello mysql"
 ```
 
 #### 字符串截取（SUBSTRING）
 ``` sql
 SELECT SUBSTRING('hello mysql', 7, 5);
-# 输出 "mysql"
+-- 输出 "mysql"
 ```
 
 ### 数值
@@ -267,25 +267,25 @@ SELECT SUBSTRING('hello mysql', 7, 5);
 #### 向上取整
 ``` sql
 SELECT CEIL(1.1);
-# 输出 "2"
+-- 输出 "2"
 ```
 
 #### 向下取整
 ``` sql
 SELECT FLOOR(1.9);
-# 输出 "1"
+-- 输出 "1"
 ```
 
 #### 四舍五入
 ``` sql
 SELECT ROUND(1.5);
-# 输出 "2"
+-- 输出 "2"
 ```
 
 #### 求余
 ``` sql
 SELECT MOD(4, 3);
-# 输出 "1"
+-- 输出 "1"
 ```
 
 #### 0-1 之间的随机数
@@ -301,7 +301,7 @@ SELECT ROUND((RAND() * 100) / 10, 2);
 #### 6 位数字验证码
 ``` sql
 SELECT LPAD(CEIL(RAND() * 1000000), 6, 0);
-# 或
+-- 或
 SELECT SUBSTRING(RAND(), 3, 6);
 ```
 
@@ -310,19 +310,19 @@ SELECT SUBSTRING(RAND(), 3, 6);
 ##### 十进制 -> 十六进制
 ``` sql
 SELECT HEX(10);
-# 输出 "A"
+-- 输出 "A"
 ```
 
 ##### 十进制 -> 八进制
 ``` sql
 SELECT OCT(10);
-# 输出 "12"
+-- 输出 "12"
 ```
 
 ##### 十进制 -> 二进制
 ``` sql
 SELECT BIN(4);
-# 输出 "100"
+-- 输出 "100"
 ```
 
 ### 日期
@@ -350,13 +350,13 @@ SELECT YEAR(NOW());
 #### 给定一个日期，取月
 ``` sql
 SELECT MONTH('2022-10-11');
-# 输出 "10"
+-- 输出 "10"
 ```
 
 #### 给定一个日期，取日
 ``` sql
 SELECT DAY('2022-10-11');
-# 输出 "11"
+-- 输出 "11"
 ```
 
 #### 日期加减
@@ -374,10 +374,10 @@ SELECT DATE_ADD('2022-10-11 23:59:59', INTERVAL '1:1' MINUTE_SECOND);
 #### 两日期之间间隔时间
 大在前，小在后。
 ``` sql
-# '2022-01-05' 与 '2022-12-24' 间隔天数
+-- '2022-01-05' 与 '2022-12-24' 间隔天数
 SELECT DATEDIFF('2022-12-24', '2022-01-05');
 
-# '2022-01-05' 与现在间隔天数
+-- '2022-01-05' 与现在间隔天数
 SELECT DATEDIFF(NOW(), '2022-01-05');
 ```
 
@@ -387,20 +387,20 @@ SELECT DATEDIFF(NOW(), '2022-01-05');
 `SELECT IF(x, y, z)` 等价 `x ? y : z`
 ``` sql
 SELECT IF(TRUE, '真', '假');
-# 输出 "真"
+-- 输出 "真"
 
 SELECT IF(FALSE, '真', '假');
-# 输出 "假"
+-- 输出 "假"
 ```
 
 #### IFNULL
 `SELECT IFNULL(x, y)` 等价 `x == null ? y : x;`
 ``` sql
 SELECT IFNULL(NULL, '空!');
-# 输出 "空!"
+-- 输出 "空!"
 
 SELECT IFNULL('非空!', '空!');
-# 输出 "非空!"
+-- 输出 "非空!"
 ```
 
 #### CASE WHEN THEN ELSE END
@@ -473,55 +473,55 @@ ALTER TABLE xxx MODIFY xxx 默认值|自增;
 
 #### 非空
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 MODIFY 字段名 数据类型 NOT NULL;
 
-# 删除
+-- 删除
 ALTER TABLE 表名 MODIFY 字段名 数据类型 NULL;
 ```
 
 #### 唯一
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 UNIQUE KEY (字段1, 字段2, ...);
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP CONSTRAINT 约束名;
 ```
 
 #### 主键
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ADD PRIMARY KEY (字段名);
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP PRIMARY KEY;
 ```
 
 #### 默认值
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ALTER 字段名 SET DEFAULT 默认值;
 
-# 删除
+-- 删除
 ALTER TABLE 表名 ALTER 字段名 DROP DEFAULT;
 ```
 
 #### 条件
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ADD 约束名 CHECK (条件);
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP 约束名;
 ```
 
 #### 自增
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 MODIFY 字段名 INT AUTO_INCREMENT;
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP 约束名;
 ```
 
@@ -582,20 +582,20 @@ SET DEFAULT|父表有变更时，子表将外键列设置为默认值。（InnoD
 
 #### 外键约束的添加与删除
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段);
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
 ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
 ```
 
 #### 外键约束行为的添加与删除
 ``` sql
-# 添加
+-- 添加
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段) ON UPDATE 更新时的行为 ON DELETE 删除时的行为;
 
-# 删除
+-- 删除
 ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
 ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
 ```
