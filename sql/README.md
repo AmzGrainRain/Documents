@@ -1,5 +1,5 @@
 # SQL
-
+本文档为助记 SQL 语法诞生。请自行百度解惑，此处不提供任何教程。
 ## 数据定义语言（Data Definition Language，DDL）
 用于描述数据库中要存储的现实世界实体的编程语句。
 ### 数据库操作
@@ -39,8 +39,8 @@ SHOW TABLES;
 #### 创建数据表
 ``` sql
 CREATE TABLE 表名(
-  字段 字段类型 默认值,
-  字段 字段类型 默认值
+  字段 字段类型 约束条件,
+  字段 字段类型 约束条件
 )
 ```
 
@@ -58,7 +58,7 @@ DESC 表名;
 
 ##### 新增字段
 ``` sql
-ALTER TABLE 表名 ADD 字段 字段类型 默认值;
+ALTER TABLE 表名 ADD 字段 字段类型 约束条件;
 ```
 
 ##### 删除字段
@@ -66,28 +66,19 @@ ALTER TABLE 表名 ADD 字段 字段类型 默认值;
 ALTER TABLE 表名 DROP 字段;
 ```
 
-<!-- ##### 设置字段默认值
-``` sql
-ALTER TABLE 表名 ALTER COLUMN 字段 SET DEFAULT 默认值;
-```
-
-##### 删除字段默认值
-``` sql
-ALTER TABLE 表名 ALTER COLUMN 字段 DROP DEFAULT;
-``` -->
-
 ##### 修改字段名
 修改字段名须重新指定字段的类型和默认值。
 ``` sql
-ALTER TABLE 表名 CHANGE 原字段名 新字段名 新字段类型 新字段默认值;
+ALTER TABLE 表名 CHANGE 原字段名 新字段名 新字段类型 新字段约束条件;
 ```
 
 ##### 修改字段类型
 ``` sql
-ALTER TABLE 表名 MODIFY 字段 字段类型 默认值;
+ALTER TABLE 表名 MODIFY 字段 字段类型 约束条件;
 ```
 
 ##### 重命名数据表
+
 ###### 方法一
 ``` sql
 ALTER TABLE 表名 RENAME TO 新表名;
@@ -102,7 +93,8 @@ RENAME TABLE 表名 新表名;
 
 #### 删除表
 
-##### 删除（目标不存在会引发错误）
+##### 删除
+目标不存在会引发错误。
 ``` sql
 DROP TABLE 表名;
 ```
@@ -113,13 +105,14 @@ DROP TABLE IF EXISTS 表名;
 ```
 
 #### 清空表
-底层原理：先删除表，再创建表。
+先删除表，再创建表。
 ``` sql
 TRUNCATE 表名;
 ```
 
 ## 数据操纵语言（Data Manipulation Language，DML）
 用于数据库操作、对数据库其中的对象和数据运行访问工作的编程语句。
+
 ### 添加数据
 
 #### 单条数据
@@ -169,6 +162,7 @@ DELETE FROM 表 WHERE 条件;
 
 ## 数据查询语言（Data Query Language，DQL）
 用于查询数据库数据的编程语句。
+
 ``` sql
 SELECT 字段1 AS 别名1, 字段2, ...
 FROM 表名
@@ -181,6 +175,7 @@ LIMIT 从, 到
 
 ## 数据控制语言（Data Control Language，DCL）
 用于查询数据库数据的编程语句。
+
 ### 用户管理
 
 #### 创建用户
@@ -225,42 +220,39 @@ REVOKE 权限列表 ON 数据库名.数据表名 FROM '用户名'@'主机名';
 ### 字符串
 
 #### 字符串拼接（CONCAT）
-拼接多个字符串，可以是字段，可以是常量字符串。
 ``` sql
-SELECT CONCAT(字段1, 字段2, '123', ...)
+SELECT CONCAT(字段1, 字段2, '123', ...);
 ```
 
 #### 字母小写（LOWER）
-字母全部转换为小写。
 ``` sql
-SELECT LOWER('Hello')
+SELECT LOWER('Hello');
 # 输出 "hello"
 ```
 
 #### 字母大写（UPPER）
-字母全部转换为大写。
 ``` sql
-SELECT UPPER('Hello')
+SELECT UPPER('Hello');
 # 输出 "HELLO"
 ```
 
 #### 左填充（LPAD）
 给定一个长度，从左侧填充，直到长度等于或大于给定长度。
 ``` sql
-SELECT LPAD('hello', 7, '_')
+SELECT LPAD('hello', 7, '_');
 # 输出 "__hello"
 ```
 
 #### 右填充（RPAD）
 给定一个长度，从右侧填充，直到长度等于或大于给定长度。
 ``` sql
-SELECT RPAD('hello', 7, '_')
+SELECT RPAD('hello', 7, '_');
 # 输出 "hello__"
 ```
 
 #### 消除字符串首尾空格（TRIM）
 ``` sql
-SELECT TRIM('        hello mysql   ')
+SELECT TRIM('        hello mysql   ');
 # 输出 "hello mysql"
 ```
 
@@ -308,7 +300,7 @@ SELECT ROUND((RAND() * 100) / 10, 2);
 
 #### 6 位数字验证码
 ``` sql
-SELECT RAND() * 1000000;
+SELECT LPAD(CEIL(RAND() * 1000000), 6, 0);
 # 或
 SELECT SUBSTRING(RAND(), 3, 6);
 ```
@@ -451,4 +443,159 @@ FROM scores;
 
 
 ## 约束
+设置约束时强烈建议为约束命名。在后期需要删除约束时，可以通过约束名直接删除。如果没有设置约束名，那么在删除约束前要先通过 `SHOW CREATE TABLE 表名` 来查看系统给约束的默认命名，才能根据默认命名来删除约束。
 
+### 约束关键字
+关键字|含义
+-|-
+NOT NULL|非空
+UNIQUE|唯一
+PRIMARY KEY|主键
+DEFAULT|默认值
+CHECK|满足条件（8.0.16版本以后）
+AUTO_INCREMENT|自增
+FOREIGN KEY|外键
+
+### 普通约束
+
+#### 关于 ALTER TABLE xxx MODIFY
+修改字段数据类型、添加或删除非空和自增约束。  
+如果不指定**自增约束**则代表**不设置**或**删除**已经存在的自增约束。
+``` sql
+ALTER TABLE xxx MODIFY xxx 默认值|自增;
+```
+
+#### 关于 ALTER TABLE xxx ADD
+为字段添加唯一、主键、条件、外键约束。  
+
+#### 关于 ALTER TABLE xxx DROP CONSTRAINT
+根据约束名删除指定约束。
+
+#### 非空
+``` sql
+# 添加
+ALTER TABLE 表名 MODIFY 字段名 数据类型 NOT NULL;
+
+# 删除
+ALTER TABLE 表名 MODIFY 字段名 数据类型 NULL;
+```
+
+#### 唯一
+``` sql
+# 添加
+ALTER TABLE 表名 ADD CONSTRAINT 约束名 UNIQUE KEY (字段1, 字段2, ...);
+
+# 删除
+ALTER TABLE 表名 DROP CONSTRAINT 约束名;
+```
+
+#### 主键
+``` sql
+# 添加
+ALTER TABLE 表名 ADD PRIMARY KEY (字段名);
+
+# 删除
+ALTER TABLE 表名 DROP PRIMARY KEY;
+```
+
+#### 默认值
+``` sql
+# 添加
+ALTER TABLE 表名 ALTER 字段名 SET DEFAULT 默认值;
+
+# 删除
+ALTER TABLE 表名 ALTER 字段名 DROP DEFAULT;
+```
+
+#### 条件
+``` sql
+# 添加
+ALTER TABLE 表名 ADD 约束名 CHECK (条件);
+
+# 删除
+ALTER TABLE 表名 DROP 约束名;
+```
+
+#### 自增
+``` sql
+# 添加
+ALTER TABLE 表名 MODIFY 字段名 INT AUTO_INCREMENT;
+
+# 删除
+ALTER TABLE 表名 DROP 约束名;
+```
+
+#### 示例
+创建一个员工表 employee ，对于其字段有下列要求：
+
+字段名|含义|字段类型|约束条件
+-|-|-|-
+id|编号|INT|自增、主键
+name|姓名|VARCHAR(10)|非空、唯一
+age|年龄|TINYINT UNSIGNED|在 (0, 80] 之间
+status|状态|TINYINT UNSIGNED|默认为 1
+gender|性别|CHAR(1)|值为 “男” 或 “女”
+
+创建员工表 employee 时约束字段：
+``` sql
+CREATE TABLE employee (
+  id INT AUTO_INCREMENT COMMENT '编号',
+  name VARCHAR(10) NOT NULL COMMENT '姓名',
+  age TINYINT COMMENT '年龄',
+  status TINYINT UNSIGNED DEFAULT 1 COMMENT '状态',
+  gender CHAR(1) COMMENT '性别',
+  PRIMARY KEY (id),
+  UNIQUE KEY (name),
+  CHECK(age > 0 && age <= 80),
+  CHECK(gender = '男' || gender = '女')
+) COMMENT '员工表';
+```
+
+创建员工表 employee 之后约束字段：
+``` sql
+CREATE TABLE employee (
+  id INT COMMENT '编号',
+  name VARCHAR(10) COMMENT '姓名',
+  age TINYINT COMMENT '年龄',
+  status TINYINT UNSIGNED COMMENT '状态',
+  gender CHAR(1) COMMENT '性别'
+) COMMENT '员工表';
+
+ALTER TABLE employee ADD PRIMARY KEY (id);
+ALTER TABLE employee MODIFY id INT AUTO_INCREMENT;
+ALTER TABLE employee MODIFY name VARCHAR(10) NOT NULL;
+ALTER TABLE employee ADD UNIQUE KEY (name);
+ALTER TABLE employee ADD CHECK (age > 0 && age <= 80);
+ALTER TABLE employee MODIFY status TINYINT UNSIGNED DEFAULT 1;
+ALTER TABLE employee ADD CHECK (gender = '男' || gender = '女');
+```
+
+### 外键约束
+#### 行为列表
+关键字|含义
+-|-
+NO ACTION|当在父表中删除/更新对应记录时，如果存在对应外键则不允许删除/更新。（与 RESTRICT 一致）
+RESTRICT|当在父表中删除/更新对应记录时，如果存在对应外键则不允许删除/更新。（与 NO ACTION 一致）
+CASCADE|当在父表中删除/更新对应记录时，如果存在对应外键则也删除/更新外键在子表中的记录。
+SET NULL|当在父表中删除对应记录时，如果存在对应外键则设置子表中该外键值为 NULL 。(该外键不能 NOT NULL）
+SET DEFAULT|父表有变更时，子表将外键列设置为默认值。（InnoDB 不支持）
+
+#### 外键约束的添加与删除
+``` sql
+# 添加
+ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段);
+
+# 删除
+ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
+ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
+```
+
+#### 外键约束行为的添加与删除
+``` sql
+# 添加
+ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段) ON UPDATE 更新时的行为 ON DELETE 删除时的行为;
+
+# 删除
+ALTER TABLE 表名 DROP FOREIGN KEY 约束名; # 删除外键
+ALTER TABLE 表名 DROP INDEX 约束名;       # 删除索引
+```
