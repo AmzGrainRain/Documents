@@ -672,3 +672,123 @@ id|主键|无
 name|课程名称|无
 
 ## 多表查询
+详情参阅[菜鸟教程图解](https://www.runoob.com/w3cnote/sql-join-image-explain.html)
+
+### 隐式连接 & 显式连接
+选择两个表，通过 WHERE 条件过滤的语法，就是**隐式连接**。  
+使用 XXX JOIN 选择两个表，并通过 ON 条件过滤的语法，就是**显式连接**。  
+**推荐使用显式连接，后面的 SQL 语句除示例外，优先使用显示连接。**
+
+### 内连接
+基本语法：
+``` sql
+SELECT
+  字段1, 字段2, ...
+FROM
+  表1 AS 别名,
+INNER JOIN
+  表2 AS 别名
+ON 连接条件
+```
+内连接分为三个，分别是：等值连接、非等值连接、自连接。
+
+#### 等值连接
+常用于排序、分组和筛选数据。
+
+##### 双表查询
+查询员工表的 name 字段、部门表的 name 字段：
+``` sql
+SELECT
+  员工表.name,
+  部门表.name
+FROM
+  员工表
+  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id
+;
+```
+
+##### 多表查询
+查询员工表的 name 字段、部门表的 name 字段、工资表的 total 字段，并按照工资表的 total 字段降序排列：
+``` sql
+SELECT
+  员工表.name,
+  员工表.name,
+  工资表.total AS t
+FROM
+  员工表
+  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id
+  INNER JOIN 工资表 ON 员工表.work_id = 工资表.id
+ORDER BY t DESC;
+```
+
+#### 非等值连接
+查询级别大于 3 的员工，并按照年龄升序排列：
+``` sql
+SELECT
+  员工表.name，
+  员工表.age
+FROM
+  员工表
+  INNER JOIN 员工等级表 ON 员工等级表.level > 3
+ORDER BY 员工表.age [ASC];
+```
+
+#### 自连接
+使用自连接可以将自身表的一个镜像当作另一个表来对待，从而能够得到一些特殊的数据。使用自连接的目的并不是自己和自己关联，更多的时候是和表里的其他进行组合。  
+
+#### 过滤笛卡尔积重复数据
+为员工两两分组，排列组合：
+``` sql
+SELECT
+  a.name,
+  b.name
+FROM
+  员工表 AS a
+  INNER JOIN 员工表 AS b ON a.name <> b.name
+;
+```
+
+### 外连接
+
+
+
+<!-- 
+### 隐式内连接
+查询员工表及其所属的部门表的所有字段：
+``` sql
+SELECT * FROM A, B WHERE A.work_id = B.id;
+```
+
+### 显式内连接
+查询员工表及其所属的部门表的所有字段：
+``` sql
+SELECT * FROM A INNER JOIN B ON A.work_id = B.id;
+```
+
+### 外连接
+外连接分为显式左外连接、隐式左外连接、显式右外连接、隐式右外连接。
+#### 左外连接
+#### 右外连接
+查询 A、B 交集部分的数据：
+
+
+### LEFT OUTER JOIN
+查询员工和员工所属的部门。  
+其实就是查询员工表（A）的所有字段和部门表（B）的 name 字段：
+``` sql
+-- 这样
+
+
+-- 这样
+SELECT A.*, B.name FROM A LEFT OUTER JOIN B ON A.work_id = B.id;
+
+-- 或者这样
+SELECT A.*, B.name FROM B RIGHT OUTER JOIN A ON A.work_id = B.id;
+```
+
+### RIGHT OUTER JOIN
+查询部门和部门下的所有员工姓名y。  
+其实就是查询部门表（B）的所有字段和员工表（A）的 name 字段：
+``` sql
+SELECT A.name, B.* FROM A RIGHT OUTER JOIN B ON A.work_id = B.id;
+``` -->
