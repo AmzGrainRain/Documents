@@ -674,12 +674,15 @@ name|课程名称|无
 ## 多表查询
 详情参阅[菜鸟教程图解](https://www.runoob.com/w3cnote/sql-join-image-explain.html)
 
-### 隐式连接 & 显式连接
-选择两个表，通过 WHERE 条件过滤的语法，就是**隐式连接**。  
-使用 XXX JOIN 选择两个表，并通过 ON 条件过滤的语法，就是**显式连接**。  
+### 隐式/显式连接
+选择多个表，通过 WHERE 条件过滤的语法，就是**隐式连接**。  
+使用 XXX JOIN 选择多个表，并通过 ON 条件过滤的语法，就是**显式连接**。  
 **推荐使用显式连接，后面的 SQL 语句除示例外，优先使用显示连接。**
 
 ### 内连接
+
+#### 特点
+根据年代区分，SQL92 标准仅支持内连接，SQL99 标准支持内连接、左外连接、右外连接和全外连接。  
 基本语法：
 ``` sql
 SELECT
@@ -698,18 +701,28 @@ ON 连接条件
 ##### 双表查询
 查询员工表的 name 字段、部门表的 name 字段：
 ``` sql
+-- 显式写法
 SELECT
   员工表.name,
   部门表.name
 FROM
   员工表
-  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id
-;
+  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id;
+
+-- 隐式写法
+SELECT
+  a.name,
+  b.name
+FROM
+  员工表 AS a,
+  部门表 AS b
+WHERE a.work_id = b.id;
 ```
 
 ##### 多表查询
 查询员工表的 name 字段、部门表的 name 字段、工资表的 total 字段，并按照工资表的 total 字段降序排列：
 ``` sql
+-- 显式写法
 SELECT
   员工表.name,
   员工表.name,
@@ -719,11 +732,14 @@ FROM
   INNER JOIN 部门表 ON 员工表.work_id = 部门表.id
   INNER JOIN 工资表 ON 员工表.work_id = 工资表.id
 ORDER BY t DESC;
+
+-- 隐式写法：有兴趣的话可以自己试试有多烧脑
 ```
 
 #### 非等值连接
 查询级别大于 3 的员工，并按照年龄升序排列：
 ``` sql
+-- 显式写法
 SELECT
   员工表.name，
   员工表.age
@@ -731,6 +747,16 @@ FROM
   员工表
   INNER JOIN 员工等级表 ON 员工等级表.level > 3
 ORDER BY 员工表.age [ASC];
+
+-- 隐式写法
+SELECT
+  a.name，
+  a.age AS empAge
+FROM
+  员工表 AS a,
+  员工等级表 AS b
+WHERE b.level > 3
+ORDER BY empAge [ASC];
 ```
 
 #### 自连接
@@ -739,56 +765,118 @@ ORDER BY 员工表.age [ASC];
 ##### 过滤笛卡尔积重复数据
 为员工两两分组，排列组合：
 ``` sql
+-- 显式写法
 SELECT
   a.name,
   b.name
 FROM
   员工表 AS a
-  INNER JOIN 员工表 AS b ON a.name <> b.name
-;
+  INNER JOIN 员工表 AS b ON a.name <> b.name;
+
+-- 隐式写法
+SELECT
+  a.name,
+  b.name
+FROM
+  员工表 AS a,
+  员工表 AS b
+WHERE a.name <> b.name;
+```
+
+##### 查询每一个员工姓名和他的领导姓名
+有这么一个表：
+字段|描述|外键约束情况
+-|-|-
+id|主键|无
+name|姓名|无
+age|年龄|无
+gender|性别|无
+work_no|工号|唯一
+leader_id|领导的 ID|无
+edu_id|教育信息 ID|唯一且关联 B 表的主键
+
+当我们要时查询每一个员工和他的领导姓名，就需要自查寻了：
+``` sql
+-- 显式写法
+SELECT
+  a.name,
+  b.name
+FROM
+  员工表 AS a
+  INNER JOIN 员工表 AS b ON a.leader_id = b.id;
+
+-- 隐式写法
+SELECT
+  a.name,
+  b.name
+FROM
+  员工表 AS a,
+  员工表 AS b
+WHERE a.leader_id = b.id;
 ```
 
 ### 外连接
+外连接没有隐式写法。  
 
-
-
-<!-- 
-### 隐式内连接
-查询员工表及其所属的部门表的所有字段：
+#### 特点
+- 外连接的查询结果是主表中的所有记录
+  - 如果从表中有和它匹配的，则显示匹配的值。
+  - 如果没有与之匹配的，则显示 NULL 。
+  - 外连接查询结果 = 内连接结果 + 主表中有而从表中没有的记录。
+- 左外连接（LEFT \[OUTER\] JOIN）左边的是主表。
+- 右外连接（RIGHT \[OUTER\] JOIN）右边的是主表。
 ``` sql
-SELECT * FROM A, B WHERE A.work_id = B.id;
+-- A << B
+SELECT * FROM A LEFT OUTER JOIN B ON A.b_id = B.id;
+
+-- B << A
+SELECT * FROM B LEFT OUTER JOIN A ON A.b_id = B.id;
+
+-- A >> B
+SELECT * FROM A RIGHT OUTER JOIN B ON A.b_id = B.id;
+
+-- B >> A
+SELECT * FROM B RIGHT OUTER JOIN A ON A.b_id = B.id;
 ```
 
-### 显式内连接
-查询员工表及其所属的部门表的所有字段：
+#### 示例
+员工表：
+字段|描述|外键约束情况
+-|-|-
+id|主键|无
+name|姓名|无
+age|年龄|无
+gender|性别|无
+dep_id|部门ID|关联 B 表的主键
+
+部门表：
+字段|描述|外键约束情况
+-|-|-
+id|主键|无
+department|部门名称|无
+
+查询没有加入任何部门的员工：
 ``` sql
-SELECT * FROM A INNER JOIN B ON A.work_id = B.id;
+SELECT *
+FROM
+  员工表 AS a
+  LEFT OUTER JOIN 部门表 AS b ON a.dep_id = b.id
+WHERE a.dep_id IS NULL;
 ```
 
-### 外连接
-外连接分为显式左外连接、隐式左外连接、显式右外连接、隐式右外连接。
-#### 左外连接
-#### 右外连接
-查询 A、B 交集部分的数据：
-
-
-### LEFT OUTER JOIN
-查询员工和员工所属的部门。  
-其实就是查询员工表（A）的所有字段和部门表（B）的 name 字段：
+查询部门员工数量并升序排列：
 ``` sql
--- 这样
-
-
--- 这样
-SELECT A.*, B.name FROM A LEFT OUTER JOIN B ON A.work_id = B.id;
-
--- 或者这样
-SELECT A.*, B.name FROM B RIGHT OUTER JOIN A ON A.work_id = B.id;
+SELECT
+  部门表.name AS dep_name,
+  COUNT(*) AS emp_num
+FROM
+  部门表 AS A
+  LEFT OUTER JOIN 员工表 AS B ON A.id = B.dep_id
+GROUP BY dep_name
+ORDER BY emp_num [ASC];
 ```
 
-### RIGHT OUTER JOIN
-查询部门和部门下的所有员工姓名y。  
-其实就是查询部门表（B）的所有字段和员工表（A）的 name 字段：
-``` sql
-SELECT A.name, B.* FROM A RIGHT OUTER JOIN B ON A.work_id = B.id;
-``` -->
+## 联合查询
+
+## 内容部分引用
+> DQL连接的查询 [跳转](https://blog.csdn.net/weixin_38746310/article/details/106606649)
