@@ -1,13 +1,23 @@
-# 大数据平台搭建文档
+# 平台搭建
+- [Hadoop 搭建文档](hadoop/README.md)  
+- [Zookeeper 搭建文档](zookeeper/README.md)  
+- [MySql 搭建文档](mysql/README.md)  
+- [Hive 搭建文档](hive/README.md)  
+- [Sqoop 搭建文档](sqoop/README.md)  
+- [HBase 搭建文档](hbase/README.md)  
+- [Scala & Spark 搭建文档](scala&spark/README.md)  
+- [Flume 搭建文档](flume/README.md)  
+- [Kafka 搭建文档](kafka/README.md)  
+- [SQL 助记文档](sql/README.md)
 
-## 平台搭建
-[Hadoop 搭建文档](./hadoop/README.md)  
-[Zookeeper 搭建文档](./zookeeper/README.md)  
-[MySql 搭建文档](./mysql/README.md)  
-[Hive 搭建文档](./hive/README.md)  
-[Sqoop 搭建文档](./sqoop/README.md)  
-[HBase 搭建文档](./hbase/README.md)  
-[Scala & Spark 搭建文档](./scala&spark/README.md)  
-[Flume 搭建文档](./flume/README.md)  
-[Kafka 搭建文档](./kafka/README.md)  
-[SQL 助记文档](./sql/README.md)
+
+Hadoop
+Zookeeper
+MySql
+Hive
+Sqoop
+HBase
+Scala & Spark
+Flume
+Kafka
+SQL 助记文档
