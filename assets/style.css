@@ -7,9 +7,6 @@
   -webkit-touch-callout: none;
   box-sizing: border-box;
 }
-:root {
-  --theme-color: #000;
-}
 body:not(.ready) {
   overflow: hidden;
 }
@@ -17,6 +14,9 @@ body:not(.ready) .app-nav,
 body:not(.ready) > nav,
 body:not(.ready) [data-cloak] {
   display: none;
+}
+.docsify-copy-code-button {
+  border-bottom-left-radius: .5rem !important;
 }
 div#app {
   font-size: 30px;
@@ -50,6 +50,12 @@ span.emoji {
   transition: width 0.2s, opacity 0.4s;
   width: 0;
   z-index: 999999;
+}
+.search input {
+  border-radius: .5rem;
+}
+.search input:focus {
+  box-shadow: none !important;
 }
 .search .search-keyword,
 .search a:hover {
@@ -130,15 +136,20 @@ li input[type="checkbox"] {
   color: var(--theme-color, #42b983);
 }
 .app-nav a.active {
+  font-weight: bolder;
   border-bottom: 2px solid #42b983;
   border-bottom: 2px solid var(--theme-color, #42b983);
 }
 .app-nav li {
   display: inline-block;
   margin: 0 1rem;
-  padding: 5px 0;
+  padding: 5px 10px;
   position: relative;
   cursor: pointer;
+  border-radius: .5rem;
+}
+.app-nav li:hover {
+  background-color: #0001;
 }
 .app-nav li ul {
   background-color: #fff;
