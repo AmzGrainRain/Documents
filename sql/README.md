@@ -1,4 +1,4 @@
-# SQL
+# SQL 基础
 本文档为助记 SQL 语法诞生。请自行百度解惑，此处不提供任何教程。
 ## 数据定义语言（Data Definition Language，DDL）
 用于描述数据库中要存储的现实世界实体的编程语句。
@@ -82,6 +82,9 @@ ALTER TABLE 表名 MODIFY 字段 字段类型 [约束条件];
 ###### 方法一
 ``` sql
 ALTER TABLE 表名 RENAME TO 新表名;
+
+-- 或
+
 ALTER TABLE 表名 RENAME 新表名;
 ```
 
@@ -163,14 +166,121 @@ DELETE FROM 表 WHERE 条件;
 ## 数据查询语言（Data Query Language，DQL）
 用于查询数据库数据的编程语句。
 
+### 基本语法
 ``` sql
 SELECT 字段1 AS 别名1, 字段2, ...
 FROM 表名
 WHERE 条件1, 条件2, ...
 GROUP BY 字段1 AS 别名1, 字段2, ...
 HAVING 条件1, 条件2, ...
+ORDER BY 字段1 [ASC], 字段2 DESC, ...
+LIMIT 从, 到
+```
+
+### 执行顺序
+``` sql
+FROM 表名
+WHERE 条件1, 条件2, ...
+GROUP BY 字段1 AS 别名1, 字段2, ...
+HAVING 条件1, 条件2, ...
+SELECT 字段1 AS 别名1, 字段2, ...
 ORDER BY 字段1, 字段2 DESC, ...
 LIMIT 从, 到
+```
+
+### 关键字
+
+#### BETWEEN
+查询年龄在 20-30 之间的员工：
+``` sql
+SELECT * FROM employee WHERE employee.age BETWEEN 20 AND 30;
+```
+
+#### DISTINCT
+去重查询的结果：
+``` sql
+SELECT DISTINCT * FROM 员工表;
+```
+
+#### LIKE
+通配符列表：
+通配符|描述
+-|-
+%|代表零个或多个字符
+_|仅替代一个字符
+\[charlist\]|字符列中的任何单一字符
+\[^charlist\] 或者 \[!charlist\]|不在字符列中的任何单一字符
+
+查询姓李的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '李%';
+```
+
+查询姓名包含 "莹" 的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '%莹%';
+```
+
+查询姓李且姓名是两个字的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '李__';
+```
+
+查询姓李、王、赵的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '[李王赵]%';
+```
+
+查询姓李、王、赵以外的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '[^李王赵]%';
+
+-- 或
+
+SELECT * FROM 员工表 WHERE 员工表.name LIKE '[!李王赵]%';
+```
+
+
+#### NOT LIKE
+反转 LIKE 的结果，不再过多赘述。
+
+#### OR
+查询年龄在 30 岁以下或 40 岁以上的员工：
+``` sql
+SELECT * FROM 员工表 WHERE 员工表.age < 30 OR 员工表.age > 40;
+```
+
+#### IN
+> IN 在查询的时候，首先查询子查询的表，然后将内表和外表做一个笛卡尔积，然后按照条件进行筛选。所以相对内表比较小的时候，IN 的速度较快。
+
+查询年龄为 31, 33, 36 的员工：
+``` sql
+SELECT * FROM employee WHERE employee.age > IN (31, 33, 36);
+
+-- -- 或
+
+-- SELECT * FROM employee WHERE employee.age > EXISTS(31, 33, 36);
+```
+
+#### NOT IN
+反转 IN 的结果，不再过多赘述。
+
+#### ALL
+一个人的年龄同时大于 28, 19, 31 的员工：
+``` sql
+SELECT * FROM employee WHERE employee.age > ALL (28, 19, 31);
+```
+
+#### ANY & SOME
+一个人的年龄大于 28, 19, 31 其中一个的员工：
+``` sql
+SELECT *
+FROM employee
+WHERE employee.age > ANY (28, 19, 31);
+
+SELECT *
+FROM employee
+WHERE employee.age > SOME (28, 19, 31);
 ```
 
 ## 数据控制语言（Data Control Language，DCL）
@@ -862,6 +972,14 @@ FROM
   员工表 AS a
   LEFT OUTER JOIN 部门表 AS b ON a.dep_id = b.id
 WHERE a.dep_id IS NULL;
+
+-- 或
+
+SELECT *
+FROM
+  部门表 AS a
+  RIGHT OUTER JOIN 员工表 AS b ON a.dep_id = b.id
+WHERE a.dep_id IS NULL;
 ```
 
 查询部门员工数量并升序排列：
@@ -874,9 +992,119 @@ FROM
   LEFT OUTER JOIN 员工表 AS B ON A.id = B.dep_id
 GROUP BY dep_name
 ORDER BY emp_num [ASC];
+
+-- 或
+
+SELECT
+  部门表.name AS dep_name,
+  COUNT(*) AS emp_num
+FROM
+  员工表 AS A
+  RIGHT OUTER JOIN 部门表 AS B ON A.id = B.dep_id
+GROUP BY dep_name
+ORDER BY emp_num [ASC];
+```
+
+### 交叉连接
+交叉连接的结果是笛卡尔积：
+``` sql
+-- 交叉连接——显式自连接，排列组合 name
+SELECT
+  a.name
+  b.name
+FROM 员工表 AS a CROSS JOIN 员工表 AS b;
+
+-- 内连接-隐式自连接，排列组合 name
+SELECT
+  a.name
+  b.name
+FROM 员工表 AS a, 员工表 AS b;
 ```
 
 ## 联合查询
+把多条 SQL 查询的结果合并起来形成一个新的查询结果集。
 
-## 内容部分引用
-> DQL连接的查询 [跳转](https://blog.csdn.net/weixin_38746310/article/details/106606649)
+A：查询年龄大于 50 的员工。  
+B：查询男性员工。  
+合并 A 和 B 的查询结果：
+``` sql
+SELECT * FROM 员工表 WHERE age > 50
+UNION ALL
+SELECT * FROM 员工表 WHERE gender = '男';
+```
+
+合并 A 和 B 的查询结果（去重）：
+``` sql
+SELECT * FROM 员工表 WHERE age > 50
+UNION
+SELECT * FROM 员工表 WHERE gender = '男';
+```
+
+## 子查询
+SQL 嵌套 SQL 就是子查寻。
+
+### 标量子查询
+查询所有与张三同一天入职的员工：
+``` sql
+SELECT * FROM 员工表
+WHERE employment_date = (
+  SELECT employment_date
+  FROM 员工表
+  WHERE name = '张三'
+);
+```
+
+### 列子查询
+查询与张三、李四同一天入职的员工：
+``` sql
+SELECT * FROM 员工表
+WHERE employment_date IN (
+  SELECT employment_date
+  FROM 员工表
+  WHERE name IN ('张三', '李四')
+);
+```
+
+### 行子查寻
+查询与张三同一天入职且都是男性的员工：
+``` sql
+SELECT * FROM 员工表
+WHERE (entry_date, gender) = (
+  SELECT
+    entry_date,
+    gender
+  FROM 员工表
+  WHERE name = '张三'
+);
+```
+
+### 表子查询
+查询与张三、李四年龄、性别相同的员工（结果不包含张三、李四）：
+``` sql 
+SELECT * FROM 员工表
+WHERE (age, gender) IN (
+  SELECT
+    age,
+    gender
+  FROM 员工表
+  WHERE name IN ('张三', '李四')
+) AND name NOT IN ('张三', '李四');
+```
+
+### EXISTS 子查询
+EXISTS 用于指定一个子查询检查子查询是否至少返回一行数据，指定的子查询实际上并不返回任何数据，而是返回值 True 或 False。而且 EXISTS 的子查询是一个受限的 SELECT 语句，不允许有 COMPUTE 子句和 INTO 关键字。在执行 EXISTS 时先执行外层语句，再根据外层语句的查询结果循环子句。
+
+查询所有部门的员工：
+``` sql
+SELECT * FROM employee
+WHERE EXISTS (
+  SELECT * FROM department
+  WHERE employee.department_id = id
+);
+```
+
+## 事务
+
+
+# SQL 进阶
+

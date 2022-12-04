@@ -1,23 +1,13 @@
 # 大数据平台搭建文档
 
-## 一键直达
-[hadoop 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/hadoop/README.md)  
-[zookeeper 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/zookeeper/README.md)  
-[mysql 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/mysql/README.md)  
-[hive 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/hive/README.md)  
-[sqoop 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/sqoop/README.md)  
-[hbase 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/hbase/README.md)  
-[scala & spark 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/scala&spark/README.md)  
-[flume 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/flume/README.md)  
-[kafka 搭建文档](https://github.com/AmzGrainRain/B3D/tree/main/kafka/README.md)  
-
-## 一键直达（码云）
-[hadoop 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hadoop/README.md)  
-[zookeeper 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/zookeeper/README.md)  
-[mysql 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/mysql/README.md)  
-[hive 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hive/README.md)  
-[sqoop 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/sqoop/README.md)  
-[hbase 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/hbase/README.md)  
-[scala & spark 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/scala&spark/README.md)  
-[flume 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/flume/README.md)  
-[kafka 搭建文档](https://gitee.com/AmzGrainRain/B3D/tree/main/kafka/README.md)  
+## 平台搭建
+[Hadoop 搭建文档](./hadoop/README.md)  
+[Zookeeper 搭建文档](./zookeeper/README.md)  
+[MySql 搭建文档](./mysql/README.md)  
+[Hive 搭建文档](./hive/README.md)  
+[Sqoop 搭建文档](./sqoop/README.md)  
+[HBase 搭建文档](./hbase/README.md)  
+[Scala & Spark 搭建文档](./scala&spark/README.md)  
+[Flume 搭建文档](./flume/README.md)  
+[Kafka 搭建文档](./kafka/README.md)  
+[SQL 助记文档](./sql/README.md)
