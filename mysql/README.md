@@ -12,18 +12,18 @@
 ## 1.安装软件包
 
 进入 /opt/tar/MySQL/ 目录内：
-``` shell
+``` bash
 cd /opt/tar/MySQL/
 ```
 
 查看当前目录内的文件：
-``` shell
+``` bash
 ls
 ```
 ![软件包列表](./images/2_1.png)
 
 使用 rpm 包管理器安装当前目录所有 .rpm 软件包：
-``` shell
+``` bash
 rpm -ivh ./* --force --nodeps
 ```
 ![安装结果](./images/2_2.png)
@@ -41,17 +41,17 @@ rpm -ivh ./* --force --nodeps
 ## 2.启动MySQL & 设置开机自启
 
 通过 systemctl 启动 mysqld 守护服务：
-``` shell
+``` bash
 systemctl start mysqld.service
 ```
 
 通过 systemctl 设置开机启动 mysqld 守护服务：
-``` shell
+``` bash
 systemctl enable mysqld.service
 ```
 
 通过 systemctl 查看 mysqld 守护服务状态：
-``` shell
+``` bash
 systemctl status mysqld.service
 ```
 ![操作结果](./images/3_1.png)
@@ -63,7 +63,7 @@ systemctl status mysqld.service
 MySQL启动时，会在 /var/log/mysqld.log 输出日志。默认密码就在日志中。  
 
 使用 grep 命令查找日志中的密码：
-``` shell
+``` bash
 grep 'temporary password' /var/log/mysqld.log
 
 # 或
@@ -73,7 +73,7 @@ cat /var/log/mysqld.log | grep 'temporary password'
 ![操作结果](./images/4_1.png)
 
 复制临时密码，以 root 身份登录到 mysql：
-``` shell
+``` bash
 mysql -u root -p
 ```
 ![操作结果](./images/4_2.png)
@@ -111,6 +111,7 @@ CREATE USER 'root'@'%' IDENTIFIED BY '用户的密码';
   - TO：介词
   - 'root'@'%'：权限赋给 root 用户，所有 ip 都能连接
   - WITH GRANT OPTION：允许级联赋权
+
 ``` sql
 /*
   在开发环境建议这么做，在生产环境上是很危险的操作。

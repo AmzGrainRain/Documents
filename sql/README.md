@@ -204,6 +204,7 @@ SELECT DISTINCT * FROM 员工表;
 
 #### LIKE
 通配符列表：
+
 通配符|描述
 -|-
 %|代表零个或多个字符
@@ -255,11 +256,7 @@ SELECT * FROM 员工表 WHERE 员工表.age < 30 OR 员工表.age > 40;
 
 查询年龄为 31, 33, 36 的员工：
 ``` sql
-SELECT * FROM employee WHERE employee.age > IN (31, 33, 36);
-
--- -- 或
-
--- SELECT * FROM employee WHERE employee.age > EXISTS(31, 33, 36);
+SELECT * FROM 员工表 WHERE 员工表.age > IN (31, 33, 36);
 ```
 
 #### NOT IN
@@ -268,19 +265,19 @@ SELECT * FROM employee WHERE employee.age > IN (31, 33, 36);
 #### ALL
 一个人的年龄同时大于 28, 19, 31 的员工：
 ``` sql
-SELECT * FROM employee WHERE employee.age > ALL (28, 19, 31);
+SELECT * FROM 员工表 WHERE 员工表.age > ALL (28, 19, 31);
 ```
 
 #### ANY & SOME
 一个人的年龄大于 28, 19, 31 其中一个的员工：
 ``` sql
 SELECT *
-FROM employee
-WHERE employee.age > ANY (28, 19, 31);
+FROM 员工表
+WHERE 员工表.age > ANY (28, 19, 31);
 
 SELECT *
-FROM employee
-WHERE employee.age > SOME (28, 19, 31);
+FROM 员工表
+WHERE 员工表.age > SOME (28, 19, 31);
 ```
 
 ## 数据控制语言（Data Control Language，DCL）
@@ -721,6 +718,7 @@ ALTER TABLE 表名 DROP INDEX 约束名;       -- 删除索引
 每个人的教育信息只能有一个，教育信息也只能属于一个人。
 
 个人信息表 A ：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -731,6 +729,7 @@ work_no|工号|唯一
 edu_id|教育信息 ID|唯一且关联 B 表的主键
 
 教育信息表 B：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -742,6 +741,7 @@ edu|教育背景|无
 一个员工只能属于一个部门，一个部门可以有多个员工：
 
 员工表 A ：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -751,6 +751,7 @@ gender|性别|无
 dep_id|部门ID|关联 B 表的主键
 
 部门表 B ：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -761,6 +762,7 @@ department|部门名称|无
 一个学生可以学习多门课程，一门课程可以被多名学生学习：
 
 学生表 A ：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -770,12 +772,14 @@ gender|性别|无
 course|课程|无
 
 多对多关系表 C ：
+
 字段|描述|外键约束情况
 -|-|-
 student_id|学生 ID|关联 A 表的主键
 course_id|课程 ID|关联 B 表的主键
 
 课程表 B ：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -809,92 +813,93 @@ ON 连接条件
 常用于排序、分组和筛选数据。
 
 ##### 双表查询
-查询员工表的 name 字段、部门表的 name 字段：
+查询员工表的**姓名字段**、部门表的**名称字段**：
 ``` sql
 -- 显式写法
 SELECT
-  员工表.name,
-  部门表.name
+  员工表.姓名,
+  部门表.名称
 FROM
   员工表
-  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id;
+  INNER JOIN 部门表 ON 员工表.部门id = 部门表.id;
 
 -- 隐式写法
 SELECT
-  a.name,
-  b.name
+  员工表.姓名,
+  部门表.名称
 FROM
-  员工表 AS a,
-  部门表 AS b
-WHERE a.work_id = b.id;
+  员工表,
+  部门表
+WHERE 员工表.部门id = 部门表.id;
 ```
 
 ##### 多表查询
-查询员工表的 name 字段、部门表的 name 字段、工资表的 total 字段，并按照工资表的 total 字段降序排列：
+查询员工表的**姓名字段**、部门表的**名称字段**、工资表的**总工资字段**，并**按照工资表的总工资字段降序排列**：
 ``` sql
 -- 显式写法
 SELECT
-  员工表.name,
-  员工表.name,
-  工资表.total AS t
+  部门表.名称,
+  员工表.姓名,
+  工资表.总工资 AS 总工资
 FROM
   员工表
-  INNER JOIN 部门表 ON 员工表.work_id = 部门表.id
-  INNER JOIN 工资表 ON 员工表.work_id = 工资表.id
-ORDER BY t DESC;
+  INNER JOIN 部门表 ON 员工表.部门id = 部门表.id
+  INNER JOIN 工资表 ON 员工表.工号 = 工资表.id
+ORDER BY 总工资 DESC;
 
 -- 隐式写法：有兴趣的话可以自己试试有多烧脑
 ```
 
 #### 非等值连接
-查询级别大于 3 的员工，并按照年龄升序排列：
+查询级别大于 3 的员工，并按照年龄降序排列：
 ``` sql
 -- 显式写法
 SELECT
-  员工表.name，
-  员工表.age
+  员工表.姓名,
+  员工表.年龄 AS 员工年龄
 FROM
   员工表
-  INNER JOIN 员工等级表 ON 员工等级表.level > 3
-ORDER BY 员工表.age [ASC];
+  INNER JOIN 员工等级表 ON 员工等级表.等级 > 3
+ORDER BY 员工年龄 DESC;
 
 -- 隐式写法
 SELECT
-  a.name，
-  a.age AS empAge
+  员工表.姓名,
+  员工表.年龄 AS 员工年龄
 FROM
-  员工表 AS a,
-  员工等级表 AS b
-WHERE b.level > 3
-ORDER BY empAge [ASC];
+  员工表,
+  员工等级表
+WHERE 员工等级表.等级 > 3
+ORDER BY 员工年龄 DESC;
 ```
 
 #### 自连接
 使用自连接可以将自身表的一个镜像当作另一个表来对待，从而能够得到一些特殊的数据。使用自连接的目的并不是自己和自己关联，更多的时候是和表里的其他进行组合。  
 
 ##### 过滤笛卡尔积重复数据
-为员工两两分组，排列组合：
+为员工两两分组，排列组合（排除自己和自己的组合）：
 ``` sql
 -- 显式写法
 SELECT
-  a.name,
-  b.name
+  员工表A.姓名,
+  员工表B.姓名
 FROM
-  员工表 AS a
-  INNER JOIN 员工表 AS b ON a.name <> b.name;
+  员工表 AS 员工表A
+  INNER JOIN 员工表 AS 员工表B ON 员工表A.姓名 <> 员工表B.姓名;
 
 -- 隐式写法
 SELECT
-  a.name,
-  b.name
+  员工表A.姓名,
+  员工表B.姓名
 FROM
-  员工表 AS a,
-  员工表 AS b
-WHERE a.name <> b.name;
+  员工表 AS 员工表A,
+  员工表 AS 员工表B
+WHERE 员工表A.姓名 <> 员工表B.姓名;
 ```
 
 ##### 查询每一个员工姓名和他的领导姓名
 有这么一个表：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -909,20 +914,20 @@ edu_id|教育信息 ID|唯一且关联 B 表的主键
 ``` sql
 -- 显式写法
 SELECT
-  a.name,
-  b.name
+  员工表A.姓名 AS 员工姓名,
+  员工表B.姓名 AS 领导姓名
 FROM
-  员工表 AS a
-  INNER JOIN 员工表 AS b ON a.leader_id = b.id;
+  员工表 AS 员工表A
+  INNER JOIN 员工表 AS 员工表B ON 员工表A.领导id = 员工表B.id;
 
 -- 隐式写法
 SELECT
-  a.name,
-  b.name
+  员工表A.姓名 AS 员工姓名,
+  员工表B.姓名 AS 领导姓名
 FROM
-  员工表 AS a,
-  员工表 AS b
-WHERE a.leader_id = b.id;
+  员工表 AS 员工表A,
+  员工表 AS 员工表B
+WHERE 员工表A.领导id = 员工表B.id;
 ```
 
 ### 外连接
@@ -935,6 +940,7 @@ WHERE a.leader_id = b.id;
   - 外连接查询结果 = 内连接结果 + 主表中有而从表中没有的记录。
 - 左外连接（LEFT \[OUTER\] JOIN）左边的是主表。
 - 右外连接（RIGHT \[OUTER\] JOIN）右边的是主表。
+
 ``` sql
 -- A << B
 SELECT * FROM A LEFT OUTER JOIN B ON A.b_id = B.id;
@@ -951,6 +957,7 @@ SELECT * FROM B RIGHT OUTER JOIN A ON A.b_id = B.id;
 
 #### 示例
 员工表：
+
 字段|描述|外键约束情况
 -|-|-
 id|主键|无
@@ -969,55 +976,55 @@ department|部门名称|无
 ``` sql
 SELECT *
 FROM
-  员工表 AS a
-  LEFT OUTER JOIN 部门表 AS b ON a.dep_id = b.id
-WHERE a.dep_id IS NULL;
+  员工表
+  LEFT OUTER JOIN 部门表 ON 员工表.部门id = 部门表.id
+WHERE 员工表.部门id IS NULL;
 
 -- 或
 
 SELECT *
 FROM
-  部门表 AS a
-  RIGHT OUTER JOIN 员工表 AS b ON a.dep_id = b.id
-WHERE a.dep_id IS NULL;
+  部门表
+  RIGHT OUTER JOIN 员工表 ON 员工表.部门id = 部门表.id
+WHERE 员工表.部门id IS NULL;
 ```
 
 查询部门员工数量并升序排列：
 ``` sql
 SELECT
-  部门表.name AS dep_name,
-  COUNT(*) AS emp_num
+  部门表.名称 AS 部门名称,
+  COUNT(*) AS 员工数量
 FROM
-  部门表 AS A
-  LEFT OUTER JOIN 员工表 AS B ON A.id = B.dep_id
-GROUP BY dep_name
-ORDER BY emp_num [ASC];
+  部门表
+  LEFT OUTER JOIN 员工表 ON 部门表.id = 员工表.部门id
+GROUP BY 部门名称
+ORDER BY 员工数量 [ASC];
 
 -- 或
 
 SELECT
-  部门表.name AS dep_name,
-  COUNT(*) AS emp_num
+  部门表.名称 AS 部门名称,
+  COUNT(*) AS 员工数量
 FROM
-  员工表 AS A
-  RIGHT OUTER JOIN 部门表 AS B ON A.id = B.dep_id
-GROUP BY dep_name
-ORDER BY emp_num [ASC];
+  员工表
+  RIGHT OUTER JOIN 部门表 ON 部门表.id = 员工表.部门id
+GROUP BY 部门名称
+ORDER BY 员工数量 [ASC];
 ```
 
 ### 交叉连接
 交叉连接的结果是笛卡尔积：
 ``` sql
--- 交叉连接——显式自连接，排列组合 name
+-- 交叉连接——显式自连接，排列组合姓名
 SELECT
-  a.name
-  b.name
+  a.姓名
+  b.姓名
 FROM 员工表 AS a CROSS JOIN 员工表 AS b;
 
--- 内连接-隐式自连接，排列组合 name
+-- 内连接-隐式自连接，排列组合姓名
 SELECT
-  a.name
-  b.name
+  a.姓名
+  b.姓名
 FROM 员工表 AS a, 员工表 AS b;
 ```
 
@@ -1028,16 +1035,16 @@ A：查询年龄大于 50 的员工。
 B：查询男性员工。  
 合并 A 和 B 的查询结果：
 ``` sql
-SELECT * FROM 员工表 WHERE age > 50
+SELECT * FROM 员工表 WHERE 年龄 > 50
 UNION ALL
-SELECT * FROM 员工表 WHERE gender = '男';
+SELECT * FROM 员工表 WHERE 性别 = '男';
 ```
 
 合并 A 和 B 的查询结果（去重）：
 ``` sql
-SELECT * FROM 员工表 WHERE age > 50
+SELECT * FROM 员工表 WHERE 年龄 > 50
 UNION
-SELECT * FROM 员工表 WHERE gender = '男';
+SELECT * FROM 员工表 WHERE 性别 = '男';
 ```
 
 ## 子查询
@@ -1047,8 +1054,8 @@ SQL 嵌套 SQL 就是子查寻。
 查询所有与张三同一天入职的员工：
 ``` sql
 SELECT * FROM 员工表
-WHERE employment_date = (
-  SELECT employment_date
+WHERE 入职时间 = (
+  SELECT 入职时间
   FROM 员工表
   WHERE name = '张三'
 );
@@ -1058,8 +1065,8 @@ WHERE employment_date = (
 查询与张三、李四同一天入职的员工：
 ``` sql
 SELECT * FROM 员工表
-WHERE employment_date IN (
-  SELECT employment_date
+WHERE 入职时间 IN (
+  SELECT 入职时间
   FROM 员工表
   WHERE name IN ('张三', '李四')
 );
@@ -1069,10 +1076,10 @@ WHERE employment_date IN (
 查询与张三同一天入职且都是男性的员工：
 ``` sql
 SELECT * FROM 员工表
-WHERE (entry_date, gender) = (
+WHERE (入职时间, 性别) = (
   SELECT
-    entry_date,
-    gender
+    入职时间,
+    性别
   FROM 员工表
   WHERE name = '张三'
 );
@@ -1082,10 +1089,10 @@ WHERE (entry_date, gender) = (
 查询与张三、李四年龄、性别相同的员工（结果不包含张三、李四）：
 ``` sql 
 SELECT * FROM 员工表
-WHERE (age, gender) IN (
+WHERE (年龄, 性别) IN (
   SELECT
-    age,
-    gender
+    年龄,
+    性别
   FROM 员工表
   WHERE name IN ('张三', '李四')
 ) AND name NOT IN ('张三', '李四');
@@ -1096,15 +1103,284 @@ EXISTS 用于指定一个子查询检查子查询是否至少返回一行数据�
 
 查询所有部门的员工：
 ``` sql
-SELECT * FROM employee
+SELECT * FROM 员工表
 WHERE EXISTS (
-  SELECT * FROM department
-  WHERE employee.department_id = id
+  SELECT * FROM 部门表
+  WHERE 员工表.部门id = id
 );
 ```
 
-# SQL 进阶
-
 ## 事务
+事务是一组操作的集合，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求。这些操作要么同时成功，要么同时失败。这样即使正在操作数据时因为不可抗拒原因导致操作中断，也能保证您的数据的完整性。  
+  
+事务有以下分类：
+- 扁平事务
+- 带保存点的扁平事务
+- 链事务
+- 嵌套事务
+- 分布式事务
 
-## 事务四大特性（ACID）
+### 事务四大特性（ACID）
+* 原子性（**A**tomicity）：事务是不可分割的最小操作单元，要么全部成功，要么全部失败。
+* 一致性（**C**onsistency）：事务完成时，必须使所有的数据都保持一致状态。
+* 隔离性（**I**solation）：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行。
+* 持久性（**D**urability）：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。
+
+### 事务的基本使用
+
+#### 开启事务
+使用此命令开启事务：
+``` sql
+START TRANSACTION;
+
+-- 或
+
+BEGIN;
+```
+
+#### 提交事务
+``` sql
+COMMIT;
+
+-- 或
+
+COMMIT WORK;
+```
+**注意：此时 COMMIT 与 COMMIT WORK 的作用是一样的。但是它们的作用受变量 COMPLETION_TYPE 的影响。**
+
+#### 回滚事务
+``` sql
+ROLLBACK;
+
+-- 或
+
+ROLLBACK WORK;
+```
+**注意：此时 ROLLBACK 与 ROLLBACK WORK 的作用是一样的。但是它们的作用受变量 COMPLETION_TYPE 的影响。**
+
+#### 示例
+打开事务 -> 执行一些 SQL -> 提交事务（生效前面已执行 SQL ） 
+``` sql
+-- 张三给李四转账 1000
+
+-- 开启事务
+START TRANSACTION;
+
+-- 执行一些SQL
+UPDATE 员工表 SET money = (money - 1000) WHERE 姓名 = '张三';
+UPDATE 员工表 SET money = (money + 1000) WHERE 姓名 = '李四';
+
+-- 回滚事务
+ROLLBACK;
+```
+打开事务 -> 执行一些 SQL -> 回滚事务（作废前面已执行 SQL）
+``` sql
+-- 张三给李四转账 1000
+
+-- 开启事务
+BEGIN;
+
+-- 执行一些SQL
+UPDATE 员工表 SET money = (money - 1000) WHERE 姓名 = '张三';
+UPDATE 员工表 SET money = (money + 1000) WHERE 姓名 = '李四';
+
+-- 提交事务
+COMMIT;
+```
+如果上面的两条 UPDATE 有一条执行失败，则这个事务就不会提交。
+
+#### COMPLETION_TYPE 的值
+前面我们说过，COMMIT 与 COMMIT WORK 以及 ROLLBACK 与 ROLLBACK WORK 作用是一样的。但是他们的作用受变量completion_type 的影响，在这里我们就来研究下究竟会产生什么样的影响。  
+  
+COMPLETION_TYPE 的值默认为 NO_CHAIN，除此之外还有其他的值：
+- CHAIN
+- RELEASE
+
+##### NO_CHAIN
+提交事务或回滚事务时一同结束该事务：
+``` sql
+-- 设置 COMPLETION_TYPE 为 NO_CHAIN
+SET COMPLETION_TYPE = 0;
+
+-- 开启事务
+BEGIN;
+
+-- 更新数据
+UPDATE employee SET balance = 5000 WHERE name = '张三';
+
+-- 提交事务
+COMMIT WORK;
+
+-- 更新数据
+UPDATE employee SET balance = 2000 WHERE name = '张三';
+
+-- 回滚事务
+ROLLBACK;
+```
+受 COMPLETION_TYPE = 'NO_CHAIN' 的影响，事务在 COMMIT WORK 之后就已经结束了所以最后一行的 ROLLBACK 不会生效。此时张三的零钱是 2000。
+
+##### CHAIN
+提交事务或回滚事务时自动创建一个新的事务：
+``` sql
+-- 设置 COMPLETION_TYPE 为 CHAIN
+SET COMPLETION_TYPE = 1;
+
+-- 开启事务
+BEGIN;
+
+-- 更新数据
+UPDATE employee SET balance = 5000 WHERE name = '张三';
+
+-- 提交事务
+COMMIT WORK;
+
+-- 更新数据
+UPDATE employee SET balance = 2000 WHERE name = '张三';
+
+-- 回滚事务
+ROLLBACK;
+```
+受 COMPLETION_TYPE = 'CHAIN' 的影响，COMMIT WORK 提交之后，自动又开启了一个新的事务。使得最后一行的 ROLLBACK　生效，回滚了 `UPDATE employee SET balance = 2000 WHERE name = '张三';` 此时张三的零钱是 5000。
+
+##### RELEASE
+提交事务或回滚事务时释放与 SQL 建立的连接：
+``` sql
+-- 设置 COMPLETION_TYPE 为 RELEASE
+SET COMPLETION_TYPE = 2;
+
+-- 开启事务
+BEGIN;
+
+-- 更新数据
+UPDATE employee SET balance = 5000 WHERE name = '张三';
+
+-- 提交事务
+COMMIT WORK;
+
+-- 更新数据
+UPDATE employee SET balance = 2000 WHERE name = '张三';
+
+-- 回滚事务
+ROLLBACK;
+```
+受 COMPLETION_TYPE = 'RELEASE' 的影响，COMMIT WORK 提交之后，就释放了与 SQL 建立的连接。所以后面的 SQL 不会执行，此时张三的零钱是 5000。
+
+### 事务提交默认行为
+AUTOCOMMIT 默认为 1，即所做出的操作立即生效。
+可以通过下列语句来查询事务状态：
+``` sql
+SELECT @@AUTOCOMMIT;
+
+-- 或
+
+SHOW VARIABLES LIKE 'AUTOCOMMIT';
+```
+通过此方法修改 AUTOCOMMIT 为 0 时，当前会话所作出的修改均不会立即生效，而是等待 COMMIT 命令或 ROLLBACK 命令执行：
+``` sql
+SET @@AUTOCOMMIT = 0;
+
+-- 或
+
+SET AUTOCOMMIT = 0;
+```
+
+### 并发事务问题
+名称|描述
+-|-
+脏读|一个事务读到另外一个事务还没有提交的数据。
+不可重复读|一个事务先后读取同一条记录，但两次读取的数据不同，称之为不可重复读。
+幻读|一个事务按照条件查询数据时，没有对应的数据行，但是在插入数据时，又发现这行数据已经存在。
+
+要解决并发事务所产生的上述问题，需要使用事务隔离。
+
+### 事务隔离
+事务特性（ACID）中的隔离性（Isolation）就是隔离级别，它通过锁来实现。也就是说，设置不同的隔离级别，其本质只是控制不同的锁行为。例如操作是否申请锁，什么时候申请锁，申请的锁是立刻释放还是持久持有直到事务结束才释放等。
+
+#### 隔离级别
+级别|脏读|不可重复读|幻读
+-|-|-|-
+READ UNCOMMITTED|√|√|√
+READ COMMITTED|×|√|√
+REPEATABLE READ|×|×|√
+SERIALIZABLE|×|×|×
+
+#### 查看隔离级别
+``` sql
+SELECT @@TRANSATION_ISOLATION;
+```
+
+或者查找变量值：
+``` sql
+-- 查看当前会话隔离级别
+SELECT @@TX_ISOLATION;
+
+-- 查看全局会话隔离级别
+SELECT @@GLOBAL.TX_ISOLATION;
+```
+
+#### 设置隔离级别
+SESSION：当前会话  
+GLOBAL：全局
+``` sql
+SET [ SESSION | GLOBAL ]
+TRANSACTION ISOLATION LEVEL 隔离级别;
+```
+
+或者修改变量值：
+``` sql
+SET @@GLOBAL.TX_ISOLATION = 隔离级别;
+set @@SESSION.TX_ISOLATION = 隔离级别;
+```
+
+### 扁平事务
+扁平事务是最常见的事务。由 BEGIN 或 START TRANSACTION 开始，COMMIT 或 ROLLBACK 结束，中间的所有操作要么都回滚要么都提交。扁平事务在生产环境中占绝大多数使用情况。因此每一种数据库产品都支持扁平事务。
+
+### 带有保存点的扁平事务  
+扁平事务的缺点在于无法回滚或提交一部分，只能全部回滚或全部提交，所以就有了 ”带有保存点“ 的扁平事务。通过在事务内部的某个位置使用 SAVEPOINT，将来可以在事务中回滚到此位置。
+
+#### 设置保存点
+``` sql
+SAVE POINT 保存点名称;
+```
+
+#### 回滚到指定保存点
+``` sql
+ROLLBACK TO 保存点名称;
+```
+
+删除指定保存点：
+``` sql
+RELEASE SAVEPOINT 保存点名称;
+```
+
+实际上，扁平事务也是有保存点的，只不过它只有一个隐式的保存点，且自动建立在事务开始的位置，因此扁平事务只能回滚到事务开始处。
+
+### 链式事务
+链式事务是保存点扁平事务的变种。它在一个事务提交的时候自动隐式的将上下文传给下一个事务，也就是说一个事务的提交和下一个事务的开始是原子性的，下一个事务可以看到上一个事务的处理结果。通俗地说，就是一个事务的提交和另一个事务的开始是链接在一起的。  
+  
+这样的事务类型，在提交事务的时候，会释放要提交事务内所有的锁和要提交事务内所有的保存点。因此链式事务只能回滚到当前所在事务的保存点，而不能回滚到已提交的事务中的保存点。
+
+### 嵌套事务
+嵌套事务由一个顶层事务控制所有的子事务。子事务的提交完成后不会真的提交，而是等到顶层事务提交才真正的提交。  
+
+关于嵌套事务的机制，主要有以下结论：
+- 回滚内部事务的同时会回滚到外部事务的起始点。
+- 事务提交时从内向外依次提交。
+- 回滚外部事务的同时会回滚所有事务，包括已提交的内部事务。因为只提交内部事务时没有真的提交。
+
+不管怎么样，最好少用嵌套事务。且 MySQL 原生不支持嵌套事务（SQL Server支持）。
+
+### 分布式事务
+将多个服务器上的事务（节点）组合形成一个遵循事务特性（ACID）的分布式事务。  
+  
+例如在工行 ATM 机转账到建行用户。工行 ATM 机所在数据库是一个事务节点 A，建行数据库是一个事务节点 B，仅靠工行 ATM 机是无法完成转账工作的，因为它控制不了建行的事务。所以它们组成一个分布式事务：
+1. ATM 机发出转账口令。
+2. ATM 机从工行用户减少 N 元。
+3. 在建行用户增加 N 元。
+4. 在 ATM 机上返回转账结果。
+
+上面涉及了两个事务节点，这些事务节点之间的事务必须同时具有 ACID 属性，要么所有的事务都成功，要么所有的事务都失败。不能只是其中一个银行的 ATM 机的事务成功，而另一个银行的事务失败。
+
+MySQL 的分布式事务使用两段式提交协议（2-phase commit, 2PC）。最重要的是，MySQL 5.7.7 之前，MySQL 对分布式事务的支持一直都不完善（第一阶段提交事务后不会写 binlog，导致宕机丢失日志），这个问题持续时间长达数十年，直到 MySQL 5.7.7，才完美支持分布式事务。相关内容可参考网上一篇文章：[MySQL 5.7 完美的分布式事务支持](https://www.linuxidc.com/Linux/2016-02/128053.htm)。
+
+### 

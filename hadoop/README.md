@@ -52,20 +52,20 @@ YARN 是一种资源协调者，是 Hadoop 的资源管理器。
 修改主机名主要是为了在集群中分辨主次  
 
 在第一台服务器上操作：
-``` shell
+``` bash
 # 宿主
 hostnamectl set-hostname master
 ```
 
 在第二台服务器上操作：
-``` shell
+``` bash
 # 节点
 hostnamectl set-hostname slave1
 ```
 
 在第三台服务器上操作：
 
-``` shell
+``` bash
 # 节点
 hostnamectl set-hostname slave2
 ```
@@ -79,7 +79,7 @@ hostnamectl set-hostname slave2
 > hosts 有什么作用请自行百度
 
 通过 vi 修改 /etc/hosts 文件:
-``` shell
+``` bash
 # 编辑 hosts 文件
 vi /etc/hosts
 ```
@@ -93,7 +93,7 @@ vi /etc/hosts
 > 以下内容在 master 节点上操作
 
 通过 scp 命令将 master 节点上已经修改过的 hosts 文件发送到 slave1 和 slave2：
-``` shell
+``` bash
 # scp 源 目标 (如果目标已存在则覆盖)
 scp /etc/hosts slave1:/etc/hosts
 scp /etc/hosts slave2:/etc/hosts
@@ -103,7 +103,7 @@ scp /etc/hosts slave2:/etc/hosts
 > 以下内容在所有节点上操作一次
 
 systemctl 用于控制服务，使用 systemctl 关闭防火墙：
-``` shell
+``` bash
 # systemctl 操作 服务
 
 # 关闭防火墙
@@ -114,7 +114,7 @@ systemctl disable firewalld.service
 ```
 
 查看防火墙状态，确认上面执行的是否已经生效：
-``` shell
+``` bash
 systemctl status firewalld.service
 ```
 ![结果](./images/6_1.png)
@@ -125,14 +125,14 @@ systemctl status firewalld.service
 > 以下内容在 master 节点上操作
 
 生成一个 RSA 密钥，一直回车即可。
-``` shell
+``` bash
 # ssh-keygen -t 密钥类型
 ssh-keygen -t rsa
 ```
 ![结果](./images/7_1.png)
 
 创建可信配置：
-``` shell
+``` bash
 # 给自己添加可信配置呢，此举方便后面启动集群。
 ssh-copy-id master
 
@@ -149,7 +149,7 @@ ssh-copy-id slave2
 
 ## 6.Hadoop 集群部署
 > 以下内容在 master 节点上操作
-``` shell
+``` bash
 # 切换到 opt 目录
 cd /opt
 
@@ -171,12 +171,12 @@ mv ./jdk1.8.0_191 ./jdk
 > 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
-``` shell
+``` bash
 vi ~/.bashrc
 ```
 
 在末尾追加以下内容：
-``` shell
+``` bash
 export  HADOOP_HOME=/opt/apps/hadoop
 export  PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 export  JAVA_HOME=/opt/apps/jdk
@@ -184,18 +184,18 @@ export  PATH=$PATH:$JAVA_HOME/bin
 ```
 
 刷新环境变量：
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
 测试 jdk 环境变量：
-``` shell
+``` bash
 java -version
 ```
 ![java](./images/9_1.png)
 
 测试 hadoop 环境变量：
-``` shell
+``` bash
 whereis hdfs
 ```
 ![java](./images/9_2.png)
@@ -205,24 +205,24 @@ whereis hdfs
 ## 8.Hadoop 集群配置
 > 以下内容在 master 节点上操作
 进入到 hadoop 配置文件的目录下：
-``` shell
+``` bash
 cd /opt/apps/hadoop/etc/hadoop/
 ```
 
 ### 配置 hadoop-env.sh
 使用 vi 编辑 hadoop-env.sh：
-``` shell
+``` bash
 vi hadoop-env.sh
 ```
 
 在尾部追加以下内容:
-``` shell
+``` bash
 export JAVA_HOME=/opt/apps/jdk
 ```
 
 ### <span id="core-site-xml">配置 core-site.xml</span>
 使用 vi 编辑 core-site.xml：
-``` shell
+``` bash
 vi core-site.xml
 ```
 
@@ -251,7 +251,7 @@ hadoop.tmp.dir|/tmp/hadoop-${user_name}|临时目录
 
 ### 配置 hdfs-site.xml
 使用 vi 编辑 core-site.xml：
-``` shell
+``` bash
 vi hdfs-site.xml
 ```
 
@@ -290,7 +290,7 @@ dfs.secondary.http.address|0.0.0.0:50090|hdfs对应的http服务器地址
 
 ### 配置 mapred-site.xml
 使用模板配置：
-``` shell
+``` bash
 cp ./mapred-site.xml.template ./mapred-site.xml
 vi mapred-site.xml
 ```
@@ -316,7 +316,7 @@ mapreduce.jobhistory.webapp.address|0.0.0.0:19888|定义历史服务器 web 应�
 
 ### 配置 yarn-site.xml
 使用 vi 编辑 yarn-site.xml：
-``` shell
+``` bash
 vi yarn-site.xml
 ```
 
@@ -347,7 +347,7 @@ yarn.nodemanager.aux-services|org.apache.hadoop.mapred.ShuffleHandler|通过该�
 
 ### 配置 slaves
 使用 vi 编辑 slaves：
-``` shell
+``` bash
 vi slaves
 ```
 
@@ -363,20 +363,20 @@ slave2
 > 以下内容在 master 节点上操作
 
 下发 apps 目录到 slave1 和 slave2 节点：
-``` shell
+``` bash
 scp -r /opt/apps slave1:/opt/
 scp -r /opt/apps slave2:/opt/
 ```
 
 下发环境变量文件到 slave1 和 slave2 节点：
-``` shell
+``` bash
 scp ~/.bashrc slave1:~/.bashrc
 scp ~/.bashrc slave2:~/.bashrc
 ```
 
 ## 10.生效环境变量：
 > 以下内容在所有节点上操作
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
@@ -384,17 +384,17 @@ source ~/.bashrc
 > 以下内容在 master 节点上操作
 
 格式化元数据：（切记，千万不要多次执行此命令）
-``` shell
+``` bash
 hdfs namenode -format
 ```
 
 > <span id="hdfs-error">如果多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 nomenode 解决：</span>
->``` shell
+> ``` bash
 > # 在所有节点上执行
 > rm -rf /opt/apps/hadoop/tmp/*
 > ```
 > 再次执行格式化：
-> ``` shell
+> ``` bash
 > # 在主节点上执行
 > hdfs namenode -format
 > ```
@@ -403,13 +403,13 @@ hdfs namenode -format
 ![正常输出](./images/11_1.png)
 
 启动 hdfs 和 yarn：
-``` shell
+``` bash
 start-dfs.sh && start-yarn.sh
 ```
 ![正常输出](./images/11_2.png)
 
 关闭安全模式：
-``` shell
+``` bash
 hdfs dfsadmin -safemode leave
 ```
 ---
@@ -418,7 +418,7 @@ hdfs dfsadmin -safemode leave
 > 以下内容在 master 节点上操作
 
 检查 hadoop ：
-``` shell
+``` bash
 jps
 ```
 ![正常输出](./images/12_1.png)
@@ -446,7 +446,7 @@ jps
 > 以下内容在 master 节点上操作
 
 来一波计算测试：
-``` shell
+``` bash
 # 切换目录
 cd /opt/apps/hadoop/share/hadoop/mapreduce/
 
@@ -458,7 +458,7 @@ hadoop jar hadoop-mapreduce-examples-2.6.0.jar pi 10 10
 ```
 
 查看 hdfs 报告：
-``` shell
+``` bash
 hdfs dfsadmin -report
 ```
 

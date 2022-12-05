@@ -10,7 +10,7 @@
 ---
 
 ## 1.解压 hive
-``` shell
+``` bash
 # 进入 /opt/apps 目录
 cd /opt/apps/
 
@@ -25,12 +25,12 @@ mv ./apache-hive-2.3.4-bin ./hive
 
 ## 2.放入 MySQL 驱动包
 因为 hive 需要操作 mysql，所以需要将 java 连接 mysql 需要用到的驱动复制到 hive/lib/ 下：
-``` shell
+``` bash
 cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
 ```
 
 > 启动 hive 会出现一个警告，解决方案是升级 hadoop 的 jline 库。将 hadoop 中的 jline-0.0.94.jar 替换为 hive 中较新的 jline-2.12.jar：
-> ``` shell
+> ``` bash
 > # 备份 jline-0.0.94.jar（以防万一）
 > cd /opt/apps/hadoop/share/hadoop/yarn/lib
 > cp ./jline-0.9.94.jar ./jline-0.9.94.jar.bak
@@ -42,18 +42,18 @@ cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
 
 ## 3.配置环境变量
 编辑用户根目录下的 .bashrc 文件：
-``` shell
+``` bash
 vi ~/.bashrc
 ```
 
 在文件末尾添加：
-``` shell
+``` bash
 export HIVE_HOME=/opt/apps/hive
 export PATH=$PATH:$HIVE_HOME/bin
 ```
 
 ## 4.生效环境变量
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
@@ -61,22 +61,22 @@ source ~/.bashrc
 
 ## 5.配置 hive-env.sh
 进入到 hive 配置文件的目录下：
-``` shell
+``` bash
 cd /opt/apps/hive/conf
 ```
 
 拷贝模板：
-``` shell
+``` bash
 cp ./hive-env.sh.template ./hive-env.sh
 ```
 
 编辑 hive-env.sh：
-```shell
+``` bash
 vi ./hive-env.sh
 ```
 
 在文件末尾添加：
-```shell
+``` bash
 export JAVA_HOME=/opt/apps/jdk
 export HADOOP_HOME=/opt/apps/hadoop
 export HIVE_HOME=/opt/apps/hive
@@ -84,7 +84,7 @@ export HIVE_CONF_DIR=$HIVE_HOME/conf
 ```
 
 编辑完后长这样：
-``` diff
+``` bash
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -139,22 +139,22 @@ export HIVE_CONF_DIR=$HIVE_HOME/conf
 
 # Folder containing extra libraries required for hive compilation/execution can be controlled by:
 # export HIVE_AUX_JARS_PATH=
-+ export JAVA_HOME=/opt/apps/jdk
-+ export HADOOP_HOME=/opt/apps/hadoop
-+ export HIVE_HOME=/opt/apps/hive
-+ export HIVE_CONF_DIR=$HIVE_HOME/conf
+export JAVA_HOME=/opt/apps/jdk
+export HADOOP_HOME=/opt/apps/hadoop
+export HIVE_HOME=/opt/apps/hive
+export HIVE_CONF_DIR=$HIVE_HOME/conf
 ```
 
 ---
 
 ## 6.配置 hive-site.xml
 拷贝模板：
-``` shell
+``` bash
 cp ./hive-default.xml.template ./hive-site.xml
 ```
 
 编辑 hive-site.xml：
-``` shell
+``` bash
 vi ./hive-site.xml
 ```
 
@@ -187,7 +187,7 @@ vi ./hive-site.xml
 
 ## 7.schema 格式化
 执行格式化：
-``` shell
+``` bash
 schematool -dbType mysql -initSchema
 ```
 ![结果](images/6_1.png)
@@ -196,7 +196,7 @@ schematool -dbType mysql -initSchema
 
 ## 8.启动 hive
 启动 hive ：
-```shell
+``` bash
 hive
 ```
 
@@ -204,13 +204,13 @@ hive
 ![示意图](./images/7_1.png)
 
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
-``` shell
+``` bash
 # sed -i "s/要替换的/替换为/g" 文件路径
 sed -i "s/system://g" /opt/apps/hive/conf/hive-site.xml
 ```
 
 再次尝试启动 hive：
-```shell
+``` bash
 hive
 ```
 
@@ -223,7 +223,7 @@ hive
 目的：使用 hive 处理存储在 hdfs 内的结构化数据，使得我们可以通过 SQL 语句操作这些数据。  
 
 我们先来创建一个结构化的数据：
-``` shell
+``` bash
 # 进入根目录
 cd ~
 
@@ -241,13 +241,13 @@ vi test.txt
 ![文本内容](./images/8_1.png)
 
 在 hdfs 里创建一个 test_hive 目录：
-``` shell
+``` bash
 # hdfs dfs -命令 值
 hdfs dfs -mkdir /test_hive
 ```
 
 把我们刚刚写的 test.txt 发送到 hdfs 文件系统的 /test_hive 目录里 ：
-``` shell
+``` bash
 hdfs dfs -put ~/test.txt /test_hive/test.txt
 ```
 如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop 。  
@@ -275,14 +275,14 @@ start-dfs.sh && start-yarn.sh
 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
 
 回到正题，cat 一下，证明已经发送到 hdfs 里了：
-```shell
+``` bash
 hdfs dfs -cat /test_hive/test.txt
 ```
 ![文本内容](./images/8_2.png)
 
 
 启动 hive ：
-``` shell
+``` bash
 hive
 ```
 
@@ -292,31 +292,32 @@ hive
 - 这个表的行格式：
 	-	以 “,” 分隔字段
 	- 换行符结尾
-``` shell
+
+``` bash
 create table test (name string, age int) row format delimited fields terminated by ",";
 ```
 ![文本内容](./images/8_3.png)
 
 从 hdfs 导入 /test_hive/test.txt 	内的数据到 test 数据表：
-``` shell
+``` bash
 # load data inpath 'hdfs 路径' into table 表名;
 load data inpath '/test_hive/test.txt' into table test;
 ```
 ![文本内容](./images/8_4.png)
 
 执行一个大家熟悉的命令来验证下：
-``` shell
+``` bash
 select * from test;
 ```
 ![文本内容](./images/8_5.png)
 
 输入 exit 或按下 ctrl + d 退出 hive 控制台：
-``` shell
+``` bash
 exit;
 ```
 
 在 hdfs 里可查看到 hive 的数据表信息：
-``` shell
+``` bash
 hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ```
 ![文本内容](./images/8_6.png)

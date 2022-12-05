@@ -38,17 +38,17 @@ KAFKA 工作在此模式下，发布者发送到 Topic 的消息，只有订阅�
 > 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
-``` shell
+``` bash
 cd /opt/apps
 ```
 
 解压 apache-flume-1.6.0-bin.tar.gz 到当前目录：
-``` shell
+``` bash
 tar -zxf /opt/tar/kafka_2.11-1.0.0.tgz
 ```
 
 重命名 kafka ：
-``` shelll
+``` bash
 mv ./kafka_2.11-1.0.0 ./kafka
 ```
 
@@ -58,19 +58,19 @@ mv ./kafka_2.11-1.0.0 ./kafka
 > 以下内容在 master 节点上操作
 
 编辑用户根目录下的 .bashrc 文件：
-``` shell
+``` bash
 vi ~/.bashrc
 ```
 
 在文件末尾添加：
-``` shell
+``` bash
 export KAFKA_HOME=/opt/apps/kafka
 export PATH=$PATH:$KAFKA_HOME/bin
 ```
 
 ## 3.生效环境变量
 > 以下内容在所有节点上操作
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
@@ -80,22 +80,22 @@ source ~/.bashrc
 > 以下内容在 master 节点上操作
 
 进入配置文件目录：
-``` shell
+``` bash
 cd /opt/apps/kafka/config
 ```
 
 创建 kafka 的日志目录：
-``` shell
+``` bash
 mkdir /opt/apps/kafka/logs
 ```
 
 使用 vi 编辑 server.properties：
-``` shell
+``` bash
 vi server.properties
 ```
 
 找到并修改以下内容:
-``` shell
+``` bash
 # 日志目录（确保这个目录存在）
 log.dirs=/opt/apps/kafka/logs
 
@@ -109,13 +109,13 @@ zookeeper.connect=master:2181,slave1:2181,slave2:2181
 > 以下内容在 master 节点上操作
 
 下发 kafka 目录到 slave1 和 slave2 节点：
-``` shell
+``` bash
 scp -r /opt/apps/kafka slave1:/opt/apps/
 scp -r /opt/apps/kafka slave2:/opt/apps/
 ```
 
 下发环境变量文件到 slave1 和 slave2 节点：
-``` shell
+``` bash
 scp ~/.bashrc slave1:~/.bashrc
 scp ~/.bashrc slave2:~/.bashrc
 ```
@@ -123,7 +123,7 @@ scp ~/.bashrc slave2:~/.bashrc
 
 ## 6.生效环境变量：
 > 以下内容在所有节点上操作
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
@@ -131,7 +131,7 @@ source ~/.bashrc
 
 ## 7.设置 Broker ID
 通过 cat 组合 grep 看一下 server.properties 文件内 broker.id 的默认值是什么：
-``` shell
+``` bash
 cat server.properties | grep "broker.id"
 ```
 ![查看默认id](./images/6_1.png)
@@ -142,12 +142,12 @@ cat server.properties | grep "broker.id"
 - slave2 -> 2
 
 将 slave1 的 broker.id 修改为 1：
-``` shell
+``` bash
 ssh slave1 "sed -i 's/broker.id=0/broker.id=1/g' /opt/apps/kafka/config/server.properties"
 ```
 
 将 slave2 的 broker.id 修改为 2：
-``` shell
+``` bash
 ssh slave2 "sed -i 's/broker.id=0/broker.id=2/g' /opt/apps/kafka/config/server.properties"
 ```
 ![查看默认id](./images/6_2.png)
@@ -156,7 +156,7 @@ ssh slave2 "sed -i 's/broker.id=0/broker.id=2/g' /opt/apps/kafka/config/server.p
 
 ## 8.启动 Kafka
 启动 Kafka（后面跟上 & 是为了使它后台运行）：
-``` shell
+``` bash
 kafka-server-start.sh -daemon /opt/apps/kafka/config/server.properties &
 ```
 
@@ -167,27 +167,27 @@ kafka-server-start.sh -daemon /opt/apps/kafka/config/server.properties &
 
 ## 9.测试
 新建一个名为 test 的 Topic ：
-``` shell
+``` bash
 kafka-topics.sh --create --zookeeper master:2181 --partitions 2 --replication-factor 1 --topic test
 ```
 ![新建Topic](./images/9_1.png)
 
 查看 Topic :
-``` shell
+``` bash
 kafka-topics.sh --list --zookeeper master:2181
 ```
 ![新建Topic](./images/9_2.png)
 
 发送消息：
 > 在 master 节点上执行
-``` shell
+``` bash
 # 生产者发送消息
 kafka-console-producer.sh --broker-list master:9092 --topic test
 ```
 
 接收消息：
 > 在 master 以外的任意节点上执行：
-``` shell
+``` bash
 # --from-beginning 同步历史消息
 kafka-console-consumer.sh --bootstrap-server master:9092 --topic test --from-beginning
 ```
@@ -206,18 +206,16 @@ kafka-console-consumer.sh --bootstrap-server master:9092 --topic test --from-beg
 - Isr：正在服务中的节点。
 
 查看某个 Topic（例如 test）：
-``` shell
+``` bash
 kafka-topics.sh --zookeeper master:2181 --describe –topic test
 ```
 
 删除某个 Topic（例如 test）：
-``` shell
+``` bash
 kafka-topics.sh --delete --zookeeper master:2181 --topic test
 ```
 
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
-<!-- [FLINK ON YARN 部署文档](../flink_on_yarn/README.md) -->
-完结撒花
+[回到顶部](#top)

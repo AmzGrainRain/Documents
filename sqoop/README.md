@@ -12,17 +12,17 @@
 
 ## 1.解压
 进入 /opt/app/ 目录内：
-``` shell
+``` bash
 cd /opt/apps
 ```
 
 解压 sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz 到当前目录：
-``` shell
+``` bash
 tar -zxf /opt/tar/sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz
 ```
 
 重命名 sqoop ：
-``` shelll
+``` bash
 mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
 ```
 
@@ -30,7 +30,7 @@ mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
 
 ## 2.放入 MySQL 驱动包：
 因为我们要通过 sqoop 操作 mysql，所以需要将java 连接 mysql 需要用到的驱动复制到 sqoop/lib 下：
-``` shell
+``` bash
 cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/sqoop/lib/
 ```
 
@@ -38,18 +38,18 @@ cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/sqoop/lib/
 
 ## 3.配置环境变量
 编辑用户根目录下的 .bashrc 文件：
-``` shell
+``` bash
 vi ~/.bashrc
 ```
 
 在文件末尾添加：
-``` shell
+``` bash
 export SQOOP_HOME=/opt/apps/sqoop
 export PATH=$PATH:$SQOOP_HOME/bin
 ```
 
 ## 4.生效环境变量
-``` shell
+``` bash
 source ~/.bashrc
 ```
 
@@ -57,7 +57,7 @@ source ~/.bashrc
 
 ## 5.验证安装
 执行这条指令：
-``` shell
+``` bash
 sqoop version
 ```
 ![结果](./images/4_1.png)
@@ -66,18 +66,18 @@ sqoop version
 
 ## 6.使用 sqoop 前的准备工作
 修改 mysql 的配置文件：
-``` shell
+``` bash
 vi /etc/my.cnf
 ```
 
 在 my.cnf 配置文件中，bind-address 如果是 127.0.0.1，则 mysql 只接受本地连接，不接受远程连接。在 bind-address 后面增加远程访问 IP 地址或者注释掉这句话就可以远程登陆了。所以我们需要注释掉这一行（没有的话就无需这一步操作）：
-``` shell
+``` bash
 # 注释以井号开头
 bind-address = 127.0.0.1
 ```
 
 以 root 身份登录到 mysql ：
-``` shell
+``` bash
 mysql -u root -p
 ```
 
@@ -90,6 +90,7 @@ mysql -u root -p
   - TO：介词
   - 'root'@'%'：权限赋给 root 用户，所有 ip 都能连接
   - WITH GRANT OPTION：允许级联赋权
+
 ``` sql
 /*
   在开发环境建议这么做，在生产环境上是很危险的操作。
@@ -127,7 +128,7 @@ INSERT INTO test VALUES ("张三", 20), ("李四", 24), ("王五", 22), ("王五
 
 ## 7.sqoop 指令菜单
 查看 sqoop 指令帮助：
-``` shell
+``` bash
 sqoop help
 ```
 ![sqoop指令帮助](./images/6_1.png)
@@ -153,14 +154,14 @@ version|打印 sqoop 版本信息
 ## 8.测试 sqoop 连接 mysql
 使用 sqoop 打印 mysql 内所有数据库名：
 > 通过 `sqoop help list-databases` 命令打印帮助信息。
-``` shell
+``` bash
 sqoop list-databases --connect jdbc:mysql://localhost:3306 --username root -P
 ```
 ![数据库名](./images/7_1.png)
 
 使用 sqoop 打印 sqoop_test 内所有数据表名：
 > 通过 `sqoop help list-tables` 命令打印帮助信息。
-``` shell
+``` bash
 sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P
 ```
 ![数据库名](./images/7_2.png)
@@ -170,7 +171,7 @@ sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username ro
 ## 9.导出 mysql 数据表到 hdfs
 > 通过 `sqoop help import` 命令打印帮助信息。  
 > 在此之前，请确保 Hadoop 已经启动。
-``` shell
+``` bash
 sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
 ```
 如果遇到这个错误： 
@@ -187,18 +188,18 @@ sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --use
 
 我们采用后面的方法。
 删除之前导入的数据表：
-``` shell
+``` bash
 hdfs dfs -rm -r /user/root/test
 ```
 
 再次导入：
-``` shell
+``` bash
 sqoop import --connect jdbc:mysql://master:3306/sqoop_test --table test --username root -P --m 1
 ```
 ![更换 ip](./images/8_2.png)
 
 如果卡在了 Running Job，请强制结束这些任务并重新尝试：
-``` shell
+``` bash
 # 列出所有的任务
 hadoop job -list
 
@@ -207,7 +208,7 @@ hadoop job -kill id
 ```
 
 查看导入结果：
-``` shell
+``` bash
 hdfs dfs -cat /user/root/test/part-m-00000
 ```
 ![hdfs 内的数据表](./images/8_3.png)
@@ -219,12 +220,12 @@ hdfs dfs -cat /user/root/test/part-m-00000
 > 在此之前，请确保 Hadoop 已经启动。
 
 进入 mysql ：
-``` shell
+``` bash
 mysql -u root -p
 ```
 
 切换到 sqoop_test 数据库：
-``` shell
+``` bash
 USE sqoop_test;
 ```
 
@@ -237,14 +238,14 @@ CREATE TABLE `test_from_hdfs` (
 ```
 
 退出 mysql，开始使用 sqoop 导入数据：
-``` shell
+``` bash
 sqoop export --connect jdbc:mysql://master:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
 ```
 ![导入数据：](./images/9_2.png)
 
 
 来查看下我们前面创建的 test_from_hdfs 表：
-``` shell
+``` bash
 SELECT * FROM sqoop_test.test_from_hdfs;
 ```
 ![导入的数据](./images/9_3.png)
@@ -254,7 +255,7 @@ SELECT * FROM sqoop_test.test_from_hdfs;
 
 ## 11.解决从 hdfs 导入到 mysql 中的数据中，中文变问号的问题
 进入 mysql ：
-``` shell
+``` bash
 mysql -u root -p
 ```
 
@@ -266,7 +267,7 @@ SHOW VARIABLES LIKE 'character%';
 可以看到有些地方的编码是 latin1，这种编码并不能显示中文。
 
 编辑 my.cnf ：
-``` shell
+``` bash
 vi /etc/my.cnf
 ```
 
@@ -282,7 +283,7 @@ init_connect='SET NAMES utf8'
 > systemctl restart mysqld.service
 > 所以我们还是先停止服务再启动服务吧
 
-``` shell
+``` bash
 # 停止
 systemctl stop mysqld.service
 # 启动
