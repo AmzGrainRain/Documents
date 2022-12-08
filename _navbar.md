@@ -9,4 +9,5 @@
   - [Scala & Spark 搭建文档](scala&spark/README.md)  
   - [Flume 搭建文档](flume/README.md)  
   - [Kafka 搭建文档](kafka/README.md)  
-  - [SQL 助记文档](sql/README.md)
+  - [SQL 基础文档](sql/README.md)
+  - [SQL 进阶文档](sql_adv/README.md)

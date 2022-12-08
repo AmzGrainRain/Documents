@@ -38,10 +38,15 @@ SHOW TABLES;
 
 #### 创建数据表
 ``` sql
-CREATE TABLE 表名(
+CREATE TABLE 表名 (
   字段 字段类型 [约束条件],
   字段 字段类型 [约束条件]
 )
+```
+
+#### 复制数据表结构
+``` sql
+CREATE TABLE 表名 LIKE 被复制的表名;
 ```
 
 #### 显示数据表结构
@@ -1146,7 +1151,7 @@ COMMIT;
 
 COMMIT WORK;
 ```
-**注意：此时 COMMIT 与 COMMIT WORK 的作用是一样的。但是它们的作用受变量 COMPLETION_TYPE 的影响。**
+**注意：此时 COMMIT 与 COMMIT WORK 的作用是一样的。但是它们的效果受变量 COMPLETION_TYPE 的影响。**
 
 #### 回滚事务
 ``` sql
@@ -1156,10 +1161,10 @@ ROLLBACK;
 
 ROLLBACK WORK;
 ```
-**注意：此时 ROLLBACK 与 ROLLBACK WORK 的作用是一样的。但是它们的作用受变量 COMPLETION_TYPE 的影响。**
+**注意：此时 ROLLBACK 与 ROLLBACK WORK 的作用是一样的。但是它们的效果受变量 COMPLETION_TYPE 的影响。**
 
 #### 示例
-打开事务 -> 执行一些 SQL -> 提交事务（生效前面已执行 SQL ） 
+打开事务 -> 执行一些 SQL -> 提交事务（生效前面已执行 SQL） 
 ``` sql
 -- 张三给李四转账 1000
 
@@ -1190,11 +1195,9 @@ COMMIT;
 如果上面的两条 UPDATE 有一条执行失败，则这个事务就不会提交。
 
 #### COMPLETION_TYPE 的值
-前面我们说过，COMMIT 与 COMMIT WORK 以及 ROLLBACK 与 ROLLBACK WORK 作用是一样的。但是他们的作用受变量completion_type 的影响，在这里我们就来研究下究竟会产生什么样的影响。  
+前面我们说过，COMMIT 与 COMMIT WORK 以及 ROLLBACK 与 ROLLBACK WORK 作用是一样的。但是他们的作用受变量 COMPLETION_TYPE 的影响，在这里我们就来研究下究竟会产生什么样的影响。  
   
-COMPLETION_TYPE 的值默认为 NO_CHAIN，除此之外还有其他的值：
-- CHAIN
-- RELEASE
+COMPLETION_TYPE 的值默认为`NO_CHAIN`，除此之外还有 `CHAIN`与`RELEASE`。
 
 ##### NO_CHAIN
 提交事务或回滚事务时一同结束该事务：
@@ -1217,7 +1220,7 @@ UPDATE employee SET balance = 2000 WHERE name = '张三';
 -- 回滚事务
 ROLLBACK;
 ```
-受 COMPLETION_TYPE = 'NO_CHAIN' 的影响，事务在 COMMIT WORK 之后就已经结束了所以最后一行的 ROLLBACK 不会生效。此时张三的零钱是 2000。
+受 COMPLETION_TYPE = 'NO_CHAIN' 的影响，事务在 COMMIT WORK 之后就结束了。所以最后一行的 ROLLBACK 不会生效，张三的零钱是 2000。
 
 ##### CHAIN
 提交事务或回滚事务时自动创建一个新的事务：
@@ -1240,7 +1243,7 @@ UPDATE employee SET balance = 2000 WHERE name = '张三';
 -- 回滚事务
 ROLLBACK;
 ```
-受 COMPLETION_TYPE = 'CHAIN' 的影响，COMMIT WORK 提交之后，自动又开启了一个新的事务。使得最后一行的 ROLLBACK　生效，回滚了 `UPDATE employee SET balance = 2000 WHERE name = '张三';` 此时张三的零钱是 5000。
+受 COMPLETION_TYPE = 'CHAIN' 的影响，COMMIT WORK 提交之后，又开启了一个新的事务。使得最后一行的 ROLLBACK　生效，回滚了`UPDATE employee SET balance = 2000 WHERE name = '张三';`此时张三的零钱是 5000。
 
 ##### RELEASE
 提交事务或回滚事务时释放与 SQL 建立的连接：
@@ -1305,6 +1308,7 @@ REPEATABLE READ|×|×|√
 SERIALIZABLE|×|×|×
 
 #### 查看隔离级别
+通过此命令来查看：
 ``` sql
 SELECT @@TRANSATION_ISOLATION;
 ```
@@ -1324,10 +1328,9 @@ GLOBAL：全局
 ``` sql
 SET [ SESSION | GLOBAL ]
 TRANSACTION ISOLATION LEVEL 隔离级别;
-```
 
-或者修改变量值：
-``` sql
+-- 或者修改变量值
+
 SET @@GLOBAL.TX_ISOLATION = 隔离级别;
 set @@SESSION.TX_ISOLATION = 隔离级别;
 ```
@@ -1348,7 +1351,7 @@ SAVE POINT 保存点名称;
 ROLLBACK TO 保存点名称;
 ```
 
-删除指定保存点：
+#### 删除指定保存点：
 ``` sql
 RELEASE SAVEPOINT 保存点名称;
 ```
@@ -1381,6 +1384,6 @@ RELEASE SAVEPOINT 保存点名称;
 
 上面涉及了两个事务节点，这些事务节点之间的事务必须同时具有 ACID 属性，要么所有的事务都成功，要么所有的事务都失败。不能只是其中一个银行的 ATM 机的事务成功，而另一个银行的事务失败。
 
-MySQL 的分布式事务使用两段式提交协议（2-phase commit, 2PC）。最重要的是，MySQL 5.7.7 之前，MySQL 对分布式事务的支持一直都不完善（第一阶段提交事务后不会写 binlog，导致宕机丢失日志），这个问题持续时间长达数十年，直到 MySQL 5.7.7，才完美支持分布式事务。相关内容可参考网上一篇文章：[MySQL 5.7 完美的分布式事务支持](https://www.linuxidc.com/Linux/2016-02/128053.htm)。
+MySQL 的分布式事务使用两段式提交协议（2-phase commit, 2PC）。最重要的是，MySQL 5.7.7 之前，MySQL 对分布式事务的支持一直都不完善（第一阶段提交事务后不会写 binlog，导致宕机丢失日志），这个问题持续时间长达数十年，直到 MySQL 5.7.7，才完美支持分布式事务。相关内容可参考我在网上找到的这篇文章：[MySQL 5.7 完美的分布式事务支持](https://www.linuxidc.com/Linux/2016-02/128053.htm)。
 
-### 
+# SQL 进阶
