@@ -580,7 +580,7 @@ ALTER TABLE xxx MODIFY xxx 默认值|自增;
 #### 关于 ALTER TABLE xxx ADD
 为字段添加唯一、主键、条件、外键约束。  
 
-#### 关于 ALTER TABLE xxx DROP CONSTRAINT
+#### 关于 ALTER TABLE xxx DROP CONSTRAINT xxx
 根据约束名删除指定约束。
 
 #### 非空
@@ -657,9 +657,9 @@ CREATE TABLE employee (
   status TINYINT UNSIGNED DEFAULT 1 COMMENT '状态',
   gender CHAR(1) COMMENT '性别',
   PRIMARY KEY (id),
-  UNIQUE KEY (name),
-  CHECK(age > 0 && age <= 80),
-  CHECK(gender = '男' || gender = '女')
+  CONSTRAINT `nameUnique` UNIQUE KEY (name),
+  CONSTRAINT `checkAge` CHECK(age > 0 && age <= 80),
+  CONSTRAINT `checkGender` CHECK(gender = '男' || gender = '女')
 ) COMMENT '员工表';
 ```
 
@@ -676,10 +676,10 @@ CREATE TABLE employee (
 ALTER TABLE employee ADD PRIMARY KEY (id);
 ALTER TABLE employee MODIFY id INT AUTO_INCREMENT;
 ALTER TABLE employee MODIFY name VARCHAR(10) NOT NULL;
-ALTER TABLE employee ADD UNIQUE KEY (name);
-ALTER TABLE employee ADD CHECK (age > 0 && age <= 80);
+ALTER TABLE employee ADD CONSTRAINT `nameUnique` UNIQUE KEY (name);
+ALTER TABLE employee ADD CONSTRAINT `checkAge` CHECK (age > 0 && age <= 80);
 ALTER TABLE employee MODIFY status TINYINT UNSIGNED DEFAULT 1;
-ALTER TABLE employee ADD CHECK (gender = '男' || gender = '女');
+ALTER TABLE employee ADD CONSTRAINT `checkGender` CHECK (gender = '男' || gender = '女');
 ```
 
 ### 外键约束
@@ -711,8 +711,7 @@ SET DEFAULT|父表有变更时，子表将外键列设置为默认值。（InnoD
 ALTER TABLE 表名 ADD CONSTRAINT 约束名 FOREIGN KEY (外键字段) REFERENCES 主键表 (主键字段) ON UPDATE 更新时的行为 ON DELETE 删除时的行为;
 
 -- 删除
-ALTER TABLE 表名 DROP FOREIGN KEY 约束名; -- 删除外键
-ALTER TABLE 表名 DROP INDEX 约束名;       -- 删除索引
+ALTER TABLE 表名 DROP FOREIGN KEY 约束名;
 ```
 
 ## 多表关系
@@ -1106,7 +1105,7 @@ WHERE (年龄, 性别) IN (
 ### EXISTS 子查询
 EXISTS 用于指定一个子查询检查子查询是否至少返回一行数据，指定的子查询实际上并不返回任何数据，而是返回值 True 或 False。而且 EXISTS 的子查询是一个受限的 SELECT 语句，不允许有 COMPUTE 子句和 INTO 关键字。在执行 EXISTS 时先执行外层语句，再根据外层语句的查询结果循环子句。
 
-查询所有部门的员工：
+查询所有部门的员工（不包含没有部门的员工）：
 ``` sql
 SELECT * FROM 员工表
 WHERE EXISTS (
@@ -1164,7 +1163,7 @@ ROLLBACK WORK;
 **注意：此时 ROLLBACK 与 ROLLBACK WORK 的作用是一样的。但是它们的效果受变量 COMPLETION_TYPE 的影响。**
 
 #### 示例
-打开事务 -> 执行一些 SQL -> 提交事务（生效前面已执行 SQL） 
+打开事务 -> 执行一些 SQL -> 回滚事务（作废前面已执行 SQL）
 ``` sql
 -- 张三给李四转账 1000
 
@@ -1178,7 +1177,7 @@ UPDATE 员工表 SET money = (money + 1000) WHERE 姓名 = '李四';
 -- 回滚事务
 ROLLBACK;
 ```
-打开事务 -> 执行一些 SQL -> 回滚事务（作废前面已执行 SQL）
+打开事务 -> 执行一些 SQL -> 提交事务（生效前面已执行 SQL） 
 ``` sql
 -- 张三给李四转账 1000
 
@@ -1195,7 +1194,7 @@ COMMIT;
 如果上面的两条 UPDATE 有一条执行失败，则这个事务就不会提交。
 
 #### COMPLETION_TYPE 的值
-前面我们说过，COMMIT 与 COMMIT WORK 以及 ROLLBACK 与 ROLLBACK WORK 作用是一样的。但是他们的作用受变量 COMPLETION_TYPE 的影响，在这里我们就来研究下究竟会产生什么样的影响。  
+前面我们说过，COMMIT 与 COMMIT WORK 以及 ROLLBACK 与 ROLLBACK WORK 作用是一样的。但是 COMMIT WORK 与 ROLLBACK WORK 的作用受变量 COMPLETION_TYPE 的影响，在这里我们就来研究下究竟会产生什么样的影响。  
   
 COMPLETION_TYPE 的值默认为`NO_CHAIN`，除此之外还有 `CHAIN`与`RELEASE`。
 
@@ -1385,5 +1384,3 @@ RELEASE SAVEPOINT 保存点名称;
 上面涉及了两个事务节点，这些事务节点之间的事务必须同时具有 ACID 属性，要么所有的事务都成功，要么所有的事务都失败。不能只是其中一个银行的 ATM 机的事务成功，而另一个银行的事务失败。
 
 MySQL 的分布式事务使用两段式提交协议（2-phase commit, 2PC）。最重要的是，MySQL 5.7.7 之前，MySQL 对分布式事务的支持一直都不完善（第一阶段提交事务后不会写 binlog，导致宕机丢失日志），这个问题持续时间长达数十年，直到 MySQL 5.7.7，才完美支持分布式事务。相关内容可参考我在网上找到的这篇文章：[MySQL 5.7 完美的分布式事务支持](https://www.linuxidc.com/Linux/2016-02/128053.htm)。
-
-# SQL 进阶
