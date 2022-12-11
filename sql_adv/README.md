@@ -210,15 +210,7 @@ INSTALL PLUGIN FEDERATED SONAME 'ha_federated.dll';
 -- Linux
 INSTALL PLUGIN FEDERATED SONAME 'ha_federated.so';
 ```
-
-#### 启用方法
-> my.cnf 的位置请自行百度。
-
-在 "[mysqld]" 之后，添加 `federated` ：
-
-![shell截图](./images/enable_faderated_1.png)
-
-或者在命令行用 `–federated` 选项启动 mysqld。
+安装完毕后再次查询即可发现 FEDERATED 的 supports 列已经变为了 yes
 
 #### 特点
 - 远程服务器必须是一个MySQL服务器。
@@ -266,22 +258,6 @@ PERFORMANCE_SCHEMA 是运行在较低级别的用于监控 MySQL 运行过程中
 SHOW VARIABLES LIKE 'PERFORMANCE_SCHEMA'
 ```
 
-与 FEDERATED 引擎相同，在 "[mysqld]" 之后，添加 `performance_schema` ：
-
-![shell截图](./images/enable_faderated_1.png)
-
-
 ### BLACKHOLE
 
-
 ### ARCHIVE
-
-### 创建表时指定引擎
-在创建数据表时可以指定此表使用的存储引擎：  
-``` sql
-CREATE TABLE 表名 (
-  字段 字段类型 [约束条件],
-  字段 字段类型 [约束条件]
-) ENGINE = 存储引擎;
-```
-
