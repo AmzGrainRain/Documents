@@ -94,7 +94,7 @@ CREATE TABLE 表名 (
 ```
 
 ### MRG_MYISAM
-**MERGE 存储引擎，也被称为 MRG_MYISAM 引擎（又叫分表）**是一个相同的可以被当作一个来用的 MyISAM 表的集合。“相同”意味着所有表结构、索引、字段顺序都需要一致。而且，任何或者所有的表都可以用 myisampack 来压缩。表选项的差异，比如 AVG_ROW_LENGTH，MAX_ROWS 或 PACK_KEYS 都不重要。 
+**MERGE 存储引擎，也被称为 MRG_MYISAM 引擎（又叫分表）**是一个相同的可以被当作一个来用的 MyISAM 表的集合。“相同”意味着所有表结构、索引、字段顺序都需要一致。而且，任何或者所有的表都可以用 MyISAMPack 来压缩。表选项的差异，比如 AVG_ROW_LENGTH，MAX_ROWS 或 PACK_KEYS 都不重要。 
 
 #### 特点
 当你创建 MRG_MYISAM 表时，你必须指定 `UNION=(子表1, 子表2, ...)` 子句，它用来说明你要把哪些表当作一个来用。MRG_MYISAM 表默认是只读的，如果你想要自己对 MRG_MYISAM 表的插入操作生效，那么可以指定 `INSERT_METHOD` 选项，它支持三个值：
@@ -107,7 +107,7 @@ CREATE TABLE 表名 (
 删除 MRG_MYISAM 表不会影响子表。
 
 #### 存储形式
-MRG_MYISAM 表在磁盘上对应着两个文件，他们以表名作为文件名：`.frm` 后缀名的文件文件存储表定义；`.mrg` 后缀名的文件包含被当作一个来用的表的名字。（这些子表作为 MMRG_MYISAM 表自身，不必要在同一个数据库中）
+MRG_MYISAM 表在磁盘上对应着两个文件，他们以表名作为文件名：`.frm` 后缀名的文件文件存储表定义；`.mrg` 后缀名的文件包含被当作一个来用的表的名字。（这些子表作为 MRG_MYISAM 表自身，不必要在同一个数据库中）
 
 #### 创建方法
 > 所有子表与主表的结构必须一致。  
@@ -234,7 +234,7 @@ INSTALL PLUGIN FEDERATED SONAME 'ha_federated.so';
 CREATE TABLE 表名 (
   字段 字段类型 [约束条件],
   字段 字段类型 [约束条件]
-) ENGINE=FEDERATED CONNECTION='mysql://user:host@ip:port/database/table'
+) ENGINE=FEDERATED CONNECTION='mysql://user:host@ip:port/database/table';
 ```
 
 ### PERFORMANCE_SCHEMA
@@ -255,9 +255,148 @@ PERFORMANCE_SCHEMA 是运行在较低级别的用于监控 MySQL 运行过程中
 #### 启用方法
 查看数据库是否启用了 PERFORMANCE_SCHEMA ：
 ``` sql
-SHOW VARIABLES LIKE 'PERFORMANCE_SCHEMA'
+SHOW VARIABLES LIKE 'PERFORMANCE_SCHEMA';
 ```
 
 ### BLACKHOLE
 
 ### ARCHIVE
+
+## 索引
+索引类似于书的目录，在没有目录的情况下，要从书中查找某项内容就必须阅读全文，而有了目录之后，通过页码就可以很快定位到相关内容。  
+从本质上看，索引是根据表的一个或者多个字段生成的子表，该子表中的数据已经进行了排序。子表除了包含指定字段中的数据，还包含一个 rowid 列，用于存储当前记录在原始表中的位置。用户无法看到索引，它只是用来加快查询速度。  
+为了提高查询效率，便于后期维护，索引都是基于某种数据结构而创建的，比如 B+ 树、B- 树、位图等。  
+
+优点：
+- 提高数据检索效率，降低 I/O 成本。
+- 通过索引列对数据进行排序，降低排序成本，更低的 CPU 占用。
+
+缺点：
+- 索引列占用额外空间。
+- 索引提高查询效率，降低更新数据速度。
+
+### 结构
+索引结构|描述
+-|-
+B+Tree|最常见的索引类型，大部分引擎都支持。
+Hash|使用哈希表实现，只能进行精确匹配，不支持模糊查询。
+R-Tree（空间索引）|MyISAM 引擎的一个特殊索引，主要用于地理空间数据类型，通常使用较少。
+Full-Text（全文索引）|通过建立倒排索引，快速匹配文档的方式，类似于 Lucene, Solr, ES。
+
+### 引擎支持情况
+索引类型|InnoDB|MyISAM|Memory
+:-:|:-:|:-:|:-:
+B+Tree|√|√|√
+Hash|||√
+R-Tree||√|
+Full-text|√（5.6 版本后）|√|
+
+### B 树
+![二叉树](./images/b_sub_tree.png)
+
+### 红黑树
+红黑树解决了 B 数在极端情况下退化为链表的情况，但红黑树也存在大数据量情况下，层级较深，检索速度慢的问题。
+
+## 性能分析
+
+### 查看执行频次
+查看当前数据库的 INSERT、UPDATE、DELETE、SELECT 使用频次：
+``` sql
+-- 会话
+SHOW SESSION STATUS LIKE 'Com_______
+
+-- 全局
+SHOW GLOBAL STATUS LIKE 'Com_______'
+```
+
+### 慢查询日志
+慢查询日志记录了所有执行时间超过指定参数的SQL语句。
+
+#### 查看状态
+可以通过这种方式查看慢查询日志的开关状态：
+``` sql
+SHOW VARIABLES LIKE 'SLOW_QUERY_LOG';
+```
+
+#### 启用功能
+MySQL 的慢查询日志默认没有开启，需要在 MySQL 的配置文件（my.cnf）中添加以下内容：
+``` cnf
+# 开启慢查询日志
+slow_query_log=1
+
+# 设置慢查询日志的时间为 2 秒（默认 10 秒）
+long_query_time=2
+```
+修改配置文件后重启 MySQL 服务生效。  
+
+#### 查看日志
+慢查询日志文件名：`localhost-slow.log`  
+Windows 与 Linux 路径不同，不同版本 SQL 的路径也不同，具体位置请自行百度。
+
+### PROFILE
+提供可以用来分析当前会话中语句执行的资源消耗情况，用于 SQL 调优的测量。
+
+#### 查看支持情况
+查看当前 MySQL 是否支持 PROFILE 操作：
+``` sql
+SELECT @@HAVE_PROFILING;
+
+-- 或
+
+SHOW VARIABLES LIKE 'HAVE_PROFILING%';
+```
+
+#### 开启状态
+查看开启状态：
+``` sql
+SELECT @@PROFILING;
+
+-- 或
+
+SHOW VARIABLES LIKE 'PROFILING';
+```
+
+#### 开启 PROFILE
+``` sql
+SET PROFILING = 1;
+```
+
+#### 使用
+查看当前会话所有 SQL 语句的耗时：
+``` sql
+SHOW PROFILES;
+```
+
+查看指定 query_id 对应的 SQL 语句在各个阶段的耗时：
+``` sql
+SHOW PROFILE FOR QUERY query_id;
+```
+
+查看指定 query_id 对应的 SQL 语句的 CPU 使用情况：
+``` sql
+SHOW PROFILE CPU FOR QUERY query_id;
+```
+
+### EXPLAIN/DESC
+EXPLAIN 或者 DESC 命令获取 MySQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接和连接的顺序。
+
+#### 语法
+直接在 SELECT 语句之前加上关键字 EXPLAIN 或 DESC：
+``` sql
+EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件;
+
+-- 或
+
+DESC SELECT 字段列表 FROM 表名 WHERE 条件;
+```
+
+#### 各字段含义
+字段名|含义
+-|-
+id|select 查询的序列号，表示查询中执行 SELECT 子句或者操作表的顺序（id 相同，执行顺序从上到下；id 不同，值越大越先执行）
+select_type|SELECT 的类型，常见取值有 SIMPLE（简单表，即不适用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION中的第二个或者后面的查询语句）、SUBQUERY（SELECT/WHERE之后包含了子查询）等
+type|连接类型，性能由好到差的连接类型为 NULL、system、const、eq_ref、ref、range、index、all possible_key：可能应用在这张表上的索引，一个或多个 
+key|实际使用的索引，如果为 NULL，则没有使用索引
+key_len|索引中使用的字节数，该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好 
+rows|必须要执行的行数，在 InnoDB 引擎的表中，是一个估计值，可能并不总是准确的
+filtered|返回结果的行数占需读取行数的百分比，filtered 的值越大越好
