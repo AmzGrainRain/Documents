@@ -1,4 +1,4 @@
-# <span id="top">SQOOP 搭建文档</span>
+# SQOOP 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -303,5 +303,5 @@ SHOW VARIABLES LIKE 'character%';
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#sqoop-搭建文档)  
 [HBASE 部署文档](../hbase/README.md)

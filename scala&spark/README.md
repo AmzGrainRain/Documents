@@ -1,4 +1,4 @@
-# <span id="top">SCALA & SPARK 搭建文档</span>
+# SCALA & SPARK 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -184,5 +184,5 @@ file.count()
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#scala-amp-spark-搭建文档)  
 [FLUME 部署文档](../flume/README.md)

@@ -1,4 +1,4 @@
-# <span id="top">Flume 搭建文档</span>
+# Flume 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -242,5 +242,5 @@ echo "hello flume" > data.log
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#flume-搭建文档)  
 [KAFKA 部署文档](../kafka/README.md)

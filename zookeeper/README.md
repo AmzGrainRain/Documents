@@ -1,4 +1,4 @@
-# <span id="top">ZOOKEEPER 搭建文档</span>
+# ZOOKEEPER 搭建文档
 
 ## 前提条件
 - 已经成功部署 Hadoop
@@ -244,5 +244,5 @@ slave1 与 slave2 均出现 "hello" 即视为部署成功。
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#zookeeper-搭建文档)  
 [MYSQL 部署文档](../mysql/README.md)

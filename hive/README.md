@@ -1,4 +1,4 @@
-# <span id="top">HIVE 搭建文档</span>
+# HIVE 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -325,5 +325,5 @@ hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#hive-搭建文档)  
 [SQOOP 部署文档](../sqoop/README.md)

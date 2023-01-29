@@ -1,4 +1,4 @@
-# <span id="top">MYSQL 搭建文档</span>
+# MYSQL 搭建文档
 
 ## 前提条件
 - mysql-community-client-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
@@ -127,5 +127,5 @@ FLUSH PRIVILEGES;
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#mysql-搭建文档)  
 [HIVE 部署文档](../hive/README.md)

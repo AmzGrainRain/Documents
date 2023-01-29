@@ -1,4 +1,4 @@
-# <span id="top">Hbase 搭建文档</span>
+# Hbase 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -237,5 +237,5 @@ exit
 ---
 
 ## 快速跳转
-[回到顶部](#top)  
+[回到顶部](#hbase-搭建文档)  
 [SCALA & SPARK 部署文档](../scala&spark/README.md)

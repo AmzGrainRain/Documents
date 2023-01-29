@@ -1,4 +1,4 @@
-# <span id="top">Kafka 搭建文档</span>
+# Kafka 搭建文档
 
 ## 前提条件
 - hadoop 集群已经启动
@@ -218,4 +218,4 @@ kafka-topics.sh --delete --zookeeper master:2181 --topic test
 ---
 
 ## 快速跳转
-[回到顶部](#top)
+[回到顶部](#kafka-搭建文档)
