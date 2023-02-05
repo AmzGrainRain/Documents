@@ -275,7 +275,7 @@ SHOW GLOBAL STATUS LIKE 'Com_______'
 ```
 
 ### 慢查询日志
-慢查询日志记录了所有执行时间超过指定参数的SQL语句。
+慢查询日志记录了所有执行时间超过指定参数的SQL语句。此功能在高并发场景存在性能问题。如非必要，请不要在生产环境开启此功能！
 
 #### 查看状态
 可以通过这种方式查看慢查询日志的开关状态：
@@ -460,15 +460,15 @@ MySQL 索引数据结构对经典的 B+Tree 进行了优化。在原 B+Tree 的�
 - 如果表没有主键或没有合适的唯一索引，则 InnoDB 会自动生成一个 rowid 作为隐藏的聚集索引
 
 ### 思考
-以下 SQL 语句，哪个执行效率高？为什么？
+**以下 SQL 语句，哪个执行效率高？为什么？**
 ``` sql
 SELECT * FROM user WHERE id = 10;
 SELECT * FROM user WHERE name = 'Arm';
 -- 备注：id 为主键，name 字段创建的有索引
 ```
-答：第一条语句，因为第二条需要回表查询，相当于两个步骤。  
+答：第一条语句，因为第二条需要回表查询。
   
-InnoDB 主键索引的 B+Tree 高度为多少？  
+**InnoDB 主键索引的 B+Tree 高度为多少？**  
 答：假设一行数据大小为 1k，一页中可以存储 16 行这样的数据。InnoDB 的指针占用 6 个字节的空间，主键假设为 bigint，占用字节数为 8 可得公式：`n * 8 + (n + 1) * 6 = 16 * 1024`，其中 8 表示 bigint 占用的字节数，n 表示当前节点存储的 key 的数量，(n + 1) 表示指针数量（比 key 多一个）。算出 n 约为 1170。  
 如果树的高度为2，那么他能存储的数据量大概为：`1171 * 16 = 18736`  
 如果树的高度为3，那么他能存储的数据量大概为：`1171 * 1171 * 16 = 21939856`  
@@ -484,7 +484,7 @@ CREATE [ UNIQUE | FULLTEXT ] INDEX 索引名 ON 表明 (列1, ...);
 
 #### 查看索引
 ``` sql
-SHOW INDEX FROM 表明;
+SHOW INDEX FROM 表名;
 ```
 
 #### 删除索引
@@ -498,16 +498,16 @@ DROP INDEX 索引名 ON 表名;
 CREATE INDEX idx_user_name ON tb_user(name);
 
 -- phone 手机号字段的值非空，且唯一，为该字段创建唯一索引
-CREATE UNIQUE INDEX idx_user_phone ON tb_user (phone);
+CREATE UNIQUE INDEX idx_user_phone ON tb_user(phone);
 
 -- 为 profession, age, stat 创建联合索引
-CREATE INDEX idx_user_pro_age_stat ON tb_user(profession, age, stat);
+CREATE INDEX idx_user_p_a_s ON tb_user(profession, age, stat);
 
 -- 为 email 建立合适的索引来提升查询效率
 CREATE INDEX idx_user_email ON tb_user(email);
 
 -- 删除 email 索引
-drop INDEX idx_user_email ON tb_user;
+DROP INDEX idx_user_email ON tb_user;
 ```
 
 ### 规则
@@ -515,24 +515,27 @@ drop INDEX idx_user_email ON tb_user;
 #### 最左前缀法则
 如果索引关联了多列（联合索引），要遵守最左前缀法则，最左前缀法则指的是查询从索引的最左列开始，并且不跳过索引中的列。如果跳跃某一列，索引将部分失效（后面的字段索引失效）。  
 
-联合索引中，出现范围查询（<, >），范围查询右侧的列索引失效。可以用 >= 或者 <= 来规避索引失效问题。
+联合索引中，遵循了最左前缀法则，并且出现范围查询（<, >）可能导致联合索引失效。可以用 >= 或者 <= 来规避索引失效问题。
 
 #### 索引失效情况
-在索引列上进行运算操作，索引将失效：
+在索引列上调用了函数，索引将失效：
 ``` sql
-EXPLAIN SELECT * FROM tb_user WHERE substring(phone, 10, 2) = '15';
+EXPLAIN SELECT * FROM tb_user WHERE SUBSTRING(phone, 10, 2) = '15';
 ```
 
 字符串类型字段使用时，不加引号，索引将失效：
 ``` sql
--- 此处phone的值没有加引号
+-- 此处 phone 的值没有加引号
 EXPLAIN SELECT * FROM tb_user WHERE phone = 17799990015;
 ```
 
 模糊查询中，如果仅仅是尾部模糊匹配，索引不会失效，如果是头部模糊匹配，索引失效：
 ``` sql
--- 前后都有 % 也会失效
+-- 模糊匹配头部导致索引失效
 EXPLAIN SELECT * FROM tb_user WHERE profession LIKE '%工程';
+
+-- 模糊匹配头部导致索引失效
+EXPLAIN SELECT * FROM tb_user WHERE profession LIKE '%工程%';
 ```
 
 额外注意：
@@ -560,22 +563,25 @@ EXPLAIN SELECT * FROM 表 FORCE INDEX(索引字段) where profession="软件工�
 ```
 
 #### 覆盖索引 & 回表查询
-尽量使用覆盖索引（查询使用了索引，并且需要返回的列，在该索引中已经全部能找到），减少 `SELECT *` 。  
+尽量使用覆盖索引（查询时使用了索引，并且需要返回的列在该索引中都能找到），尽可能的减少使用 `SELECT *` 。  
 
-EXPLAIN 中 EXTRA 字段含义：  
-`using index condition`： 查找使用了索引，但是需要回表查询数据  
-`using where; using index;`： 查找使用了索引，但是需要的数据都在索引列中能找到，所以不需要回表查询  
-  
-如果在聚集索引中直接能找到对应的行，则直接返回行数据，只需要一次查询，哪怕是 `SELECT *`； 如果在辅助索引中找聚集索引，如 `SELECT id, name FROM xxx WHERE name='xxx'`，也只需要通过辅助索引（name）查找到对应的 id，返回 name 和 name 索引对应的 id 即可，只需要一次查询；如果是通过辅助索引查找其他字段，则需要回表查询，如 `SELECT id, name, gender FROM xxx where name='xxx';`  
-  
+##### EXPLAIN 中 EXTRA 字段含义
+`using index condition`：使用了索引，但是需要回表查询。  
+`using where; using index;`：使用了索引，而且需要的数据都在索引列中能找到，所以不需要回表查询。  
+
+##### 小提示
+如果在聚集索引中直接能找到对应的行，则直接返回行数据，只需要一次查询，哪怕是 `SELECT *`。  
+如果在辅助索引中找聚集索引，如 `SELECT id, name FROM xxx WHERE name='xxx'`，也只需要通过辅助索引（name）查找到对应的 id，返回 name 和 name 索引对应的 id 即可，只需要一次查询。  
+如果是通过辅助索引查找其他字段，则需要回表查询，如 `SELECT id, name, gender FROM xxx where name='xxx';`  
+
 所以尽量不要用 `SELECT *`，容易出现回表查询，降低效率，除非有联合索引包含了所有字段。  
 
-##### 面试题
+##### 简单的例子
 一张表，有四个字段（id, username, password, status），由于数据量大，需要对以下SQL语句进行优化，该如何进行才是最优方案：
 ``` sql
 SELECT id, username, password FROM tb_user WHERE username='itcast';
 ```
-答：给 username 和 password 字段建立联合索引，直接覆盖索引，则不需要回表查询。
+答：给 username 和 password 字段建立联合索引，直接覆盖索引，查询时不需要回表查询。
 
 #### 前缀索引
 当字段类型为字符串（varchar, text ...）时，有时候需要索引很长的字符串，这会让索引变得很大，查询时，浪费大量的磁盘 IO，影响查询效率，此时可以将字符串的一部分前缀，建立索引，这样可以大大节约索引空间，从而提高索引效率。
@@ -587,12 +593,206 @@ CREATE INDEX 索引名 on 表名(columnn(前缀长度));
 前缀长度：  
 可以根据索引的选择性来决定，而选择性是指不重复的索引值（基数）和数据表的记录总数的比值，索引选择性越高则查询效率越高，唯一索引的选择性是1，这是最好的索引选择性，性能也是最好的。  
 
-<!-- 求选择性公式：
+### 索引设计原则
+- 针对数据量大，且查询比较频繁的表建立索引。
+- 针对常作为查询条件（where）、排序（order by）、分组（group by）操作的字段建立索引。
+- 尽量选择区分度高的列作为索引，尽量建立唯一索引，区分度越高使用索引的效率就越高。
+- 如果是字符串类型的字段，字段长度较长，可以针对字段的特点建立前缀索引。
+- 尽量使用联合索引，减少单列索引。查询时，联合索引很多时候可以覆盖索引，节省存储空间、避免回表，提高查询效率。
+- 要控制索引的数量，索引不是多多益善！索引越多，维护索引结构的代价就越大，增删改的效率就越低。
+- 如果索引不能存储 NULL 值，请在创建表时使用非空约束（NOT NULL）。当优化器知道每列是否包含 NULL 值时，能更好的确定哪个索引最有效的用于查询。
+
+## SQL 优化
+通过优化，有时可以大幅度的降低性能开销。在MySQL学习中，优化是重要的一环。
+
+### 主键优化
+在 InnoDB 存储引擎中，表数据是根据主键顺序组织存放的。这种存储方式的表被称为**索引组织表**（Index Organized Table, IOT）。
+
+#### 索引结构
+![索引结构](images/index_struct.png)
+
+#### 逻辑存储结构
+![逻辑存储结构](images/innodb_logical_structure.png)
+
+#### 页分裂
+页的一些特点：
+- 页可以为空，也可以填充一半，也可以填充满。
+- 每页至少存放 2 行数据。
+- 如果单行数据太大，会发生行溢出。
+- 这些行数据根据主键排列。
+
+为什么每页至少存放 2 行数据？如果每个页只有 1 行数据，那么页就和链表没有区别了。所以规定每页最少存放 2 行数据。
+
+**顺序插入**
+![顺序页分裂](images/page_splitting_order.png)
+页分裂过程中没有特殊情况，页剩余的空间存放不下时，就去创建新的页。
+
+**乱序插入**
+![乱序页分裂](images/page_splitting.png)
+页分裂过程：
+1. 原来有 1#、2# 两个页
+2. 插入主键为 50 的数据（乱序插入）
+3. 创建 3# 页
+4. 移动 1# 一半的数据到 3#
+5. 将主键为 50 的数据存入 3#
+6. 1# 连接 3#（保持有序）
+7. 3# 连接 2#（保持有序）
+
+#### 页合并
+删除一行记录时，实际上数据并没有在在磁盘上被删除，只是被标记（flaged）为删除并且允许其他记录使用它的（被标记为删除的记录）空间。
+
+当页中删除的记录达到 `MERGE_THRESHOLD`（默认值是页的 50%），InnDB 数据库引擎会开始寻找这个页前后的页尝试合并，减少磁盘占用。
+
+**删除数据发生的页合并**
+![页合并](images/page_merge.png)
+
+**MERGE_THRESHOLD**  
+合并页的阈值，可在创建表或创建索引时指定此参数。默认为 50%。
+
+#### 主键设计原则
+- 在满足需求的情况下，尽可能降低主键的长度。
+- 插入数据时，尽量顺序插入。使用 AUTO_INCREMENT 自增主键。
+- 尽量不要使用 uuid 做主键或其他的自然信息作为主键。（如手机号、身份证号、住址等等都是无序数据，插入数据时会发生页分裂）。
+- 尽可能避免修改主键。
+
+### 插入数据优化
+插入的数据足够多时，意味着要频繁的与数据库建立连接执行插入、提交事务。  
+
+#### 批量插入
+使用批量插入语法，单次批量插入不宜过多，一般在 500-1000 条数据之间：
 ``` sql
-SELECT count(DISTINCT 字段) / COUNT(*) from 表;
-SELECT count(DISTINCT SUBSTRING(字段, 1, 5)) / COUNT(*) from 表;
+INSERT INTO 表名 VALUES (列1，列2，...), (列1，列2，...), (列1，列2，...);
 ```
-show index 里面的sub_part可以看到接取的长度 -->
 
-#### 单列索引 & 联合索引
+#### 手动提交事务
+使用手动提交事务来避免默认情况下频繁的提交事务：
+``` sql
+BEGIN;
+INSERT INTO 表名 VALUES (列1，列2，...);
+INSERT INTO 表名 VALUES (列1，列2，...);
+INSERT INTO 表名 VALUES (列1，列2，...);
+INSERT INTO 表名 VALUES (列1，列2，...);
+COMMIT;
+```
 
+#### 主键顺序插入优化
+顺序插入的性能要比乱序插入的性能高很多。前面的主键优化里由详细阐述，此处不再过多赘述。
+
+#### 大批量插入数据
+如果一次性需要插入大批量的数据，使用 INSERT 显然不是明智之举。建议使用 MySQL 提供的 LOAD 指令，从磁盘文件读取数据，然后大批量插入数据库。  
+在插入 100 万条数据的情况下，LOAD 耗时 16 秒左右而 INSERT 则超过 10 分钟。   
+
+在使用 load 命令之前，要先开启这个功能：
+``` sql
+-- 连接 MySQL 时加上参数 --local-infile
+mysql --local-infile -u root -p
+
+-- 开启 load 功能
+SET GLOBAL local_infile=1;
+```
+
+开启 load 功能后，就可以通过以下命令导入数据了：
+``` sql
+LOAD DATA LOCAL INFILE '文件路径' INTO TABLE 表名 FIELDS TERMINATED BY '列分隔符' LINES TERMINATED BY '行分隔符';
+```
+
+被导入到数据库的文件内容格式类似 csv。每一列由特定的分隔符号。  
+我们假设这个文件在 `/home/user/data.txt` 内容类似这样：
+```
+1,小明,男,13,汉族
+2,小李,男,15,汉族
+3,小兰,女,12,满族
+4,小王,男,19,汉族
+5,小韶,女,16,汉族
+```
+
+不难看出，这段文本有 5 列数据：`序号`、`姓名`、`性别`、`年龄`、`民族`；每一列由 `,` 分隔；每一行由 `\n` 分隔。
+
+那么将文件内的数据导入到 test 表中应该这样写：
+``` sql
+LOAD DATA LOCAL INFILE '/home/user/data.txt' INTO TABLE test FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
+```
+
+### 更新数据优化
+
+### order by 优化
+Using filesort：通过表的索引或全表扫描，读取满足条件的行，然后在排序缓冲区（sort buffer）中完成排序操作。  
+Usint index：通过有序索引顺序扫描直接返回有序数据，不需要额外排序，效率高。  
+Backward index scan（反向扫描索引）：索引默认是正序的，如果使用索引倒序排序，就会触发反向扫描索引。
+
+**所有不是直接通过索引返回结果的排序，都叫 FileSort 排序。** 
+
+优化原则：
+- 根据排序字段建立合适的索引，多字段排序时，也要遵循最左前缀法则。
+- 尽量使用覆盖索引。
+- 多字段排序，同时存在升序和降序，可以在创建联合索引时指定排序规则以防止触发 Using filesort。
+- 若不可避免的触发 Using filesort，在大数据量排序时可以适当增大排序缓冲区（sort_buffer_size, 默认 256kb）大小。
+
+#### 前提条件
+tb_user 表：
+字段|类型|索引|注释
+-|-|-|-
+id|INT|Primary|主键
+name|VARCHAR(10)||姓名
+gender|CHAR(1)||性别
+age|TINYINT||年龄
+phone|VARCHAR(11)||手机号
+
+#### 只有主键索引
+通过主键索引正序排序时触发 Usint index:
+``` sql
+SELECT id, age, phone FROM tb_user ORDER BY id;
+```
+
+通过主键索引倒序排序时触发 Backward index scan; Usint index：
+``` sql
+SELECT id, age, phone FROM tb_user ORDER BY id DESC;
+```
+
+其他情况都会触发 Using filesort，效率低。
+
+#### 创建了联合索引（age, phone）
+通过联合索引排序也需要遵循最左前缀法则。  
+下列是可能会遇到的情况：
+``` sql
+-- Using index（age）
+explain SELECT id, age, phone FROM tb_user ORDER BY age;
+
+-- Backward index scan（age）; Using index（age）
+explain SELECT id, age, phone FROM tb_user ORDER BY age DESC;
+
+-- Using index（索引失效？先挖个坑）; Using filesort（phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY phone;
+
+-- Using index（索引失效？先挖个坑）; Using filesort（phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY phone DESC;
+
+-- Using index（age, phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY age, phone;
+
+-- Backward index scan（age, phone）; Using index（age, phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone DESC;
+
+-- Using index（age）; Using filesort（phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
+
+-- Using index（age）; Using filesort（phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone;
+```
+
+对于这种情况：
+``` sql
+-- Using index（age）; Using filesort（phone）
+explain SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
+```
+
+可以通过添加索引来规避 Using filesort：
+``` sql
+CREATE INDEX idx_age_phone_ad ON tb_user(age, phone DESC);
+```
+
+### group by 优化
+
+### limit 优化
+
+### count 优化
