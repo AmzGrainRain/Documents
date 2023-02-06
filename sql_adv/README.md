@@ -655,7 +655,7 @@ CREATE INDEX 索引名 on 表名(columnn(前缀长度));
 - 尽量不要使用 uuid 做主键或其他的自然信息作为主键。（如手机号、身份证号、住址等等都是无序数据，插入数据时会发生页分裂）。
 - 尽可能避免修改主键。
 
-### 插入数据优化
+### insert 优化
 插入的数据足够多时，意味着要频繁的与数据库建立连接执行插入、提交事务。  
 
 #### 批量插入
@@ -713,8 +713,6 @@ LOAD DATA LOCAL INFILE '文件路径' INTO TABLE 表名 FIELDS TERMINATED BY '�
 LOAD DATA LOCAL INFILE '/home/user/data.txt' INTO TABLE test FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
 ```
 
-### 更新数据优化
-
 ### order by 优化
 Using filesort：通过表的索引或全表扫描，读取满足条件的行，然后在排序缓冲区（sort buffer）中完成排序操作。  
 Usint index：通过有序索引顺序扫描直接返回有序数据，不需要额外排序，效率高。  
@@ -751,48 +749,122 @@ SELECT id, age, phone FROM tb_user ORDER BY id DESC;
 
 其他情况都会触发 Using filesort，效率低。
 
-#### 创建了联合索引（age, phone）
-通过联合索引排序也需要遵循最左前缀法则。  
+#### 创建了联合索引
+``` sql
+CREATE INDEX idx_user_union ON tb_user(age, phone);
+```
+
 下列是可能会遇到的情况：
 ``` sql
--- Using index（age）
-explain SELECT id, age, phone FROM tb_user ORDER BY age;
+-- 使用索引（Using index）
+SELECT id, age, phone FROM tb_user ORDER BY age;
+SELECT id, age, phone FROM tb_user ORDER BY age, phone;
 
--- Backward index scan（age）; Using index（age）
-explain SELECT id, age, phone FROM tb_user ORDER BY age DESC;
+-- 使用索引，并且反向扫描（Backward index scan; Using index）
+SELECT id, age, phone FROM tb_user ORDER BY age DESC;
+SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone DESC;
 
--- Using index（索引失效？先挖个坑）; Using filesort（phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY phone;
-
--- Using index（索引失效？先挖个坑）; Using filesort（phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY phone DESC;
-
--- Using index（age, phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY age, phone;
-
--- Backward index scan（age, phone）; Using index（age, phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone DESC;
-
--- Using index（age）; Using filesort（phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
-
--- Using index（age）; Using filesort（phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone;
+-- 使用索引（覆盖索引），但没完全使用（Using index; Using filesort）
+SELECT id, age, phone FROM tb_user ORDER BY phone;
+SELECT id, age, phone FROM tb_user ORDER BY phone DESC;
+SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
+SELECT id, age, phone FROM tb_user ORDER BY age DESC, phone;
 ```
 
 对于这种情况：
 ``` sql
--- Using index（age）; Using filesort（phone）
-explain SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
+-- 查询的列在索引内（覆盖索引），但没用上（Using index; Using filesort）
+SELECT id, age, phone FROM tb_user ORDER BY age, phone DESC;
 ```
 
-可以通过添加索引来规避 Using filesort：
+可以通过添加索引来防止出现 Using filesort：
 ``` sql
 CREATE INDEX idx_age_phone_ad ON tb_user(age, phone DESC);
 ```
 
 ### group by 优化
+Using temporary：分组时使用了临时表，效率很低。可以理解为没有命中索引。
+
+**大部分优化与 order by 优化一致。**
+
+#### 前提条件
+tb_user 表：
+字段|类型|索引|注释
+-|-|-|-
+id|INT|Primary|主键
+name|VARCHAR(10)||姓名
+gender|CHAR(1)||性别
+age|TINYINT||年龄
+phone|VARCHAR(11)||手机号
+
+#### 只有主键索引
+通过主键索引分组时触发 Usint index:
+``` sql
+SELECT id, COUNT(*) FROM tb_user GROUP BY id;
+```
+
+其他情况都会触发 Using temporary，效率低。
+
+#### 创建了联合索引
+``` sql
+CREATE INDEX idx_user_union ON tb_user(gender, age, phone);
+```
+
+下列是可能会遇到的情况：
+``` sql
+-- 使用索引
+SELECT gender, COUNT(*) FROM tb_user GROUP BY gender;
+SELECT gender, age, COUNT(*) FROM tb_user GROUP BY gender, age;
+SELECT age, COUNT(*) FROM tb_user WHERE gender='女' GROUP BY age;
+
+-- 使用索引，但没完全用上（Using index; Using temporary）
+SELECT age, COUNT(*) FROM tb_user GROUP BY age;
+```
 
 ### limit 优化
+一个很平常的 LIMIT：
+``` sql
+SELECT * FROM 表名 LIMIT 1000000, 2;
+```
+它将查询 1000000 + 2 条数据，丢弃 1000000 条数据，最终返回 2 条数据。可以看出，跳过的数据越多，就越耗时。
+
+#### 子查询优化
+使用聚集索引可以得到 [1000000, 1000002] 这个区间的数据的 id：
+``` sql
+SELECT id FROM 表名 LIMIT 1000000, 2;
+```
+
+通过 id 查询数据：
+``` sql
+SELECT *
+FROM 表名
+WHERE id = (
+  SELECT id
+  FROM 表名
+  LIMIT 1000000, 2
+);
+```
+如果提示“当前版本数据库不支持在子查询语句内使用 LIMIT 关键字”，可以使用多表查询来规避。
+
+#### 多表查询优化
+使用聚集索引得到 [1000000, 1000002] 这个区间的数据的 id，将查询结果作为一个表，进行多表查询：
+``` sql
+SELECT A.*
+FROM
+  tb_user AS A,
+  (
+    SELECT id
+    FROM 表名
+    LIMIT 1000000, 2
+  ) AS B
+WHERE A.id = B.id;
+```
 
 ### count 优化
+MyISAM 引擎把一个表的总行数存到了硬盘上，因此执行 COUNT(*) 时会直接返回这个数，效率很高。如果使用了 WHERE 那么就会一行一行的读取数据，然后累计计数。
+InnoDB 引擎在执行 COUNT(*) 时会一行一行的读取数据，然后累计计数。
+
+MySQL 没有方法优化 COUNT()，建议自行计数。
+
+### 更新数据优化
+
