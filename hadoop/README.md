@@ -250,7 +250,7 @@ io.file.bufffer.size|4096|流文件的缓冲区大小
 hadoop.tmp.dir|/tmp/hadoop-${user_name}|临时目录
 
 ### 配置 hdfs-site.xml
-使用 vi 编辑 core-site.xml：
+使用 vi 编辑 hdfs-site.xml：
 ``` bash
 vi hdfs-site.xml
 ```
