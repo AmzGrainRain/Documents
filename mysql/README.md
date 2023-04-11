@@ -1,10 +1,17 @@
 # MYSQL 搭建文档
 
 ## 前提条件
-- mysql-community-client-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
-- mysql-community-libs-5.7.16-1.el7.x86_64.rpm  （位于 /opt/tar/MySQL/）
-- mysql-community-common-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
-- mysql-community-server-5.7.16-1.el7.x86_64.rpm（位于 /opt/tar/MySQL/）
+- mysql-5.7.28-1.el7.x86_64.rpm-bundle.tar（位于 /opt/tar/mysqlhome/）
+- mysql-community-client-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-common-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-devel-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-embedded-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-embedded-compat-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-embedded-devel-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-libs-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-libs-compat-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-server-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
+- mysql-community-test-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
 - 非分布式搭建
 
 ---
@@ -13,7 +20,7 @@
 
 进入 /opt/tar/MySQL/ 目录内：
 ``` bash
-cd /opt/tar/MySQL/
+cd /opt/tar/mysqlhome/
 ```
 
 查看当前目录内的文件：
@@ -24,7 +31,7 @@ ls
 
 使用 rpm 包管理器安装当前目录所有 .rpm 软件包：
 ``` bash
-rpm -ivh ./* --force --nodeps
+rpm -ivh ./*.rpm --force --nodeps
 ```
 ![安装结果](./images/2_2.png)
 

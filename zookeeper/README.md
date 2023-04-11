@@ -2,7 +2,7 @@
 
 ## 前提条件
 - 已经成功部署 Hadoop
-- zookeeper-3.4.5.tar.gz（位于 /opt/tar/）
+- apache-zookeeper-3.5.7-bin.tar.gz（位于 /opt/tar/）
 - 分布式搭建
 
 ---
@@ -20,11 +20,11 @@
 # 进入 /opt/apps 目录
 cd /opt/apps/
 
-# 解压 zookeeper-3.4.5.tar.gz 到当前目录
-tar -zxf /opt/tar/zookeeper-3.4.5.tar.gz
+# 解压 apache-zookeeper-3.5.7-bin.tar.gz 到当前目录
+tar -zxf /opt/tar/apache-zookeeper-3.5.7-bin.tar.gz
 
 # 重命名 zookeeper
-mv ./zookeeper-3.4.5 ./zookeeper
+mv ./apache-zookeeper-3.5.7-bin ./zookeeper
 ```
 
 ---
@@ -57,7 +57,7 @@ cp ./zoo_sample.cfg ./zoo.cfg
 vi ./zoo.cfg
 ```
 
-修改完后长这样：<a id="zoo-cfg"></a>
+修改后：<a id="zoo-cfg"></a>
 ``` bash
 # The number of milliseconds of each tick
 tickTime=2000
@@ -95,9 +95,10 @@ server.3=slave2:2888:3888
 ## 3.配置环境变量
 > 以下内容在 master 节点上操作
 
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+# 这个命令是我们在 hadoop 篇通过 alias 创建的，除此之外还有一个 env-update 用于更新环境变量
+env-edit
 ```
 
 在末尾追加以下内容：
@@ -120,7 +121,7 @@ export  PATH=$PATH:$ZK_HOME/bin:$JAVA_HOME/bin
 
 刷新环境变量：
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 测试环境变量：
@@ -140,16 +141,24 @@ scp -r /opt/apps/zookeeper slave1:/opt/apps/
 scp -r /opt/apps/zookeeper slave2:/opt/apps/
 ```
 
-下发环境变量：
+下发环境变量（正常点的）：
 ``` bash
-scp ~/.bashrc slave1:~/.bashrc
-scp ~/.bashrc slave2:~/.bashrc
+scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
+scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
+```
+
+下发环境变量（骚操作）：
+``` bash
+cd /etc/profile.d/
+scp ./big_data_env.sh slave1:$(pwd)/
+scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
 ## 6.生效环境变量：
 > 以下内容在所有节点上操作
+
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
@@ -161,14 +170,14 @@ source ~/.bashrc
 ``` bash
 # server.myid=主机名:2888:3888
 
-# master 节点的 myid 是 1
-server.1=master:2888:3888
+# master 节点的 myid 是 0
+server.0=master:2888:3888
 
-# slave1 节点的 myid 是 2
-server.2=slave1:2888:3888
+# slave1 节点的 myid 是 1
+server.1=slave1:2888:3888
 
-# slave2 节点的 myid 是 3
-server.3=slave2:2888:3888
+# slave2 节点的 myid 是 2
+server.2=slave2:2888:3888
 ```
 
 设置 master 节点的 myid：
@@ -191,33 +200,25 @@ ssh slave2 "echo 3 > /opt/apps/zookeeper/data/myid"
 ## 7.启动与测试
 > 以下内容大部分在 master 节点上操作，小部分需要在所有节点上操作
 
-在所有节点上执行此命令启动 zookeeper：
+在所有节点上执行此命令来启动 zookeeper：
 ``` bash
 # zkServer.sh 支持下列参数：
 # start | start-foreground | stop | restart | status | upgrade | print-cmd
-
-# 启动 master 节点上的 zookeeper ：
 zkServer.sh start
-
-# 启动 slave1 节点上的 zookeeper ：
-ssh slave1 "zkServer.sh start"
-
-# 启动 slave2 节点上的 zookeeper ：
-ssh slave2 "zkServer.sh start"
 ```
 
-打开 master 节点的 zookeeper cli：
+在 master 节点打开 zookeeper cli：
 ``` bash
 zkCli.sh
 ```
 
-在 master 节点的 zookeeper cli 执行此命令：
+在 master 节点的 zookeeper cli 里执行此命令：
 ``` bash
 create /test "hello"
 ```
 ![master zookeeper cli](./images/8_1.png)
 
-打开 slave1 节点的 zookeeper cli：
+在 slave1 节点打开 zookeeper cli：
 ``` bash
 zkCli.sh
 ```
@@ -228,7 +229,7 @@ get /test
 ```
 ![master zookeeper cli](./images/8_2.png)
 
-打开 slave2 节点的 zookeeper cli：
+在 slave2 节点打开 zookeeper cli：
 ``` bash
 zkCli.sh
 ```

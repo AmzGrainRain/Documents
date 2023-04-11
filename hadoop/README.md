@@ -184,10 +184,31 @@ mv ./jdk1.8.0_212 ./jdk
 
 > 当一个用户登录 Linux 系统或使用 su 命令切换到另一个用户时，首先要确保执行的启动脚本就是 `/etc/profile`，此文件内部内部有一段代码会遍历执行 `/etc/profile.d/` 目录内部的所有脚本。
 
-打开 `/etc/profile.d/big_data_env.sh` 文件：
+每次修改环境变量都很麻烦，但可以通过 alias 简化环境变量的修改和刷新：
+编辑 `/etc/profile.d/big_data_env.sh` 文件：
 ``` bash
 # 此文件虽然不存在，但直接编辑就相当于新建文件
 vi /etc/profile.d/big_data_env.sh
+```
+
+在末尾写入以下内容：
+``` bash
+alias env-edit='vi /etc/profile.d/big_data_env.sh'
+alias env-update='source /etc/profile.d/big_data_env.sh'
+```
+
+使其立即生效：
+``` bash
+source /etc/profile.d/big_data_env.sh
+```
+
+这样一来我们就创建了两个新的命令，其中:
+- env-edit 命令用来编辑环境变量
+- env-update 命令用来生效您对环境变量的修改
+
+然后我们就可以开始配置 hadoop 的环境变量了。编辑环境变量：
+``` bash
+env-edit
 ```
 
 写入以下内容：
@@ -200,25 +221,8 @@ export  PATH=$PATH:$JAVA_HOME/bin
 
 刷新环境变量：
 ``` bash
-source /etc/profile.d/big_data_env.sh
+env-update
 ```
-
-你可能注意到了，每次修改环境变量都很麻烦，因为我们要输入一长串的路径，所以我们可以通过 alias 简化环境变量的修改和刷新：
-编辑 `/etc/profile.d/custom_command.sh` 文件：
-``` bash
-# 此文件虽然不存在，但直接编辑就相当于新建文件
-vi /etc/profile.d/custom_command.sh
-```
-
-在末尾写入一下内容：
-``` bash
-alias env-edit='vi /etc/profile.d/big_data_env.sh'
-alias env-update='source /etc/profile.d/big_data_env.sh'
-```
-
-这样以来我们就创建了两个新的命令，其中:
-- env-edit 命令用来编辑环境变量
-- env-update 命令用来生效您对环境变量的修改
 
 测试 jdk 环境变量：
 ``` bash
@@ -395,7 +399,11 @@ mapreduce.jobhistory.address|0.0.0.0:10020|定义历史服务器的地址和端�
 mapreduce.jobhistory.webapp.address|0.0.0.0:19888|定义历史服务器 web 应用访问地址和端口。
 
 ### 配置 yarn-site.xml
-一个集群需要一个资源管理者，所以我们需要配置这个文件。  
+获取 hadoop 的 classpath：
+``` bash
+hadoop classpath
+```
+将输出内容复制下来，马上要用。
 
 编辑 yarn-site.xml：
 ``` bash
@@ -416,6 +424,11 @@ vi yarn-site.xml
   <property>
     <name>yarn.nodemanager.aux-services</name>
     <value>mapreduce_shuffle</value>
+  </property>
+  <!-- yarn 应用的 classpath -->
+  <property>
+    <name>yarn.application.classpath</name>
+    <value>此处填入刚才复制的内容</value>
   </property>
 </configuration>
 ```
@@ -454,17 +467,23 @@ scp -r /opt/apps slave1:/opt/
 scp -r /opt/apps slave2:/opt/
 ```
 
-下发环境变量文件到 slave1 和 slave2 节点：
+下发环境变量文件（正常点的）：
 ``` bash
 scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
-scp /etc/profile.d/custom_command.sh slave2:/etc/profile.d/custom_command.sh
+scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
+```
+
+下发环境变量文件（骚操作）：
+``` bash
+cd /etc/profile.d/
+scp ./big_data_env.sh slave1:$(pwd)/
+scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
 ## 10.生效环境变量：
 > 以下内容在所有节点上操作
 ``` bash
-source /etc/profile.d/custom_command.sh
-env-update
+source /etc/profile.d/big_data_env.sh
 ```
 
 ## 11.启动 Hadoop 集群
@@ -533,16 +552,15 @@ jps
 ## 13.测试 Hadoop
 > 以下内容在 master 节点上操作
 
-来一波计算测试：
+计算测试：
 ``` bash
 # 切换目录
-cd /opt/apps/hadoop/share/hadoop/mapreduce/
+cd $HADOOP/share/hadoop/mapreduce/
 
 # 来一波 mapreduce 计算测试
-hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 10 10
+hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 5 5
 
-# 计算很漫长，速度虚拟机的配置。
-# 最终计算结果是 Estimated value of Pi is 3.20000000000000000000
+# 最终计算结果是 Estimated value of Pi is 3.68000000000000000000
 ```
 
 查看 hdfs 报告：

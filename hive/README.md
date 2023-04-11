@@ -3,8 +3,8 @@
 ## 前提条件
 - hadoop 集群已经启动
 - mysql 已部署完毕
-- apache-hive-2.3.4-bin.tar.gz（位于/opt/tar下）
-- mysql-connector-java-5.1.32.jar（位于/opt/tar下）
+- apache-hive-3.1.2-bin.tar.gz（位于/opt/tar下）
+- mysql-connector-java-5.1.37.jar（位于/opt/tar下）
 - 非分布式搭建
 
 ---
@@ -14,36 +14,44 @@
 # 进入 /opt/apps 目录
 cd /opt/apps/
 
-# 解压 apache-hive-2.3.4-bin.tar.gz 到当前目录
-tar -zxf /opt/tar/apache-hive-2.3.4-bin.tar.gz
+# 解压 apache-hive-3.1.2-bin.tar.gz 到当前目录
+tar -zxf /opt/tar/apache-hive-3.1.2-bin.tar.gz
 
 # 重命名 hive
-mv ./apache-hive-2.3.4-bin ./hive
+mv ./apache-hive-3.1.2-bin ./hive
 ```
 
 ---
 
-## 2.放入 MySQL 驱动包
+## 2.置入 jar 包
 因为 hive 需要操作 mysql，所以需要将 java 连接 mysql 需要用到的驱动复制到 hive/lib/ 下：
 ``` bash
-cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/hive/lib/
+cp /opt/tar/mysql-connector-java-5.1.37.jar /opt/apps/hive/lib/
 ```
 
-> 启动 hive 会出现一个警告，解决方案是升级 hadoop 的 jline 库。将 hadoop 中的 jline-0.0.94.jar 替换为 hive 中较新的 jline-2.12.jar：
+guava 内部提供了很多高级的数据结构，如不可变的集合、图库，以及并发、I/O、散列、缓存、基元、字符串等实用工具。而 hive 与 hadoop 则使用到了其中的一些功能。但是随着版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 hive 和 hadoop 所所依赖的 guava 版本保持一致：
+``` bash
+# 复制高版本的 guava 到 hive
+cp /opt/apps/hadoop/share/hadoop/common/lib/guava-27.0-jre.jar /opt/apps/hive/lib/
+# 从 hive 里删除低版本的 guava
+rm -f guava-19.0.jar
+```
+
+<!-- > 启动 hive 会出现一个警告，解决方案是升级 hadoop 的 jline 库。将 hadoop 中的 jline-0.0.94.jar 替换为 hive 中较新的 jline-2.12.jar：
 > ``` bash
 > # 备份 jline-0.0.94.jar（以防万一）
 > cd /opt/apps/hadoop/share/hadoop/yarn/lib
 > cp ./jline-0.9.94.jar ./jline-0.9.94.jar.bak
 > # 替换 jline-0.0.94.jar
 > cp /opt/apps/hive/lib/jline-2.12.jar /opt/apps/hadoop/share/hadoop/yarn/lib/jline-0.9.94.jar
-> ```
+> ``` -->
 
 ---
 
 ## 3.配置环境变量
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -52,14 +60,14 @@ export HIVE_HOME=/opt/apps/hive
 export PATH=$PATH:$HIVE_HOME/bin
 ```
 
-## 4.生效环境变量
+生效环境变量
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
 
-## 5.配置 hive-env.sh
+## 4.配置 hive-env.sh
 进入到 hive 配置文件的目录下：
 ``` bash
 cd /opt/apps/hive/conf
@@ -83,71 +91,9 @@ export HIVE_HOME=/opt/apps/hive
 export HIVE_CONF_DIR=$HIVE_HOME/conf
 ```
 
-编辑完后长这样：
-``` bash
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# Set Hive and Hadoop environment variables here. These variables can be used
-# to control the execution of Hive. It should be used by admins to configure
-# the Hive installation (so that users do not have to set environment variables
-# or set command line parameters to get correct behavior).
-#
-# The hive service being invoked (CLI etc.) is available via the environment
-# variable SERVICE
-
-
-# Hive Client memory usage can be an issue if a large number of clients
-# are running at the same time. The flags below have been useful in
-# reducing memory usage:
-#
-# if [ "$SERVICE" = "cli" ]; then
-#   if [ -z "$DEBUG" ]; then
-#     export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:+UseParNewGC -XX:-UseGCOverheadLimit"
-#   else
-#     export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:-UseGCOverheadLimit"
-#   fi
-# fi
-
-# The heap size of the jvm stared by hive shell script can be controlled via:
-#
-# export HADOOP_HEAPSIZE=1024
-#
-# Larger heap size may be required when running queries over large number of files or partitions.
-# By default hive shell scripts use a heap size of 256 (MB).  Larger heap size would also be
-# appropriate for hive server.
-
-
-# Set HADOOP_HOME to point to a specific hadoop install directory
-# HADOOP_HOME=${bin}/../../hadoop
-
-# Hive Configuration Directory can be controlled by:
-# export HIVE_CONF_DIR=
-
-# Folder containing extra libraries required for hive compilation/execution can be controlled by:
-# export HIVE_AUX_JARS_PATH=
-export JAVA_HOME=/opt/apps/jdk
-export HADOOP_HOME=/opt/apps/hadoop
-export HIVE_HOME=/opt/apps/hive
-export HIVE_CONF_DIR=$HIVE_HOME/conf
-```
-
 ---
 
-## 6.配置 hive-site.xml
+## 5.配置 hive-site.xml
 拷贝模板：
 ``` bash
 cp ./hive-default.xml.template ./hive-site.xml
@@ -174,16 +120,50 @@ vi ./hive-site.xml
 <!--配置数据库用户名-->
 <property>
 	<name>javax.jdo.option.ConnectionUserName</name>
-	<value>root</value>
+	<value>你的账号</value>
 </property>
 <!--配置MySQL数据库root的密码-->
 <property>
 	<name>javax.jdo.option.ConnectionPassword</name>
-	<value>你的MySQL root密码</value>
+	<value>你的密码</value>
 </property>
+<!-- 在 hibe cli 内显示当前所在的数据库 -->
+<property>
+	<name>hive.cli.print.current.db</name>
+	<value>true</value>
+</property>
+<!-- 在 hibe cli 内显示表头 -->
+<property>
+	<name>hive.cli.print.header</name>
+	<value>true</value>
+</property>
+<!-- 关闭版本验证 -->
+<property>
+	<name>hive.metastore.schema.verification</name>
+	<value>false</value>
+</property>
+<!-- 以本地模式运行 -->
+<property> 
+	<name>hive.exec.mode.local.auto</name> 
+	<value>true</value> 
+</property> 
+
 ```
 
 ---
+
+## 6.配置 log4j.properties
+拷贝模板：
+``` bash
+cp hive-log4j2.properties.template hive-log4j2.properties
+```
+
+编辑 hive-log4j2.properties：
+``` bash
+vi ./hive-log4j2.properties
+```
+
+
 
 ## 7.schema 格式化
 执行格式化：
