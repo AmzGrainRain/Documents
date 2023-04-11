@@ -2,7 +2,7 @@
 
 ## 前提条件
 - hadoop 集群已经启动
-- apache-flume-1.6.0-bin.tar.gz（位于/opt/tar下）
+- apache-flume-1.9.0-bin.tar.gz（位于/opt/tar下）
 - 非分布式搭建
 
 ---
@@ -30,22 +30,22 @@ Source 可以搭配多个 Channel；但一个 Sink 只能搭配一个 Channel。
 cd /opt/apps
 ```
 
-解压 apache-flume-1.6.0-bin.tar.gz 到当前目录：
+解压 apache-flume-1.9.0-bin.tar.gz 到当前目录：
 ``` bash
-tar -zxf /opt/tar/apache-flume-1.6.0-bin.tar.gz
+tar -zxf /opt/tar/apache-flume-1.9.0-bin.tar.gz
 ```
 
 重命名 hbase ：
 ``` bashl
-mv ./apache-flume-1.6.0-bin ./flume
+mv ./apache-flume-1.9.0-bin ./flume
 ```
 
 ---
 
 ## 2.配置环境变量
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -56,7 +56,7 @@ export PATH=$PATH:$FLUME_HOME/bin
 
 ## 3.生效环境变量
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 测试下：
@@ -100,11 +100,8 @@ mkdir ~/flume_test
 
 创建并进入 jobs 目录：
 ``` bash
-# 创建
-mkdir /opt/apps/flume/agent
-
-# 进入
-cd /opt/apps/flume/agent
+cd /opt/apps/flume
+mkdir agent && cd agent
 ```
 
 在 jobs 目录内写一个我们自己的 agent 文件：
@@ -114,6 +111,7 @@ vi ./test.conf
 
 test.conf 的内容是这样的：
 > 大坑：自定义 Agent 名称不能有下划线
+
 ``` conf
 # 其中 test 为任务名
 
@@ -136,10 +134,10 @@ test.sinks.testSink.type = logger
 ```
 
 启动 Flume Agent :
-> `-n` 任务名
-> `-c` flume 配置文件目录
-> `-f` agent 文件路径
-> `-Dflume.root.logger=INFO,console` 运行时动态修改 `flume.root.logger` 参数属性值，并将控制台日志打印级别设置为 INFO 级别。
+> `-n` 任务名  
+> `-c` flume 配置文件目录  
+> `-f` agent 文件路径  
+> `-Dflume.root.logger=INFO,console` 输出日志级别
 ``` bash
 flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO.console
 ```
@@ -159,7 +157,7 @@ ls ~/flume_test
 ```
 ![成功示例](./images/5_1.png)
 
-在启动 Agent 的终端窗口可以看到刚刚采集的消息内容。另外，对于 Spooling Directory 中的文件，其内容写入 Channel 后，该文件将会被标记并且增加 **.COMPLETED** 的后缀。
+在启动 Agent 的终端窗口可以看到刚刚采集的消息内容（不显示也没关系）。另外，对于 Spooling Directory 中的文件，其内容写入 Channel 后，该文件将会被标记并且增加 **.COMPLETED** 的后缀。
 
 ---
 
@@ -182,6 +180,7 @@ vi ./test_hdfs.conf
 
 test_hdfs.conf 的内容是这样的：
 > 大坑：自定义 Agent 名称不能有下划线
+
 ``` conf
 # 其中 test_hdfs 为任务名
 
@@ -221,7 +220,7 @@ test_hdfs.sinks.testHDFSSink.hdfs.rollSize = 134217728
 test_hdfs.sinks.sink2.hdfs.rollInterval = 60
 ```
 
-启动 flume agent :
+启动 flume agent:
 ``` bash
 flume-ng agent -n test_hdfs -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test_hdfs.conf -Dflume.root.logger=INFO,console
 ```
@@ -238,6 +237,31 @@ echo "hello flume" > data.log
 
 查看 hdfs 目录变化：
 ![成功示例](./images/6_2.png)
+
+---
+
+## guava.jar 版本不一致造成的错误
+``` bash
+Exception in thread "SinkRunner-PollingRunner-DefaultSinkProcessor" java.lang.NoSuchMethodError: com.google.common.base.Preconditions.checkArgument(ZLjava/lang/String;Ljava/lang/Object;)V
+        at org.apache.hadoop.conf.Configuration.set(Configuration.java:1357)
+        at org.apache.hadoop.conf.Configuration.set(Configuration.java:1338)
+        at org.apache.hadoop.conf.Configuration.setBoolean(Configuration.java:1679)
+        at org.apache.flume.sink.hdfs.BucketWriter.open(BucketWriter.java:206)
+        at org.apache.flume.sink.hdfs.BucketWriter.append(BucketWriter.java:504)
+        at org.apache.flume.sink.hdfs.HDFSEventSink.process(HDFSEventSink.java:406)
+        at org.apache.flume.sink.DefaultSinkProcessor.process(DefaultSinkProcessor.java:67)
+        at org.apache.flume.SinkRunner$PollingRunner.run(SinkRunner.java:145)
+        at java.lang.Thread.run(Thread.java:748)
+
+```
+这是因为 flume 与 hadoop 都使用到了 guava 库其中的一些功能，但是随着 guava版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 flume 与 hadoop 依赖的 guava 版本保持一致：
+``` bash
+# 删除 flume 里的 guava
+rm -f guava-11.0.2.jar
+
+# 从 hadoop 复制高版本的 guava 到 hive
+cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar $FLUME_HOME/lib/
+```
 
 ---
 

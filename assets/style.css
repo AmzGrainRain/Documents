@@ -894,3 +894,8 @@ code .token {
   position: relative;
   left: auto;
 }
+
+
+.docsify-copy-code-button {
+  font-size: .6em !important;
+}

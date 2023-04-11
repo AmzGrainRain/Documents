@@ -29,22 +29,14 @@ mv ./apache-hive-3.1.2-bin ./hive
 cp /opt/tar/mysql-connector-java-5.1.37.jar /opt/apps/hive/lib/
 ```
 
-guava 内部提供了很多高级的数据结构，如不可变的集合、图库，以及并发、I/O、散列、缓存、基元、字符串等实用工具。而 hive 与 hadoop 则使用到了其中的一些功能。但是随着版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 hive 和 hadoop 所所依赖的 guava 版本保持一致：
+guava 内部提供了很多高级的数据结构，如不可变的集合、图库，以及并发、I/O、散列、缓存、基元、字符串等实用工具。而 hive 与 hadoop 则使用到了其中的一些功能。但是随着版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 hive 和 hadoop 依赖的 guava 版本保持一致：
 ``` bash
-# 复制高版本的 guava 到 hive
-cp /opt/apps/hadoop/share/hadoop/common/lib/guava-27.0-jre.jar /opt/apps/hive/lib/
-# 从 hive 里删除低版本的 guava
+# 删除 hive 里的 guava
 rm -f guava-19.0.jar
-```
 
-<!-- > 启动 hive 会出现一个警告，解决方案是升级 hadoop 的 jline 库。将 hadoop 中的 jline-0.0.94.jar 替换为 hive 中较新的 jline-2.12.jar：
-> ``` bash
-> # 备份 jline-0.0.94.jar（以防万一）
-> cd /opt/apps/hadoop/share/hadoop/yarn/lib
-> cp ./jline-0.9.94.jar ./jline-0.9.94.jar.bak
-> # 替换 jline-0.0.94.jar
-> cp /opt/apps/hive/lib/jline-2.12.jar /opt/apps/hadoop/share/hadoop/yarn/lib/jline-0.9.94.jar
-> ``` -->
+# 从 hadoop 复制高版本的 guava 到 hive
+cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar /opt/apps/hive/lib/
+```
 
 ---
 
