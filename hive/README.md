@@ -165,12 +165,28 @@ vi ./hive-log4j2.properties
 
 
 
-## 7.schema 格式化
-执行格式化：
+## 7.schema 初始化
+执行初始化：
 ``` bash
 schematool -dbType mysql -initSchema
 ```
-![结果](images/6_1.png)
+![报错了](images/7_1.png)
+
+芜湖寄了！说来挺可笑，默认情况下 hive-site.xml 文件的第 3215 行居然存在会导致 schema 初始化失败的非法字符。。。
+
+编辑 hive-site.xml：
+``` bash
+vi ./hive-site.xml
+```
+
+在 vi 命令模式下输入 `:3215` 来快速跳转到第 3215 行，删掉 `&#8;` 这四个符号：
+![删掉字符](images/7_2.png)
+
+再次尝试初始化：
+``` bash
+schematool -dbType mysql -initSchema
+```
+![结果](images/7_3.png)
 
 ---
 
@@ -181,7 +197,7 @@ hive
 ```
 
 如果出现这个报错：（绝对URI中的相对路径）
-![示意图](./images/7_1.png)
+![示意图](./images/8_1.png)
 
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 ``` bash
@@ -195,7 +211,9 @@ hive
 ```
 
 成功：
-![结果](./images/7_2.png)
+![结果](./images/8_2.png)
+
+不要忘记输入 `exit;` 或按下 `ctrl + d` 退出 hive cli。
 
 ---
 
@@ -218,7 +236,7 @@ vi test.txt
 老张,31
 老刘,29
 ```
-![文本内容](./images/8_1.png)
+![文本内容](./images/9_1.png)
 
 在 hdfs 里创建一个 test_hive 目录：
 ``` bash
@@ -230,27 +248,29 @@ hdfs dfs -mkdir /test_hive
 ``` bash
 hdfs dfs -put ~/test.txt /test_hive/test.txt
 ```
-如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop 。  
-```
+
+如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop。  
+``` bash
 # 停止 hadoop 集群
-stop-yarn.sh && stop-dfs.sh
+stop-all.sh
 
 # 启动 hadoop 集群
-start-dfs.sh && start-yarn.sh
+start-all.sh
 ```
+
 如果还是不行，请尝试此方案（会清空 hdfs 内所有的数据）：
-```
+``` bash
 # 停止 hadoop 集群
-stop-yarn.sh && stop-dfs.sh
+stop-all.sh
 
 # 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录（在所有节点上执行这句）
-rm -rf /opt/apps/hadoop/data/*
+rm -rf $HADOOP/tmp
 
 # 重新格式化 namenode（在 master 节点上执行这句）
 hdfs namenode -format
 
 # 启动 hadoop 集群
-start-dfs.sh && start-yarn.sh
+start-all.sh
 ```
 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
 
@@ -258,7 +278,7 @@ start-dfs.sh && start-yarn.sh
 ``` bash
 hdfs dfs -cat /test_hive/test.txt
 ```
-![文本内容](./images/8_2.png)
+![文本内容](./images/9_2.png)
 
 
 启动 hive ：
@@ -273,25 +293,25 @@ hive
 	-	以 “,” 分隔字段
 	- 换行符结尾
 
-``` bash
-create table test (name string, age int) row format delimited fields terminated by ",";
+``` sql
+CREATE TABLE test (name string, age int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ",";
 ```
-![文本内容](./images/8_3.png)
+![文本内容](./images/9_3.png)
 
-从 hdfs 导入 /test_hive/test.txt 	内的数据到 test 数据表：
+从 hdfs 导入 `/test_hive/test.txt` 内的数据到 test 数据表：
 ``` bash
 # load data inpath 'hdfs 路径' into table 表名;
 load data inpath '/test_hive/test.txt' into table test;
 ```
-![文本内容](./images/8_4.png)
+![文本内容](./images/9_4.png)
 
 执行一个大家熟悉的命令来验证下：
-``` bash
-select * from test;
+``` sql
+SELECT * FROM test;
 ```
-![文本内容](./images/8_5.png)
+![文本内容](./images/9_5.png)
 
-输入 exit 或按下 ctrl + d 退出 hive 控制台：
+输入 `exit` 或按下 `ctrl + d` 退出 hive cli：
 ``` bash
 exit;
 ```
@@ -300,7 +320,7 @@ exit;
 ``` bash
 hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ```
-![文本内容](./images/8_6.png)
+![文本内容](./images/9_6.png)
 
 ---
 
