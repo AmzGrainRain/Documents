@@ -5,7 +5,7 @@
 - mysql 已部署完毕
 - hive 已部署完毕
 - zookeeper 已经启动
-- hbase-1.2.0-bin.tar.gz（位于/opt/tar下）
+- hbase-2.2.3-bin.tar.gz（位于/opt/tar下）
 - 分布式搭建
 
 ---
@@ -18,25 +18,24 @@
 cd /opt/apps
 ```
 
-解压 hbase-1.2.0-bin.tar.gz 到当前目录：
+解压 hbase-2.2.3-bin.tar.gz 到当前目录：
 ``` shell
-tar -zxf /opt/tar/hbase-1.2.0-bin.tar.gz
+tar -zxf /opt/tar/hbase-2.2.3-bin.tar.gz
 ```
 
 重命名 hbase ：
 ``` shelll
-mv ./hbase-1.2.0 ./hbase
+mv ./hbase-2.2.3 ./hbase
 ```
 
 ---
 
 ## 2.配置环境变量
 > 以下内容在 master 节点上操作
-> 仅 master 节点需要配置环境变量
 
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` shell
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -65,19 +64,11 @@ vi hbase-env.sh
 ```diff
 # The java implementation to use.  Java 1.7+ required.
 - export JAVA_HOME=/usr/java/jdk1.6.0/
-+ export JAVA_HOME=/opt/apps/jdk
++ export JAVA_HOME=/opt/apps/jdk/
 
 # Tell HBase whether it should manage it's own instance of Zookeeper or not.
 - export HBASE_MANAGES_ZK=true
 + export HBASE_MANAGES_ZK=false
-```
-
-注释以下配置：
-> 目前使用 jdk 版本为 jdk1.8，无须配置此项，故注释（不注释会出错）
-``` shell
-# Configure PermSize. Only needed in JDK7. You can safely remove it for JDK8+
-#export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -XX:PermSize=128m -XX:MaxPermSize=128m"
-#export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -XX:PermSize=128m -XX:MaxPermSize=128m"
 ```
 
 配置 hbase-site.xml：
@@ -159,8 +150,9 @@ ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 
 ## 5.生效环境变量
 > 以下内容在所有节点上操作
+
 ``` shell
-source ~/.bashrc
+env-update
 ```
 
 ## 6.启动测试
@@ -182,10 +174,10 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ---
 
 ## 7.Hbase shell
-> 以下内容在 master 节点上操作
+> 以下内容在 master 节点上操作  
+> 确保您已经启动了 hadoop 和 zookeeper
 
 进入 hbase 命令行：
-> 确保您已经启动了 hadoop 和 zookeeper
 ``` shell
 hbase shell
 ```
