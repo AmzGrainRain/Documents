@@ -3,7 +3,7 @@
 ## 前提条件
 - hadoop 集群已经启动
 - zookeeper 已经启动
-- kafka_2.11-1.0.0.tgz（位于/opt/tar下）
+- kafka_2.12-2.4.1.tgz（位于/opt/tar下）
 - 分布式搭建
 
 ---
@@ -42,14 +42,14 @@ KAFKA 工作在此模式下，发布者发送到 Topic 的消息，只有订阅�
 cd /opt/apps
 ```
 
-解压 apache-flume-1.6.0-bin.tar.gz 到当前目录：
+解压 kafka_2.12-2.4.1.tgz 到当前目录：
 ``` bash
-tar -zxf /opt/tar/kafka_2.11-1.0.0.tgz
+tar -zxf /opt/tar/kafka_2.12-2.4.1.tgz
 ```
 
 重命名 kafka ：
 ``` bash
-mv ./kafka_2.11-1.0.0 ./kafka
+mv ./kafka_2.12-2.4.1 ./kafka
 ```
 
 ---
@@ -57,9 +57,9 @@ mv ./kafka_2.11-1.0.0 ./kafka
 ## 2.配置环境变量
 > 以下内容在 master 节点上操作
 
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -71,7 +71,7 @@ export PATH=$PATH:$KAFKA_HOME/bin
 ## 3.生效环境变量
 > 以下内容在所有节点上操作
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
@@ -79,14 +79,14 @@ source ~/.bashrc
 ## 4.修改配置文件
 > 以下内容在 master 节点上操作
 
-进入配置文件目录：
-``` bash
-cd /opt/apps/kafka/config
-```
-
 创建 kafka 的日志目录：
 ``` bash
 mkdir /opt/apps/kafka/logs
+```
+
+进入配置文件目录：
+``` bash
+cd /opt/apps/kafka/config
 ```
 
 使用 vi 编辑 server.properties：
@@ -114,27 +114,41 @@ scp -r /opt/apps/kafka slave1:/opt/apps/
 scp -r /opt/apps/kafka slave2:/opt/apps/
 ```
 
-下发环境变量文件到 slave1 和 slave2 节点：
+下发环境变量文件到 slave1 和 slave2 节点（正常版）：
 ``` bash
-scp ~/.bashrc slave1:~/.bashrc
-scp ~/.bashrc slave2:~/.bashrc
+scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
+scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
 ```
+
+下发环境变量文件到 slave1 和 slave2 节点（骚操作）：
+``` bash
+cd /etc/profile.d
+scp ./big_data_env.sh slave1:$(pwd)/
+scp ./big_data_env.sh slave2:$(pwd)/
+```
+
 ---
 
 ## 6.生效环境变量：
 > 以下内容在所有节点上操作
+
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
 
 ## 7.设置 Broker ID
+进入配置文件目录：
+``` bash
+cd /opt/apps/kafka/config
+```
+
 通过 cat 组合 grep 看一下 server.properties 文件内 broker.id 的默认值是什么：
 ``` bash
 cat server.properties | grep "broker.id"
 ```
-![查看默认id](./images/6_1.png)
+![查看 master broker id](./images/6_1.png)
 
 那我们就规划以下三个节点的 Broker ID：
 - master -> 0（无需修改了）
@@ -150,7 +164,7 @@ ssh slave1 "sed -i 's/broker.id=0/broker.id=1/g' /opt/apps/kafka/config/server.p
 ``` bash
 ssh slave2 "sed -i 's/broker.id=0/broker.id=2/g' /opt/apps/kafka/config/server.properties"
 ```
-![查看默认id](./images/6_2.png)
+![查看其他节点的 broker id](./images/6_2.png)
 
 ---
 
@@ -166,6 +180,8 @@ kafka-server-start.sh -daemon /opt/apps/kafka/config/server.properties &
 ---
 
 ## 9.测试
+> 请确保您的 hadoop 集群、zookeeper、kafka 已经启动
+
 新建一个名为 test 的 Topic ：
 ``` bash
 kafka-topics.sh --create --zookeeper master:2181 --partitions 2 --replication-factor 1 --topic test
@@ -180,6 +196,7 @@ kafka-topics.sh --list --zookeeper master:2181
 
 发送消息：
 > 在 master 节点上执行
+
 ``` bash
 # 生产者发送消息
 kafka-console-producer.sh --broker-list master:9092 --topic test
