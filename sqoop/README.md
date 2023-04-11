@@ -4,8 +4,8 @@
 - hadoop 集群已经启动
 - mysql 已部署完毕
 - hive 已部署完毕
-- mysql-connector-java-5.1.32.jar（位于/opt/tar下）
-- sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz（位于/opt/tar下）
+- mysql-connector-java-5.1.37.jar（位于/opt/tar下）
+- sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz（位于/opt/tar下）
 - 非分布式搭建
 
 ---
@@ -16,14 +16,14 @@
 cd /opt/apps
 ```
 
-解压 sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz 到当前目录：
+解压 sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz 到当前目录：
 ``` bash
-tar -zxf /opt/tar/sqoop-1.4.3.bin__hadoop-2.0.0-alpha.tar.gz
+tar -zxf /opt/tar/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 ```
 
 重命名 sqoop ：
 ``` bash
-mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
+mv ./sqoop-1.4.7.bin__hadoop-2.6.0 ./sqoop
 ```
 
 ---
@@ -31,15 +31,15 @@ mv ./sqoop-1.4.3.bin__hadoop-2.0.0-alpha ./sqoop
 ## 2.放入 MySQL 驱动包：
 因为我们要通过 sqoop 操作 mysql，所以需要将java 连接 mysql 需要用到的驱动复制到 sqoop/lib 下：
 ``` bash
-cp /opt/tar/mysql-connector-java-5.1.32.jar /opt/apps/sqoop/lib/
+cp /opt/tar/mysql-connector-java-5.1.37.jar /opt/apps/sqoop/lib/
 ```
 
 ---
 
 ## 3.配置环境变量
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -50,7 +50,7 @@ export PATH=$PATH:$SQOOP_HOME/bin
 
 ## 4.生效环境变量
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
@@ -70,10 +70,10 @@ sqoop version
 vi /etc/my.cnf
 ```
 
-在 my.cnf 配置文件中，bind-address 如果是 127.0.0.1，则 mysql 只接受本地连接，不接受远程连接。在 bind-address 后面增加远程访问 IP 地址或者注释掉这句话就可以远程登陆了。所以我们需要注释掉这一行（没有的话就无需这一步操作）：
+在 my.cnf 配置文件中，bind-address 如果是 127.0.0.1，则 mysql 只接受本地连接，不接受远程连接。在 bind-address 后面增加远程访问 IP 地址或者注释掉这句话就可以远程登陆了。所以我们需要注释掉这一行：
 ``` bash
-# 注释以井号开头
-bind-address = 127.0.0.1
+# 没有下面这一行的话就无需这一步操作
+#bind-address = 127.0.0.1
 ```
 
 以 root 身份登录到 mysql ：
@@ -81,7 +81,7 @@ bind-address = 127.0.0.1
 mysql -u root -p
 ```
 
-依照我们之前在[ mysql 搭建文档 ](../mysql/README.md)说过的方法，完全允许 root 远程连接 mysql ：  
+依照我们之前在[ mysql 搭建文档 ](../mysql/README.md)说过的方法，完全允许 root 远程连接 mysql：  
 命令解释：
   - GRANT：赋权命令
   - ALL PRIVILEGES：当前用户的所有权限
@@ -105,14 +105,17 @@ FLUSH PRIVILEGES;
 
 创建一个用于测试 sqoop 的数据库和表：
 ``` sql
-# 创建 sqoop_test 数据库
+-- 创建 sqoop_test 数据库
 CREATE DATABASE sqoop_test;
 
-# 切换到 sqoop_test 数据库
+-- 切换到 sqoop_test 数据库
 USE sqoop_test;
 
-# 创建 test 表
-CREATE TABLE `test` (`name` VARCHAR(50), `age` INT) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- 创建 test 表
+CREATE TABLE `test` (
+  `name` VARCHAR(50),
+  `age` INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 ![SQL结果](./images/5_1.png)
 
@@ -120,7 +123,11 @@ CREATE TABLE `test` (`name` VARCHAR(50), `age` INT) ENGINE=InnoDB DEFAULT CHARSE
 
 插入一些数据：
 ``` sql
-INSERT INTO test VALUES ("张三", 20), ("李四", 24), ("王五", 22), ("王五", 22);
+INSERT INTO test VALUES
+  ("张三", 20),
+  ("李四", 24),
+  ("王五", 22),
+  ("王五", 22);
 ```
 ![插入结果](./images/5_2.png)
 
@@ -194,7 +201,7 @@ hdfs dfs -rm -r /user/root/test
 
 再次导入：
 ``` bash
-sqoop import --connect jdbc:mysql://master:3306/sqoop_test --table test --username root -P --m 1
+sqoop import --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --table test --username root -P --m 1
 ```
 ![更换 ip](./images/8_2.png)
 
@@ -239,17 +246,22 @@ CREATE TABLE `test_from_hdfs` (
 
 退出 mysql，开始使用 sqoop 导入数据：
 ``` bash
-sqoop export --connect jdbc:mysql://master:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
+sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
 ```
 ![导入数据：](./images/9_2.png)
 
-
-来查看下我们前面创建的 test_from_hdfs 表：
+登入 mysql：
 ``` bash
+mysql -u root -p
+```
+
+查看下我们创建的 test_from_hdfs 表：
+``` sql
 SELECT * FROM sqoop_test.test_from_hdfs;
 ```
 ![导入的数据](./images/9_3.png)
-可以看到数据导入成功了，但是有一个新的问题。那就是所有的汉字都显示成了问号，篇幅原因我们放在下一节一一道来。
+
+可以看到数据导入成功了，但是有一个新的问题。那就是所有的汉字都显示成了问号，篇幅原因我们放在下一节细说。
 
 ---
 
@@ -279,15 +291,8 @@ init_connect='SET NAMES utf8'
 
 重启 mysql 服务：
 
-> 直接重启服务大概率会卡住（不明原因）
-> systemctl restart mysqld.service
-> 所以我们还是先停止服务再启动服务吧
-
 ``` bash
-# 停止
-systemctl stop mysqld.service
-# 启动
-systemctl start mysqld.service
+systemctl restart mysqld.service
 ```
 
 进入 mysql 查看编码信息：
@@ -297,7 +302,12 @@ SHOW VARIABLES LIKE 'character%';
 ![编码信息](./images/10_2.png)
 可以看到编码全是 utf8 了。
 
-删除我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表，然后重复第十步操作即可。
+清空我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表：
+``` sql
+TRUNCATE sqoop_test.test_from_hdfs;
+```
+
+然后重复第十步操作即可。
 ![正常的输出](./images/10_3.png)
 
 ---

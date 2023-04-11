@@ -480,7 +480,7 @@ scp ./big_data_env.sh slave1:$(pwd)/
 scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
-## 10.生效环境变量：
+## 10.生效环境变量
 > 以下内容在所有节点上操作
 ``` bash
 source /etc/profile.d/big_data_env.sh

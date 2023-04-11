@@ -202,6 +202,7 @@ hive
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 ``` bash
 # sed -i "s/要替换的/替换为/g" 文件路径
+# 此命令用于替换内容
 sed -i "s/system://g" /opt/apps/hive/conf/hive-site.xml
 ```
 
@@ -222,11 +223,7 @@ hive
 
 我们先来创建一个结构化的数据：
 ``` bash
-# 进入根目录
-cd ~
-
-# 新建一个文本文件
-vi test.txt
+vi ~/test.txt
 ```
 
 写入这些东西：
@@ -240,7 +237,6 @@ vi test.txt
 
 在 hdfs 里创建一个 test_hive 目录：
 ``` bash
-# hdfs dfs -命令 值
 hdfs dfs -mkdir /test_hive
 ```
 
