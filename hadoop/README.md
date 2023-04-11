@@ -2,10 +2,9 @@
 
 ## 前提条件
 - CentOS-7-x86_64-Minimal-2009.iso
-- jdk-8u191-linux-x64.tar.gz（位于 /opt/tar/）
-- hadoop-2.6.0.tar.gz（位于 /opt/tar/）
+- jdk-8u212-linux-x64.tar.gz（位于 /opt/tar/）
+- hadoop-3.1.3.tar.gz（位于 /opt/tar/）
 - 三台互通的虚拟机
-- 分布式搭建
 
 ---
 
@@ -22,6 +21,18 @@ Hadoop 是一个由 Apache 基金会所开发的分布式系统基础架构。�
 HDFS 是一个分布式文件系统。
 #### NameNode
 存储文件的元数据，如文件名，文件目录结构，文件属性（生成时间、副本数、文件权限），以及每个文件的块列表和块所在的 DataNode 等。
+#### SecondaryNameNode
+SecondaryNameNode 的作用是合并 fsimage 和 edits文件。  
+
+NameNode 的存储目录树的信息，而目录树的信息则存放在 fsimage 文件中，当 NameNode 启动的时候会首先读取整个 fsimage 文件，将信息装载到内存中。  
+
+edits 文件存储日志信息，在 NameNode 上所有对目录的操作，增加，删除，修改等都会保存到 edits 文件中，并不会同步到 fsimage 中，当 NameNode 关闭的时候，也不会将 fsimage 和 edits 进行合并。  
+
+所以当 NameNode 启动的时候，首先装载 fsimage 文件，然后按照 edits 中的记录执行一遍所有记录的操作，最后把信息的目录树写入 fsimage 中，并删掉 edits 文件，重新启用新的 edits 文件。  
+
+但是如果 NameNode 执行了很多操作的话，就会导致 edits 文件很大，那么在下一次启动的过程中，就会导致 NameNode 的启动速度很慢，慢到几个小时也不是不可能，所以出现了 SecondNameNode。 
+
+SecondaryNameNode 会按照一定的规则被唤醒，进行 fsimage 和 edits 的合并，防止文件过大。合并的过程是，将 NameNode 的 fsimage 和 edits 下载到 SecondryNameNode 所在的节点的数据目录，然后合并到 fsimage 文件，最后上传到 NameNode 节点。合并的过程中不影响 NameNode 节点的使用。
 #### DataNode
 在本地文件系统存储文件块数据，以及块数据的校验和。
 #### Secondary NameNode
@@ -49,7 +60,7 @@ YARN 是一种资源协调者，是 Hadoop 的资源管理器。
 ---
 
 ## 1.修改主机名
-修改主机名主要是为了在集群中分辨主次  
+修改主机名主要是为了在集群中分辨主次。  
 
 在第一台服务器上操作：
 ``` bash
@@ -75,12 +86,11 @@ hostnamectl set-hostname slave2
 ---
 
 ## 2.修改 hosts 规则
-> 以下内容在 master 节点上操作  
-> hosts 有什么作用请自行百度
+> 以下内容仅在 master 节点上操作  
+> [hosts 有什么作用？](https://baike.baidu.com/item/hosts/10474546)
 
-通过 vi 修改 /etc/hosts 文件:
+修改 /etc/hosts 文件:
 ``` bash
-# 编辑 hosts 文件
 vi /etc/hosts
 ```
 
@@ -90,7 +100,7 @@ vi /etc/hosts
 ---
 
 ## 3.同步 hosts 规则
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作
 
 通过 scp 命令将 master 节点上已经修改过的 hosts 文件发送到 slave1 和 slave2：
 ``` bash
@@ -104,8 +114,7 @@ scp /etc/hosts slave2:/etc/hosts
 
 systemctl 用于控制服务，使用 systemctl 关闭防火墙：
 ``` bash
-# systemctl 操作 服务
-
+# 命令格式：systemctl [要执行的操作] [服务名.service]
 # 关闭防火墙
 systemctl stop firewalld.service
 
@@ -122,7 +131,8 @@ systemctl status firewalld.service
 ---
 
 ## 5.配置 SSH 免密登录
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作  
+> [什么是 RSA 密钥？](https://zhuanlan.zhihu.com/p/26810938)
 
 生成一个 RSA 密钥，一直回车即可。
 ``` bash
@@ -131,7 +141,7 @@ ssh-keygen -t rsa
 ```
 ![结果](./images/7_1.png)
 
-创建可信配置：
+创建可信配置（SSH免密登录）：
 ``` bash
 # 给自己添加可信配置呢，此举方便后面启动集群。
 ssh-copy-id master
@@ -149,6 +159,7 @@ ssh-copy-id slave2
 
 ## 6.Hadoop 集群部署
 > 以下内容在 master 节点上操作
+
 ``` bash
 # 切换到 opt 目录
 cd /opt
@@ -157,25 +168,29 @@ cd /opt
 mkdir apps && cd apps
 
 # 解压 hadoop 和 jdk
-tar -zxf /opt/tar/hadoop-2.6.0.tar.gz
-tar -zxf /opt/tar/jdk-8u191-linux-x64.tar.gz
+tar -zxf /opt/tar/hadoop-3.1.3.tar.gz
+tar -zxf /opt/tar/jdk-8u212-linux-x64.tar.gz
 
 # 重命名 hadoop
-mv ./hadoop-2.6.0 ./hadoop
+mv ./hadoop-3.1.3 ./hadoop
 
 # 重命名 jdk
-mv ./jdk1.8.0_191 ./jdk
+mv ./jdk1.8.0_212 ./jdk
 ```
 
 ## 7.配置环境变量
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作  
+> [什么是环境变量？](https://baike.baidu.com/item/%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F/1730949)
 
-编辑用户根目录下的 .bashrc 文件：
+> 当一个用户登录 Linux 系统或使用 su 命令切换到另一个用户时，首先要确保执行的启动脚本就是 `/etc/profile`，此文件内部内部有一段代码会遍历执行 `/etc/profile.d/` 目录内部的所有脚本。
+
+打开 `/etc/profile.d/big_data_env.sh` 文件：
 ``` bash
-vi ~/.bashrc
+# 此文件虽然不存在，但直接编辑就相当于新建文件
+vi /etc/profile.d/big_data_env.sh
 ```
 
-在末尾追加以下内容：
+写入以下内容：
 ``` bash
 export  HADOOP_HOME=/opt/apps/hadoop
 export  PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
@@ -185,8 +200,25 @@ export  PATH=$PATH:$JAVA_HOME/bin
 
 刷新环境变量：
 ``` bash
-source ~/.bashrc
+source /etc/profile.d/big_data_env.sh
 ```
+
+你可能注意到了，每次修改环境变量都很麻烦，因为我们要输入一长串的路径，所以我们可以通过 alias 简化环境变量的修改和刷新：
+编辑 `/etc/profile.d/custom_command.sh` 文件：
+``` bash
+# 此文件虽然不存在，但直接编辑就相当于新建文件
+vi /etc/profile.d/custom_command.sh
+```
+
+在末尾写入一下内容：
+``` bash
+alias env-edit='vi /etc/profile.d/big_data_env.sh'
+alias env-update='source /etc/profile.d/big_data_env.sh'
+```
+
+这样以来我们就创建了两个新的命令，其中:
+- env-edit 命令用来编辑环境变量
+- env-update 命令用来生效您对环境变量的修改
 
 测试 jdk 环境变量：
 ``` bash
@@ -204,38 +236,56 @@ whereis hdfs
 
 ## 8.Hadoop 集群配置
 > 以下内容在 master 节点上操作
+
 进入到 hadoop 配置文件的目录下：
 ``` bash
-cd /opt/apps/hadoop/etc/hadoop/
+cd $HADOOP_HOME/etc/hadoop/
 ```
 
 ### 配置 hadoop-env.sh
-使用 vi 编辑 hadoop-env.sh：
+由于 hadoop 运行时依赖 Java，所以我们需要在此文件里为 hadoop 配置环境变量；另外，在新版的 hadoop 中我们还需要配置启动 hadoop 时所使用的用户，所以我们还需要在此文件里设置用户名。
+
+编辑 hadoop-env.sh：
 ``` bash
 vi hadoop-env.sh
 ```
 
-在尾部追加以下内容:
+在文件末尾追加以下内容:
 ``` bash
+# Java 环境变量
 export JAVA_HOME=/opt/apps/jdk
+# Hadoop 执行命令时使用的用户名
+export HADOOP_SHELL_EXECNAME=root
+# NameNode 用户名
+export HDFS_NAMENODE_USER=root
+# DataNode 用户名
+export HDFS_DATANODE_USER=root
+# Secondary NameNode 用户名
+export HDFS_SECONDARYNAMENODE_USER=root
+# Yarn Resource Manager 用户名
+export YARN_RESOURCEMANAGER_USER=root
+# Yarn NodeManager 用户名
+export YARN_NODEMANAGER_USER=root
 ```
 
 ### <span id="core-site-xml">配置 core-site.xml</span>
-使用 vi 编辑 core-site.xml：
+编辑 core-site.xml：
 ``` bash
 vi core-site.xml
 ```
 
-修改后长这样：
+修改后：
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+  <!-- 指定 hadoop 的工作地址 -->
   <property>
     <name>fs.defaultFS</name>
     <value>hdfs://master:9000</value>
   </property>
+  <!-- 指定 hadoop 的缓存目录 -->
   <property>
     <name>hadoop.tmp.dir</name>
     <value>file:/opt/apps/hadoop/tmp</value>
@@ -250,29 +300,35 @@ io.file.bufffer.size|4096|流文件的缓冲区大小
 hadoop.tmp.dir|/tmp/hadoop-${user_name}|临时目录
 
 ### 配置 hdfs-site.xml
-使用 vi 编辑 core-site.xml：
+我们需要在这个文件里指定容灾备份数量、名称节点数据存储目录、数据节点数据存储目录、辅助节点服务器。
+
+编辑 core-site.xml：
 ``` bash
 vi hdfs-site.xml
 ```
 
-修改后长这样：
+修改后：
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+  <!-- 容灾备份数量 -->
   <property>
     <name>dfs.replication</name>
     <value>2</value>
   </property>
+  <!-- 名称节点的数据存储目录 -->
   <property>
     <name>dfs.namenode.name.dir</name>
     <value>file:/opt/apps/hadoop/tmp/dfs/name</value>
   </property>
+  <!-- 数据节点的数据存储目录 -->
   <property>
     <name>dfs.datanode.data.dir</name>
     <value>file:/opt/apps/hadoop/tmp/dfs/data</value>
   </property>
+  <!-- SecondaryNameNode 工作在 master 上 -->
   <property>
     <name>dfs.secondary.http.address</name>
     <value>127.0.0.1:50090</value>
@@ -285,25 +341,49 @@ vi hdfs-site.xml
 dfs.replication|3|缺省的块复制数量
 dfs.webhdfs.enabled|true|是否通过http协议读取hdfs文件（不安全）
 dfs.namenode.name.dir|file://${hadoop.tmp.dir}/dfs/name|dfs名称节点存储位置
+dfs.namenode.secondary.http-address|127.0.0.1:50090|dfs名称节点
 dfs.datanode.data.dir|file://${hadoop.tmp.dir}/dfs/data|dfs数据节点存储数据块的位置
 dfs.secondary.http.address|0.0.0.0:50090|hdfs对应的http服务器地址
 
 ### 配置 mapred-site.xml
+此文件用于配置集群如何进行 mapreduce 计算。  
+
 使用模板配置：
 ``` bash
 cp ./mapred-site.xml.template ./mapred-site.xml
 vi mapred-site.xml
 ```
 
-修改后长这样：
+修改后：
 ``` xml
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+  <!-- 使用 yarn 集群框架 -->
   <property>
     <name>mapreduce.framework.name</name>
     <value>yarn</value>
+  </property>
+  <!--
+    不要随意改，这是魔法~~~
+
+    一开始没有配置这三个，导致后面进行 mapreduce 测试时
+    报错提示缺少这三个配置，所以后来给写了进来，及不知的话
+    到时候报错的时候，直接复制粘贴进来，把路径换成 hadoop
+    安装路径，然后再把这个文件分发给其他节点就行了。
+  -->
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/apps/hadoop/</value>
+  </property>
+  <property>
+      <name>mapreduce.map.env</name>
+      <value>HADOOP_MAPRED_HOME=/opt/apps/hadoop/</value>
+  </property>
+  <property>
+      <name>mapreduce.reduce.env</name>
+      <value>HADOOP_MAPRED_HOME=/opt/apps/hadoop/</value>
   </property>
 </configuration>
 ```
@@ -315,20 +395,24 @@ mapreduce.jobhistory.address|0.0.0.0:10020|定义历史服务器的地址和端�
 mapreduce.jobhistory.webapp.address|0.0.0.0:19888|定义历史服务器 web 应用访问地址和端口。
 
 ### 配置 yarn-site.xml
-使用 vi 编辑 yarn-site.xml：
+一个集群需要一个资源管理者，所以我们需要配置这个文件。  
+
+编辑 yarn-site.xml：
 ``` bash
 vi yarn-site.xml
 ```
 
-修改后长这样：
+修改后：
 ``` xml
 <?xml version="1.0"?>
 
 <configuration>
+  <!-- 把 yarn 集群的资源管理者设置为 master -->
   <property>
     <name>yarn.resourcemanager.hostname</name>
     <value>master</value>
   </property>
+  <!-- 自定义服务 -->
   <property>
     <name>yarn.nodemanager.aux-services</name>
     <value>mapreduce_shuffle</value>
@@ -343,15 +427,17 @@ yarn.resourcemanager.scheduler.address|0.0.0.0:8030|定义历史服务器的地�
 yarn.resourcemanager.resource-tracker.address|0.0.0.0:8031|ResourceManager 提供给 NodeManager 的地址. NodeManager 通过该地址向 RM 汇报心跳，领取任务等
 yarn.resourcemanager.admin.address|0.0.0.0:8033|ResourceManager提供给管理员的访问地址. 管理员通过该地址向 RM 发送管理命令等
 yarn.resourcemanager.webapp.address|0.0.0.0:8088|ResourceManager对 web 服务提供地址. 用户可通过该地址在浏览器中查看集群各类信息
-yarn.nodemanager.aux-services|org.apache.hadoop.mapred.ShuffleHandler|通过该配置项，用户可以自定义一些服务，例如 Map-Reduce 的shuffle 功能就是采用这种方式实现的，这样就可以在 NodeManager 上扩展自己的服务
+yarn.nodemanager.aux-services|org.apache.hadoop.mapred.ShuffleHandler|通过该配置项，用户可以自定义一些服务，例如 Map-Reduce 的 shuffle 功能就是采用这种方式实现的，这样就可以在 NodeManager 上扩展自己的服务
 
-### 配置 slaves
-使用 vi 编辑 slaves：
+### 配置 workers
+我们需要在此文件内写入所有节点的主机名，这样 master 才知道集群里都有哪些主机。  
+
+编辑 workers：
 ``` bash
-vi slaves
+vi workers
 ```
 
-slaves 文件内部需要填写所有节点，修改后长这样：
+填写所有节点：
 ```
 slave1
 slave2
@@ -360,7 +446,7 @@ slave2
 ---
 
 ## 9.分发文件
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作
 
 下发 apps 目录到 slave1 和 slave2 节点：
 ``` bash
@@ -370,32 +456,33 @@ scp -r /opt/apps slave2:/opt/
 
 下发环境变量文件到 slave1 和 slave2 节点：
 ``` bash
-scp ~/.bashrc slave1:~/.bashrc
-scp ~/.bashrc slave2:~/.bashrc
+scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
+scp /etc/profile.d/custom_command.sh slave2:/etc/profile.d/custom_command.sh
 ```
 
 ## 10.生效环境变量：
 > 以下内容在所有节点上操作
 ``` bash
-source ~/.bashrc
+source /etc/profile.d/custom_command.sh
+env-update
 ```
 
 ## 11.启动 Hadoop 集群
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作
 
-格式化元数据：（切记，千万不要多次执行此命令）
+格式化元数据：（仅在 master 节点上执行一次此命令）
 ``` bash
 hdfs namenode -format
 ```
 
-> <span id="hdfs-error">如果多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 nomenode 解决：</span>
+> <span id="hdfs-error">如果不小心多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#core-site-xml) 里配置的数据缓存目录并重新格式化 namenode 解决：</span>
 > ``` bash
 > # 在所有节点上执行
-> rm -rf /opt/apps/hadoop/tmp/*
+> rm -rf $HADOOP_HOME/tmp
 > ```
 > 再次执行格式化：
 > ``` bash
-> # 在主节点上执行
+> # 在 master 节点上执行
 > hdfs namenode -format
 > ```
 
@@ -404,18 +491,19 @@ hdfs namenode -format
 
 启动 hdfs 和 yarn：
 ``` bash
-start-dfs.sh && start-yarn.sh
+start-all.sh
 ```
 ![正常输出](./images/11_2.png)
 
-关闭安全模式：
+在所有节点上关闭安全模式：
 ``` bash
+# 在所有节点执行一次
 hdfs dfsadmin -safemode leave
 ```
 ---
 
 ## 12.检查启动情况
-> 以下内容在 master 节点上操作
+> 以下内容仅在 master 节点上操作
 
 检查 hadoop ：
 ``` bash
@@ -430,7 +518,7 @@ jps
 
 检查端口启动状态的方法有很多种，这里我们使用最简单的浏览器测试法。  
 
-浏览器打开 http://192.168.56.101:50070  
+浏览器打开 http://192.168.56.101:9870  
 ![master:50070](./images/12_2.png)
 
 浏览器打开 http://192.168.56.101:8088  
@@ -451,7 +539,7 @@ jps
 cd /opt/apps/hadoop/share/hadoop/mapreduce/
 
 # 来一波 mapreduce 计算测试
-hadoop jar hadoop-mapreduce-examples-2.6.0.jar pi 10 10
+hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 10 10
 
 # 计算很漫长，速度虚拟机的配置。
 # 最终计算结果是 Estimated value of Pi is 3.20000000000000000000

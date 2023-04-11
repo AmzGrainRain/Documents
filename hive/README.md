@@ -160,7 +160,7 @@ vi ./hive-site.xml
 
 修改以下配置：
 > 直接在 hive-site.xml 文件查找对应项修改参数，切勿全部删除！！！  
-> vi 编辑器命令模式下使用 "/"+"关键字" 搜索。
+> vi 编辑器命令模式下使用 "/"+"关键字" 搜索，按 N 键跳转到下一个搜索结果。
 ``` xml
 <property>
 	<name>javax.jdo.option.ConnectionURL</name>
