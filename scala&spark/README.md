@@ -2,8 +2,8 @@
 
 ## 前提条件
 - hadoop 集群已经启动
-- scala-2.11.8.tgz（位于/opt/tar下）
-- spark-2.0.0-bin-hadoop2.6.tgz（位于/opt/tar下）
+- scala3-3.2.2.tar.gz（位于/opt/tar下）
+- spark-3.1.1-bin-hadoop3.2.tgz（位于/opt/tar下）
 - 分布式搭建
 
 ---
@@ -16,16 +16,16 @@
 cd /opt/apps
 ```
 
-分别解压 scala-2.11.8.tgz 与 spark-2.0.0-bin-hadoop2.6.tgz 到当前目录：
+分别解压 scala3-3.2.2.tar.gz 与 spark-3.1.1-bin-hadoop3.2.tgz 到当前目录：
 ``` bash
-tar -zxf /opt/tar/scala-2.11.8.tgz
-tar -zxf /opt/tar/spark-2.0.0-bin-hadoop2.6.tgz
+tar -zxf /opt/tar/scala3-3.2.2.tar.gz
+tar -zxf /opt/tar/spark-3.1.1-bin-hadoop3.2.tgz
 ```
 
 重命名 scala 与 spark ：
 ``` bashl
-mv ./scala-2.11.8 ./scala
-mv ./spark-2.0.0-bin-hadoop2.6 ./spark
+mv ./scala3-3.2.2 ./scala
+mv ./spark-3.1.1-bin-hadoop3.2 ./spark
 ```
 
 ---
@@ -33,9 +33,9 @@ mv ./spark-2.0.0-bin-hadoop2.6 ./spark
 ## 2.配置环境变量
 > 以下内容在 master 节点上操作
 
-编辑用户根目录下的 .bashrc 文件：
+编辑环境变量：
 ``` bash
-vi ~/.bashrc
+env-edit
 ```
 
 在文件末尾添加：
@@ -87,12 +87,12 @@ export SPARK_WORKER_PORT=7078
 
 使用预置模板：
 ``` bash
-cp ./slaves.template ./slaves
+cp ./workers.template ./workers
 ```
 
 编辑它：
 ``` bash
-vi ./slaves
+vi ./workers
 ```
 
 删掉默认存在的 localhost，在末尾写入这些：
@@ -107,30 +107,35 @@ slave2
 ## 5.分发文件
 > 以下内容在 master 节点上操作
 
-分发 scala 到 slave1、slave2 ：
+分发 scala、spark 到 slave1、slave2：
 ``` bash
 scp -r /opt/apps/scala slave1:/opt/apps/
 scp -r /opt/apps/scala slave2:/opt/apps/
-```
 
-分发 spark 到 slave1、slave2 ：
-``` bash
 scp -r /opt/apps/spark slave1:/opt/apps/
 scp -r /opt/apps/spark slave2:/opt/apps/
 ```
 
-分发环境变量文件到 slave1、slave2 ：
+分发环境变量文件到 slave1、slave2（正常版）：
 ``` bash
-scp ~/.bashrc slave1:~/
-scp ~/.bashrc slave2:~/
+scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/
+scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/
+```
+
+分发环境变量文件到 slave1、slave2（骚操作）：
+``` bash
+cd /etc/profile.d/
+scp ./big_data_env.sh slave1:$(pwd)/
+scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
 ---
 
 ## 6.生效环境变量
 > 以下内容在所有节点上操作
+
 ``` bash
-source ~/.bashrc
+env-update
 ```
 
 ---
@@ -168,14 +173,14 @@ hdfs dfs -put ~/data.txt /test_spark/
 cd /opt/apps/spark/sbin/
 spark-shell
 ```
-![发送到 hdfs](./images/7_4.png)
+![进入 spark shell](./images/7_4.png)
 
 统计 hdfs 内的 /test_spark/data.txt 有多少行：
 ``` scala
 val file = sc.textFile("hdfs://master:9000/test_spark/data.txt")
 file.count()
 ```
-![发送到 hdfs](./images/7_5.png)
+![执行一些 scala](./images/7_5.png)
 
 退出 spark shell ：
 ``` scala
