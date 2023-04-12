@@ -1,5 +1,16 @@
 # HIVE 搭建文档
 
+## 简介
+
+### Hive 是什么
+Apache Hive 是建立在 Hadoop 之上的一个由 Facebook 实现并开源的数据仓库系统。它可以将存储在 Hadoop 上的结构化数据、半结构化数据文件映射为一张数据表，并基于表提供了类似 SQL 的查询语法（HQL）用于访问和分析存储在 Hadoop 上的大型数据集。Hive 的核心是将 HQL 语句转为 MapReduce 程序，然后将程序提交到 Hadoop 集群执行。
+
+### Hive 与 Hadoop 的关系
+Hive 作为一个数据仓库系统具备存储和分析数据的能力，只不过 Hive 利用了 Hadoop 实现了数据存储的能力。简而言之就是 Hive 利用 Hadoop 的 HDFS 存储数据，利用 Mapreduce 查询分析数据。
+
+### Hive 出现的意义
+Hive 使得开发者专注于编写 HQL 进行数据分析，避免了 MapReduce 高昂的学习成本，提升了数据分析的效率。
+
 ## 前提条件
 - hadoop 集群已经启动
 - mysql 已部署完毕
