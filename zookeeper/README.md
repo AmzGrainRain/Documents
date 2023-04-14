@@ -103,8 +103,8 @@ env-edit
 
 在末尾追加以下内容：
 ``` bash
-export  ZK_HOME=/opt/apps/zookeeper
-export  PATH=$PATH:$ZK_HOME/bin:$JAVA_HOME/bin
+export ZK_HOME=/opt/apps/zookeeper
+export PATH=$PATH:$ZK_HOME/bin:$JAVA_HOME/bin
 ```
 
 > 关于 zookeeper 的一个大坑：  
@@ -137,17 +137,17 @@ zkServer.sh
 
 下发 zookeeper：
 ``` bash
-scp -r /opt/apps/zookeeper slave1:/opt/apps/
+scp -r /opt/apps/zookeeper slave1:/opt/apps/ &
 scp -r /opt/apps/zookeeper slave2:/opt/apps/
 ```
 
-下发环境变量（正常点的）：
+下发环境变量：
 ``` bash
 scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
 scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
 ```
 
-下发环境变量（骚操作）：
+下发环境变量的另一种方式（骚操作）：
 ``` bash
 cd /etc/profile.d/
 scp ./big_data_env.sh slave1:$(pwd)/
@@ -170,14 +170,14 @@ env-update
 ``` bash
 # server.myid=主机名:2888:3888
 
-# master 节点的 myid 是 0
-server.0=master:2888:3888
+# master 节点的 myid 是 1
+server.1=master:2888:3888
 
-# slave1 节点的 myid 是 1
-server.1=slave1:2888:3888
+# slave1 节点的 myid 是 2
+server.2=slave1:2888:3888
 
-# slave2 节点的 myid 是 2
-server.2=slave2:2888:3888
+# slave2 节点的 myid 是 3
+server.3=slave2:2888:3888
 ```
 
 设置 master 节点的 myid：
@@ -187,6 +187,7 @@ echo 1 > /opt/apps/zookeeper/data/myid
 
 设置 slave1 节点的 myid：
 ``` bash
+# 远程执行命令：ssh [主机名@]地址 "要远程执行的命令"
 ssh slave1 "echo 2 > /opt/apps/zookeeper/data/myid"
 ```
 

@@ -47,17 +47,22 @@ rpm -ivh ./*.rpm --force --nodeps
 
 ## 2.启动MySQL & 设置开机自启
 
-通过 systemctl 启动 mysqld 守护服务：
+查看 mysqld 守护进程状态：
+``` bash
+systemctl status mysqld.service
+```
+
+如果 mysqld 没有启动，则手动启动它：
 ``` bash
 systemctl start mysqld.service
 ```
 
-通过 systemctl 设置开机启动 mysqld 守护服务：
+设置开机启动 mysqld 守护进程：
 ``` bash
 systemctl enable mysqld.service
 ```
 
-通过 systemctl 查看 mysqld 守护服务状态：
+再次查看 mysqld 守护进程状态：
 ``` bash
 systemctl status mysqld.service
 ```

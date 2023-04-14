@@ -247,7 +247,7 @@ cd $HADOOP_HOME/etc/hadoop/
 ```
 
 ### 配置 hadoop-env.sh
-由于 hadoop 运行时依赖 Java，所以我们需要在此文件里为 hadoop 配置环境变量；另外，在新版的 hadoop 中我们还需要配置启动 hadoop 时所使用的用户，所以我们还需要在此文件里设置用户名。
+由于 hadoop 运行时依赖 Java，所以我们需要在此文件里为 hadoop 配置环境变量；我们还需要在此文件里指定启动 namenode、datanode、secondary namenode、resource manager、node manager 时所使用的用户。
 
 编辑 hadoop-env.sh：
 ``` bash
@@ -273,6 +273,8 @@ export YARN_NODEMANAGER_USER=root
 ```
 
 ### <span id="core-site-xml">配置 core-site.xml</span>
+我们需要在此文件里设置 hadoop 用于接收各种请求的端口和 hadoop 的缓存目录。
+
 编辑 core-site.xml：
 ``` bash
 vi core-site.xml
@@ -304,7 +306,7 @@ io.file.bufffer.size|4096|流文件的缓冲区大小
 hadoop.tmp.dir|/tmp/hadoop-${user_name}|临时目录
 
 ### 配置 hdfs-site.xml
-我们需要在这个文件里指定容灾备份数量、名称节点数据存储目录、数据节点数据存储目录、辅助节点服务器。
+我们需要在此文件内设置 hadoop 集群容灾备份数量、名称节点（namenode）数据存储目录、数据节点（datanode）数据存储目录、辅助名称节点（secondary namenode）节点地址和端口。
 
 编辑 core-site.xml：
 ``` bash
@@ -350,13 +352,7 @@ dfs.datanode.data.dir|file://${hadoop.tmp.dir}/dfs/data|dfs数据节点存储数
 dfs.secondary.http.address|0.0.0.0:50090|hdfs对应的http服务器地址
 
 ### 配置 mapred-site.xml
-此文件用于配置集群如何进行 mapreduce 计算。  
-
-使用模板配置：
-``` bash
-cp ./mapred-site.xml.template ./mapred-site.xml
-vi mapred-site.xml
-```
+我们需要在此文件内配置 hadoop 集群使用 yarn 进行 mapreduce 计算。
 
 修改后：
 ``` xml
@@ -370,10 +366,8 @@ vi mapred-site.xml
     <value>yarn</value>
   </property>
   <!--
-    不要随意改，这是魔法~~~
-
     一开始没有配置这三个，导致后面进行 mapreduce 测试时
-    报错提示缺少这三个配置，所以后来给写了进来，及不知的话
+    报错提示缺少这三个配置，所以后来给写了进来，及不住的话
     到时候报错的时候，直接复制粘贴进来，把路径换成 hadoop
     安装路径，然后再把这个文件分发给其他节点就行了。
   -->
@@ -399,6 +393,8 @@ mapreduce.jobhistory.address|0.0.0.0:10020|定义历史服务器的地址和端�
 mapreduce.jobhistory.webapp.address|0.0.0.0:19888|定义历史服务器 web 应用访问地址和端口。
 
 ### 配置 yarn-site.xml
+我们需要在此文件内配置集群的资源管理节点（resourcemanager）、为 node manager 添加一些自定义服务、配置 yarn 的 classpath。
+
 获取 hadoop 的 classpath：
 ``` bash
 hadoop classpath
@@ -443,7 +439,7 @@ yarn.resourcemanager.webapp.address|0.0.0.0:8088|ResourceManager对 web 服务�
 yarn.nodemanager.aux-services|org.apache.hadoop.mapred.ShuffleHandler|通过该配置项，用户可以自定义一些服务，例如 Map-Reduce 的 shuffle 功能就是采用这种方式实现的，这样就可以在 NodeManager 上扩展自己的服务
 
 ### 配置 workers
-我们需要在此文件内写入所有节点的主机名，这样 master 才知道集群里都有哪些主机。  
+包含在此文件内的主机名，都将被 master 认为是集群里的一个节点。所以我们需要在此文件内写入所有节点的主机名，这样 master 才知道集群里都有哪些主机。
 
 编辑 workers：
 ``` bash
@@ -463,25 +459,29 @@ slave2
 
 下发 apps 目录到 slave1 和 slave2 节点：
 ``` bash
-scp -r /opt/apps slave1:/opt/
+# 在后台给 slave1 发送文件
+# 命令后方加一个 '&' 可以理解为后台运行
+scp -r /opt/apps slave1:/opt/ &
+# 在前台给 slave2 发送文件
 scp -r /opt/apps slave2:/opt/
 ```
 
-下发环境变量文件（正常点的）：
+下发环境变量文件：
 ``` bash
-scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
-scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
-```
-
-下发环境变量文件（骚操作）：
-``` bash
+# pwd 命令返回当前所在目录
+# 可以理解为 $() 把 pwd 命令的输出转为了字符串
 cd /etc/profile.d/
 scp ./big_data_env.sh slave1:$(pwd)/
 scp ./big_data_env.sh slave2:$(pwd)/
+
+# 以上三条命令等价于这两条命令
+scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/
+scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/
 ```
 
 ## 10.生效环境变量
 > 以下内容在所有节点上操作
+
 ``` bash
 source /etc/profile.d/big_data_env.sh
 ```
@@ -555,7 +555,7 @@ jps
 计算测试：
 ``` bash
 # 切换目录
-cd $HADOOP/share/hadoop/mapreduce/
+cd $HADOOP_HOME/share/hadoop/mapreduce/
 
 # 来一波 mapreduce 计算测试
 hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 5 5
