@@ -54,21 +54,21 @@ export PATH=$PATH:$HBASE_HOME/bin
 cd /opt/apps/hbase/conf/
 ```
 
-修改 hbase-env.sh：
+编辑 hbase-env.sh：
 ``` shell
 vi hbase-env.sh
 ```
 
-取消注释并修改:
-> 因为使用的 zookeeper 是手动安装的，并非自带的，所以修改 HBASE_MANAGES_ZK 为 false
-```diff
-# The java implementation to use.  Java 1.7+ required.
-- export JAVA_HOME=/usr/java/jdk1.6.0/
-+ export JAVA_HOME=/opt/apps/jdk/
+找到并取消注释，然后修改:
+``` shell
+# 配置 Java 环境变量
+export JAVA_HOME=/opt/apps/jdk/
 
-# Tell HBase whether it should manage it's own instance of Zookeeper or not.
-- export HBASE_MANAGES_ZK=true
-+ export HBASE_MANAGES_ZK=false
+# 使用独立部署的 zookeeper
+export HBASE_MANAGES_ZK=false
+
+# 禁止 Hbase 查找 Hadoop 的 Classs 以防止冲突问题
+export HBASE_DISABLE_HADOOP_CLASSPATH_LOOKUP="false"
 ```
 
 配置 hbase-site.xml：
@@ -120,7 +120,7 @@ vi hbase-site.xml
 vi regionservers
 ```
 
-将内容改为：
+删掉默认的内容并将内容改为：
 ``` shell
 slave1
 slave2

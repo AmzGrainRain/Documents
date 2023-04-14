@@ -42,11 +42,14 @@ cp /opt/tar/mysql-connector-java-5.1.37.jar /opt/apps/hive/lib/
 
 guava 内部提供了很多高级的数据结构，如不可变的集合、图库，以及并发、I/O、散列、缓存、基元、字符串等实用工具。而 hive 与 hadoop 则使用到了其中的一些功能。但是随着版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 hive 和 hadoop 依赖的 guava 版本保持一致：
 ``` bash
+# 进入 hive 的 jar 库目录
+cd /opt/apps/hive/lib
+
 # 删除 hive 里的 guava
 rm -f guava-19.0.jar
 
 # 从 hadoop 复制高版本的 guava 到 hive
-cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar /opt/apps/hive/lib/
+cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar ./
 ```
 
 ---
@@ -109,8 +112,9 @@ vi ./hive-site.xml
 
 修改以下配置：
 > 直接在 hive-site.xml 文件查找对应项修改参数，切勿全部删除！！！  
-> vi 编辑器命令模式下使用 "/"+"关键字" 搜索，按 N 键跳转到下一个搜索结果。
+> vi 编辑器命令模式下使用 "/关键字" 搜索，按 N 键跳转到下一个搜索结果。
 ``` xml
+<!--配置数据库地址-->
 <property>
 	<name>javax.jdo.option.ConnectionURL</name>
 	<value>jdbc:mysql://localhost:3306/hivedb?createDatabaseIfNotExist=true&amp;useSSL=false</value>	
@@ -123,12 +127,12 @@ vi ./hive-site.xml
 <!--配置数据库用户名-->
 <property>
 	<name>javax.jdo.option.ConnectionUserName</name>
-	<value>你的账号</value>
+	<value>你的 mysql 账号</value>
 </property>
 <!--配置MySQL数据库root的密码-->
 <property>
 	<name>javax.jdo.option.ConnectionPassword</name>
-	<value>你的密码</value>
+	<value>你的 mysql 密码</value>
 </property>
 <!-- 在 hibe cli 内显示当前所在的数据库 -->
 <property>
@@ -156,17 +160,10 @@ vi ./hive-site.xml
 ---
 
 ## 6.配置 log4j.properties
-拷贝模板：
+拷贝模板即可：
 ``` bash
 cp hive-log4j2.properties.template hive-log4j2.properties
 ```
-
-编辑 hive-log4j2.properties：
-``` bash
-vi ./hive-log4j2.properties
-```
-
-
 
 ## 7.schema 初始化
 执行初始化：
@@ -248,30 +245,30 @@ hdfs dfs -mkdir /test_hive
 hdfs dfs -put ~/test.txt /test_hive/test.txt
 ```
 
-如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop。  
-``` bash
-# 停止 hadoop 集群
-stop-all.sh
-
-# 启动 hadoop 集群
-start-all.sh
-```
-
-如果还是不行，请尝试此方案（会清空 hdfs 内所有的数据）：
-``` bash
-# 停止 hadoop 集群
-stop-all.sh
-
-# 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录（在所有节点上执行这句）
-rm -rf $HADOOP/tmp
-
-# 重新格式化 namenode（在 master 节点上执行这句）
-hdfs namenode -format
-
-# 启动 hadoop 集群
-start-all.sh
-```
-具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
+> 如果发送文件到 hdfs 时遇到错误，请尝试重启您的 hadoop。  
+> ``` bash
+> # 停止 hadoop 集群
+> stop-all.sh
+> 
+> # 启动 hadoop 集群
+> start-all.sh
+> ```
+> 
+> 如果还是不行，请尝试此方案（会清空 hdfs 内所有的数据）：
+> ``` bash
+> # 停止 hadoop 集群
+> stop-all.sh
+> 
+> # 清空您在 core-site.xml 里设置的 hadoop.tmp.dir 目录（在所有节点上执行这句）
+> rm -rf $HADOOP/tmp
+> 
+> # 重新格式化 namenode（在 master 节点上执行这句）
+> hdfs namenode -format
+> 
+> # 启动 hadoop 集群
+> start-all.sh
+> ```
+> 具体请参考 [hadoop 搭建文档 ](../hadoop/README.md)第八步的引用部分。  
 
 回到正题，cat 一下，证明已经发送到 hdfs 里了：
 ``` bash
@@ -285,22 +282,19 @@ hdfs dfs -cat /test_hive/test.txt
 hive
 ```
 
-执行这段指令：
-- 创建一个数据表 test。
-- 这个表的有两个字段 name 和 age。
-- 这个表的行格式：
-	-	以 “,” 分隔字段
-	- 换行符结尾
-
+创建一个拥有两个字段 name 和 age 的数据表 test。这个表以 “,” 分隔列、以换行符分隔行：
 ``` sql
-CREATE TABLE test (name string, age int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ",";
+CREATE TABLE test (
+	name string,
+	age int
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ",";
 ```
 ![文本内容](./images/9_3.png)
 
 从 hdfs 导入 `/test_hive/test.txt` 内的数据到 test 数据表：
-``` bash
-# load data inpath 'hdfs 路径' into table 表名;
-load data inpath '/test_hive/test.txt' into table test;
+``` sql
+-- LOAD DATA INPATH 'hdfs 路径' INTO TABLE 表名;
+LOAD DATA INPATH '/test_hive/test.txt' INTO TABLE test;
 ```
 ![文本内容](./images/9_4.png)
 

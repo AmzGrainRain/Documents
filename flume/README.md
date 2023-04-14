@@ -240,7 +240,8 @@ echo "hello flume" > data.log
 
 ---
 
-## guava.jar 版本不一致造成的错误
+## hdfs 测试时遇到错误？
+错误堆栈信息：
 ``` bash
 Exception in thread "SinkRunner-PollingRunner-DefaultSinkProcessor" java.lang.NoSuchMethodError: com.google.common.base.Preconditions.checkArgument(ZLjava/lang/String;Ljava/lang/Object;)V
         at org.apache.hadoop.conf.Configuration.set(Configuration.java:1357)
@@ -254,8 +255,11 @@ Exception in thread "SinkRunner-PollingRunner-DefaultSinkProcessor" java.lang.No
         at java.lang.Thread.run(Thread.java:748)
 
 ```
-这是因为 flume 与 hadoop 都使用到了 guava 库其中的一些功能，但是随着 guava版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 flume 与 hadoop 依赖的 guava 版本保持一致：
+这是因为 flume 与 hadoop 都使用到了 guava 库其中的一些功能，但是随着 guava 版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 flume 与 hadoop 依赖的 guava 版本保持一致：
 ``` bash
+# 进入 flume 的 jar 库目录
+cd /opt/apps/flume/lib
+
 # 删除 flume 里的 guava
 rm -f guava-11.0.2.jar
 

@@ -112,9 +112,9 @@ CREATE DATABASE sqoop_test;
 USE sqoop_test;
 
 -- 创建 test 表
-CREATE TABLE `test` (
-  `name` VARCHAR(50),
-  `age` INT
+CREATE TABLE test (
+  name VARCHAR(50),
+  age INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 ![SQL结果](./images/5_1.png)
@@ -166,7 +166,7 @@ sqoop list-databases --connect jdbc:mysql://localhost:3306 --username root -P
 ```
 ![数据库名](./images/7_1.png)
 
-使用 sqoop 打印 sqoop_test 内所有数据表名：
+使用 sqoop 打印 sqoop_test 数据库内所有的数据表名：
 > 通过 `sqoop help list-tables` 命令打印帮助信息。
 ``` bash
 sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P
@@ -238,9 +238,9 @@ USE sqoop_test;
 
 在 sqoop_test 数据库创建一个 test_from_hdfs 表：
 ``` sql
-CREATE TABLE `test_from_hdfs` (
-  `name` VARCHAR(50),
-  `age` INT
+CREATE TABLE test_from_hdfs (
+  name VARCHAR(50),
+  age INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
@@ -293,6 +293,10 @@ init_connect='SET NAMES utf8'
 
 ``` bash
 systemctl restart mysqld.service
+
+# 如果上一条命令卡住的话用这两条
+systemctl stop mysqld.service
+systemctl start mysqld.service
 ```
 
 进入 mysql 查看编码信息：
@@ -307,8 +311,22 @@ SHOW VARIABLES LIKE 'character%';
 TRUNCATE sqoop_test.test_from_hdfs;
 ```
 
-然后重复第十步操作即可。
+再次尝试使用 sqoop 导入数据：
+``` bash
+sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
+```
+
+登入 mysql：
+``` bash
+mysql -u root -p
+```
+
+再次查看下我们创建的 test_from_hdfs 表：
+``` sql
+SELECT * FROM sqoop_test.test_from_hdfs;
+```
 ![正常的输出](./images/10_3.png)
+完美解决！
 
 ---
 
