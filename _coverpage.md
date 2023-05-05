@@ -1,7 +1,7 @@
-# 大数据平台搭建文档
+# 欢迎来访
 
-> 芜湖开摆~~~
+> The quick brown fox jumps over the lazy dog.
 
-[前往仓库](https://github.com/AmzGrainRain/B3D)
-[开始浏览](#平台搭建)
+[前往仓库](https://github.com/AmzGrainRain/Documents)
+[开始浏览](#文档列表)
 
