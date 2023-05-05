@@ -1,4 +1,4 @@
-# 平台搭建
+# 文档集
 - [Hadoop 搭建文档](hadoop/README.md)  
 - [Zookeeper 搭建文档](zookeeper/README.md)  
 - [MySql 搭建文档](mysql/README.md)  
