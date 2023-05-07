@@ -11,4 +11,5 @@
   - [Kafka 搭建文档](kafka/README.md)  
   - [SQL 基础文档](sql/README.md)
   - [SQL 进阶文档](sql_adv/README.md)
+  - [Scala 语法助记](./scala/README.md)
   - [C++11 新特性与规范](c++11/README.md)
