@@ -85,6 +85,29 @@ object 有参函数 {
 }
 ```
 
+### 代码块形参（控制抽象）
+```scala
+object 代码块参数 {
+  private def codeSegmentParam(code: => Unit): Unit = {
+    println("准备执行代码块")
+    code
+    println("执行代码块完毕")
+  }
+
+  def main(args: Array[String]): Unit = {
+    // 将代码块作为实参传递
+    codeSegmentParam({
+      println("此信息来自代码块")
+    })
+
+    // 省略小括号
+    codeSegmentParam {
+      println("此信息来自代码块")
+    }
+  }
+}
+```
+
 ### 具有返回值的函数
 ```scala
 object 返回值 {
@@ -234,17 +257,32 @@ object 偏应用函数 {
 
 ### 函数柯里化
 ```scala
+package Function
+
 object 柯里化 {
   private def distanceBetweenTwoPoints(x1: Int, y1: Int)
                                       (x2: Int, y2: Int): Double = {
     Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
   }
 
+  private def test1(): Double = {
+    val middleFunc: (Int, Int) => Double = distanceBetweenTwoPoints(0, 0)
+
+    middleFunc(4, 6)
+  }
+
+  private def test2(): Double = {
+    distanceBetweenTwoPoints(0, 0)(4, 6)
+  }
+
   def main(args: Array[String]): Unit = {
-    val result: Double = distanceBetweenTwoPoints(0, 0)(4, 6)
-    println(result)
+    val ans1: Double = test1()
+    val ans2: Double = test2()
+
+    println(ans1 == ans2) // true
   }
 }
+
 ```
 
 ### 高阶函数
@@ -268,6 +306,19 @@ object 高阶函数 {
 ```
 
 ## 循环
+
+### while
+```scala
+object while循环 {
+  def main(args: Array[String]): Unit = {
+    var i: Int = 3
+    while (i > 0) {
+      println(i)
+      i -= 1
+    }
+  }
+}
+```
 
 ### for
 ```scala
@@ -364,6 +415,78 @@ object for_yield {
     val filtered: AI = for { x <- arr if x % 2 == 0; if x != 10 } yield x
 
     filtered.foreach(println) // 2, 4, 6, 8
+  }
+}
+```
+
+### 手搓一个 while 循环
+借助于闭包、递归、控制抽象、柯里化等实现 while 循环的功能，以加深对于高阶函数的理解。
+```scala
+package Loop
+
+import scala.annotation.tailrec
+
+object 手搓while循环 {
+  /**
+   * 柯里化
+   * @param condition 条件代码块
+   * @return 代码执行器
+   */
+  @tailrec
+  private def while1(condition: => Boolean) (code: => Unit): Unit = {
+    if (condition) {
+      code
+      while1(condition)(code)
+    }
+  }
+
+  /**
+   * 闭包、递归、控制抽象
+   * @param condition 条件代码块
+   * @return 代码执行器
+   */
+  private def while2(condition: => Boolean): (=> Unit) => Unit = {
+    def loop(code: => Unit): Unit = {
+      if (condition) {
+        code
+        while2(condition)(code)
+      }
+    }
+    loop _
+  }
+
+  /**
+   * 闭包、递归、控制抽象、匿名函数
+   * @param condition 条件代码块
+   * @return 代码执行器
+   */
+  private def while3(condition: => Boolean): (=> Unit) => Unit = {
+    (code: => Unit) => {
+      if (condition) {
+        code
+        while3(condition)(code)
+      }
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    var num1: Int = 3
+    while1(num1 > 0) {
+      println(num1)
+      num1 -= 1
+    }
+
+    var num2: Int = 3
+    while2(num2 > 0) {
+      println(num2)
+      num2 -= 1
+    }
+
+    var num3: Int = 3
+    while2(num3 > 0) {
+      println(num3)
+      num3 -= 1
+    }
   }
 }
 ```
