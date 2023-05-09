@@ -1,6 +1,7 @@
 # Hbase 搭建文档
 
 ## 前提条件
+
 - hadoop 集群已经启动
 - mysql 已部署完毕
 - hive 已部署完毕
@@ -11,35 +12,42 @@
 ---
 
 ## 1.解压
+>
 > 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
-``` shell
+
+```bash
 cd /opt/apps
 ```
 
 解压 hbase-2.2.3-bin.tar.gz 到当前目录：
-``` shell
+
+```bash
 tar -zxf /opt/tar/hbase-2.2.3-bin.tar.gz
 ```
 
 重命名 hbase ：
-``` shelll
+
+```bashl
 mv ./hbase-2.2.3 ./hbase
 ```
 
 ---
 
 ## 2.配置环境变量
+>
 > 以下内容在 master 节点上操作
 
 编辑环境变量：
-``` shell
+
+```bash
 env-edit
 ```
 
 在文件末尾添加：
-``` shell
+
+```bash
 export HBASE_HOME=/opt/apps/hbase
 export PATH=$PATH:$HBASE_HOME/bin
 ```
@@ -47,20 +55,24 @@ export PATH=$PATH:$HBASE_HOME/bin
 ---
 
 ## 3.修改配置文件
+>
 > 以下内容在 master 节点上操作
 
 进入配置文件目录：
-``` shell
+
+```bash
 cd /opt/apps/hbase/conf/
 ```
 
 编辑 hbase-env.sh：
-``` shell
+
+```bash
 vi hbase-env.sh
 ```
 
 找到并取消注释，然后修改:
-``` shell
+
+```bash
 # 配置 Java 环境变量
 export JAVA_HOME=/opt/apps/jdk/
 
@@ -72,99 +84,112 @@ export HBASE_DISABLE_HADOOP_CLASSPATH_LOOKUP="false"
 ```
 
 配置 hbase-site.xml：
-``` shell
+
+```bash
 vi hbase-site.xml
 ```
 
 配置后：
-``` xml
+
+```xml
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
-	<!-- hbase 的数据保存在 hdfs 对应目录下 -->
-	<property>
-		<name>hbase.rootdir</name>
-		<value>hdfs://master:9000/hbase</value>
-	</property>
-	<!-- 是否是分布式环境 -->
-	<property> 
-		<name>hbase.cluster.distributed</name> 
-		<value>true</value> 
-	</property> 
-	<!-- 冗余度 -->
-	<property>
-		<name>dfs.replication</name>
-		<value>2</value>
-	</property>
-	<!-- 连接 zookeeper -->
-	<property>
-		<name>hbase.zookeeper.property.clientPort</name>
-		<value>2181</value>
-	</property>
-	<!-- zookeeper 数据目录 -->
-	<property> 
-		<name>hbase.zookeeper.property.dataDir</name> 
-		<value>/opt/apps/hbase</value>       
-	</property>
-	<!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
-	<property> 
-		<name>hbase.zookeeper.quorum</name> 
-		<value>master,slave1,slave2</value>     
-	</property>
+ <!-- hbase 的数据保存在 hdfs 对应目录下 -->
+ <property>
+  <name>hbase.rootdir</name>
+  <value>hdfs://master:9000/hbase</value>
+ </property>
+ <!-- 是否是分布式环境 -->
+ <property> 
+  <name>hbase.cluster.distributed</name> 
+  <value>true</value> 
+ </property> 
+ <!-- 冗余度 -->
+ <property>
+  <name>dfs.replication</name>
+  <value>2</value>
+ </property>
+ <!-- 连接 zookeeper -->
+ <property>
+  <name>hbase.zookeeper.property.clientPort</name>
+  <value>2181</value>
+ </property>
+ <!-- zookeeper 数据目录 -->
+ <property> 
+  <name>hbase.zookeeper.property.dataDir</name> 
+  <value>/opt/apps/hbase</value>       
+ </property>
+ <!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
+ <property> 
+  <name>hbase.zookeeper.quorum</name> 
+  <value>master,slave1,slave2</value>     
+ </property>
 </configuration>
 ```
 
 修改配置文件（master 节点）：
-``` shell
+
+```bash
 vi regionservers
 ```
 
 删掉默认的内容并将内容改为：
-``` shell
+
+```bash
 slave1
 slave2
 ```
+
 ![regionservers](images/3_1.png)
 
 ---
 
 ## 4.分发文件
+>
 > 以下内容在 master 节点上操作
 
 分发文件到 slave1、slave2 ：
-``` shell
+
+```bash
 scp -r /opt/apps/hbase slave1:/opt/apps/
 scp -r /opt/apps/hbase slave2:/opt/apps/
 ```
 
 修改 slave1、slave2 下 regionservers 文件：
 > master 节点以外的所有节点的 regionservers 文件需要包含 master 节点
-``` shell
+
+```bash
 ssh slave1 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ```
+
 ![img.png](images/4_1.png)
 
 ---
 
 ## 5.生效环境变量
+>
 > 以下内容在所有节点上操作
 
-``` shell
+```bash
 env-update
 ```
 
 ## 6.启动测试
+>
 > 以下内容在 master 节点上操作
 
 master 节点上启动：
-``` shell
+
+```bash
 start-hbase.sh
 ```
 
 检查进程（三个节点）：
-``` shell
+
+```bash
 jps
 ```
 
@@ -174,11 +199,13 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ---
 
 ## 7.Hbase shell
+>
 > 以下内容在 master 节点上操作  
 > 确保您已经启动了 hadoop 和 zookeeper
 
 进入 hbase 命令行：
-``` shell
+
+```bash
 hbase shell
 ```
 
@@ -222,12 +249,13 @@ hbase shell
 使用 RowKey 的前缀进行搜索|`scan '表名', FILTER=>"PrefixFilter('前缀')"`
 
 退出 hbase 命令行:
-``` shell
+
+```bash
 exit
 ```
 
 ---
 
 ## 快速跳转
-[回到顶部](#hbase-搭建文档)  
-[SCALA & SPARK 部署文档](../scala&spark/README.md)
+
+[回到顶部](#hbase-搭建文档)

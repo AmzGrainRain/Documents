@@ -1,4 +1,6 @@
 const searchList = [
+  '/docs/scala/README.md',
+  '/docs/c++11/README.md',
   '/docs/hadoop/README.md',
   '/docs/zookeeper/README.md',
   '/docs/mysql/README.md',
@@ -9,9 +11,7 @@ const searchList = [
   '/docs/flume/README.md',
   '/docs/kafka/README.md',
   '/docs/sql/README.md',
-  '/docs/sql_adv/README.md',
-  '/docs/scala/README.md',
-  '/docs/c++11/README.md'
+  '/docs/sql_adv/README.md'
 ]
 
 window.$docsify = {
@@ -26,14 +26,12 @@ window.$docsify = {
   themeColor: '#000000',
   noEmoji: false,
   mergeNavbar: true,
-  cornerExternalLinkTarget: '_blank',
-  // routerMode: 'history',
+  routerMode: 'history',
   // hideSidebar: true,
   onlyCover: true,
   requestHeaders: {
     'cache-control': 'max-age=600'
   },
-  ext: '.md',
   basePath: '/',
   search: {
     paths: searchList,

@@ -738,7 +738,7 @@ body {
   font-size: 0.8rem;
 }
 .markdown-section pre {
-  padding: 0 1.4rem;
+  padding: 0 .5rem;
   line-height: 1.5rem;
   overflow: auto;
   word-wrap: normal;
@@ -746,7 +746,7 @@ body {
 .markdown-section pre > code {
   color: #525252;
   font-size: 0.8rem;
-  padding: 2.2em 5px;
+  padding: 1em 5px;
   line-height: inherit;
   margin: 0 2px;
   max-width: inherit;

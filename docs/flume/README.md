@@ -1,6 +1,7 @@
 # Flume 搭建文档
 
 ## 前提条件
+
 - hadoop 集群已经启动
 - apache-flume-1.9.0-bin.tar.gz（位于/opt/tar下）
 - 非分布式搭建
@@ -8,111 +9,135 @@
 ---
 
 ## 介绍
+
 Flume 是 Cloudera 提供的一个高可用的，高可靠的，分布式的海量日志采集、聚合和传输系统。Flume 基于流式架构，灵活简单。
 
 ### Source 组件
+
 负责接收数据到 Flume Agent 的组件。
 
 ### Channel 组件
+
 Channel 是位于 Source 和 Sink 之间的缓冲区。Memory Channel 是内存中的队列。Memory Channel 在不需要关心数据丢失的情景下适用。File Channel 将所有事件写到磁盘。
 
 ### Sink 组件
+
 Sink 不断地轮询 Channel 中的事件且批量地移除它们，并将这些事件批量写入到存储或 索引系统、或者被发送到另一个 Flume Agent。
 
 ### 注意
+
 Source 可以搭配多个 Channel；但一个 Sink 只能搭配一个 Channel。
 
 ---
 
 ## 1.解压
+
 进入 /opt/app/ 目录内：
-``` bash
+
+```bash
 cd /opt/apps
 ```
 
 解压 apache-flume-1.9.0-bin.tar.gz 到当前目录：
-``` bash
+
+```bash
 tar -zxf /opt/tar/apache-flume-1.9.0-bin.tar.gz
 ```
 
 重命名 hbase ：
-``` bashl
+
+```bashl
 mv ./apache-flume-1.9.0-bin ./flume
 ```
 
 ---
 
 ## 2.配置环境变量
+
 编辑环境变量：
-``` bash
+
+```bash
 env-edit
 ```
 
 在文件末尾添加：
-``` bash
+
+```bash
 export FLUME_HOME=/opt/apps/flume
 export PATH=$PATH:$FLUME_HOME/bin
 ```
 
 ## 3.生效环境变量
-``` bash
+
+```bash
 env-update
 ```
 
 测试下：
-``` bash
+
+```bash
 flume-ng version
 ```
+
 ![测试结果](./images/3_1.png)
 
 ---
 
 ## 4.修改配置文件
+
 进入配置文件目录：
-``` bash
+
+```bash
 cd /opt/apps/flume/conf
 ```
 
 使用预置模板：
-``` bash
+
+```bash
 cp ./flume-env.sh.template ./flume-env.sh
 ```
 
 编辑它：
-``` bash
+
+```bash
 vi ./flume-env.sh
 ```
 
 在文件末尾添加：
-``` bash
+
+```bash
 export JAVA_HOME=/opt/apps/jdk
 ```
 
 ---
 
 ## 5.本地测试
+
 目的：监控指定目录，当目录有新的日志产生时，把日志一行行打印到控制台。
 
 创建用于测试的目录：
-``` bash
+
+```bash
 mkdir ~/flume_test
 ```
 
 创建并进入 jobs 目录：
-``` bash
+
+```bash
 cd /opt/apps/flume
 mkdir agent && cd agent
 ```
 
 在 jobs 目录内写一个我们自己的 agent 文件：
-``` bash
+
+```bash
 vi ./test.conf
 ```
 
 test.conf 的内容是这样的：
 > 大坑：自定义 Agent 名称不能有下划线
 
-``` conf
+```conf
 # 其中 test 为任务名
 
 # 自定义 Agent 的名称
@@ -138,12 +163,14 @@ test.sinks.testSink.type = logger
 > `-c` flume 配置文件目录  
 > `-f` agent 文件路径  
 > `-Dflume.root.logger=INFO,console` 输出日志级别
-``` bash
+
+```bash
 flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO.console
 ```
 
 进入测试目录写一个日志：
-``` bash
+
+```bash
 # 进入测试目录
 cd ~/flume_test
 
@@ -152,9 +179,11 @@ echo "123123" > test.log
 ```
 
 查看测试目录变化：
-``` bash
+
+```bash
 ls ~/flume_test
 ```
+
 ![成功示例](./images/5_1.png)
 
 在启动 Agent 的终端窗口可以看到刚刚采集的消息内容（不显示也没关系）。另外，对于 Spooling Directory 中的文件，其内容写入 Channel 后，该文件将会被标记并且增加 **.COMPLETED** 的后缀。
@@ -162,15 +191,18 @@ ls ~/flume_test
 ---
 
 ## 6.hdfs 测试
+
 目的：监控指定目录，当目录有新的日志产生时，把日志保存到 hdfs。
 
 创建用于测试的目录：
-``` bash
+
+```bash
 mkdir ~/flume_test_hdfs
 ```
 
 在 jobs 目录内写一个新的 agent 文件：
-``` bash
+
+```bash
 # 进入 agent 目录
 cd /opt/apps/flume/agent/
 
@@ -181,7 +213,7 @@ vi ./test_hdfs.conf
 test_hdfs.conf 的内容是这样的：
 > 大坑：自定义 Agent 名称不能有下划线
 
-``` conf
+```conf
 # 其中 test_hdfs 为任务名
 
 # 自定义 Agent 的名称
@@ -221,18 +253,21 @@ test_hdfs.sinks.sink2.hdfs.rollInterval = 60
 ```
 
 启动 flume agent:
-``` bash
+
+```bash
 flume-ng agent -n test_hdfs -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test_hdfs.conf -Dflume.root.logger=INFO,console
 ```
 
 进入测试目录写一个日志：
-``` bash
+
+```bash
 # 进入测试目录
 cd ~/flume_test_hdfs
 
 # 随便写一个后缀为 log 的文件
 echo "hello flume" > data.log
 ```
+
 ![写入日志](./images/6_1.png)
 
 查看 hdfs 目录变化：
@@ -241,8 +276,10 @@ echo "hello flume" > data.log
 ---
 
 ## hdfs 测试时遇到错误？
+
 错误堆栈信息：
-``` bash
+
+```bash
 Exception in thread "SinkRunner-PollingRunner-DefaultSinkProcessor" java.lang.NoSuchMethodError: com.google.common.base.Preconditions.checkArgument(ZLjava/lang/String;Ljava/lang/Object;)V
         at org.apache.hadoop.conf.Configuration.set(Configuration.java:1357)
         at org.apache.hadoop.conf.Configuration.set(Configuration.java:1338)
@@ -255,8 +292,10 @@ Exception in thread "SinkRunner-PollingRunner-DefaultSinkProcessor" java.lang.No
         at java.lang.Thread.run(Thread.java:748)
 
 ```
+
 这是因为 flume 与 hadoop 都使用到了 guava 库其中的一些功能，但是随着 guava 版本的更新，其中的一些代码与旧版本不可以互通，所以我们需要使 flume 与 hadoop 依赖的 guava 版本保持一致：
-``` bash
+
+```bash
 # 进入 flume 的 jar 库目录
 cd /opt/apps/flume/lib
 
@@ -270,5 +309,5 @@ cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar $FLUME_HOME/lib/
 ---
 
 ## 快速跳转
-[回到顶部](#flume-搭建文档)  
-[KAFKA 部署文档](../kafka/README.md)
+
+[回到顶部](#flume-搭建文档)

@@ -1,9 +1,11 @@
 # SCALA 语法备忘
+
 本文档为助记 SCALA 语法诞生。请自行百度解惑，此处不提供任何教程。
 
 ## 杂项
 
 ### 字符串模板
+
 ```scala
 object 字符串模板 {
   def main(args: Array[String]): Unit = {
@@ -20,6 +22,7 @@ object 字符串模板 {
 ```
 
 ### 类型别名
+
 ```scala
 object type_alias {
   type A = Array[Int]
@@ -40,6 +43,7 @@ object type_alias {
 ```
 
 ### 字面量亦是对象
+
 ```scala
 object 字面量亦是对象 {
   def main(args: Array[String]): Unit = {
@@ -52,6 +56,7 @@ object 字面量亦是对象 {
 ## 函数
 
 ### 函数的定义
+
 ```scala
 def 函数名(参数1: 类型, 参数1: 类型, ...): 函数返回值 = {
   // 一些代码
@@ -59,6 +64,7 @@ def 函数名(参数1: 类型, 参数1: 类型, ...): 函数返回值 = {
 ```
 
 ### 无参函数
+
 ```scala
 object 无参函数 {
   private def noParams(): Unit = {
@@ -72,6 +78,7 @@ object 无参函数 {
 ```
 
 ### 有参函数
+
 ```scala
 object 有参函数 {
   private def useParams(msg: String): Unit = {
@@ -86,6 +93,7 @@ object 有参函数 {
 ```
 
 ### 代码块形参（控制抽象）
+
 ```scala
 object 代码块参数 {
   private def codeSegmentParam(code: => Unit): Unit = {
@@ -109,6 +117,7 @@ object 代码块参数 {
 ```
 
 ### 具有返回值的函数
+
 ```scala
 object 返回值 {
   private def useReturn(condition: Boolean): String = {
@@ -124,6 +133,7 @@ object 返回值 {
 ```
 
 ### 嵌套函数
+
 ```scala
 object 嵌套函数 {
   def main(args: Array[String]): Unit = {
@@ -137,6 +147,7 @@ object 嵌套函数 {
 ```
 
 ### 形参默认值
+
 ```scala
 object 形参默认值 {
   private def useDefaultParam(x: Int = 1, y: Int = 2): Int = {
@@ -150,6 +161,7 @@ object 形参默认值 {
 ```
 
 ### 可变长参数
+
 ```scala
 object 可变长参数 {
   private def variableLengthParams(args: Int*): Unit = {
@@ -166,6 +178,7 @@ object 可变长参数 {
 ```
 
 ### 函数返回值
+
 ```scala
 object 函数返回值 {
   private def useReturn(condition: Boolean): String = {
@@ -181,6 +194,7 @@ object 函数返回值 {
 ```
 
 ### 函数重载
+
 ```scala
 object 重载 {
   private def test(): Unit = {
@@ -201,6 +215,7 @@ object 重载 {
 ```
 
 ### 匿名函数（lambda表达式）
+
 ```scala
 package Function
 
@@ -224,6 +239,7 @@ object 匿名函数 {
 ```
 
 ### 偏应用函数
+
 ```scala
 package Function
 
@@ -256,6 +272,7 @@ object 偏应用函数 {
 ```
 
 ### 函数柯里化
+
 ```scala
 package Function
 
@@ -286,6 +303,7 @@ object 柯里化 {
 ```
 
 ### 高阶函数
+
 ```scala
 object 高阶函数 {
   private def surprised(prefix: String, callback: (String, String) => Unit): String => Unit = {
@@ -308,6 +326,7 @@ object 高阶函数 {
 ## 循环
 
 ### while
+
 ```scala
 object while循环 {
   def main(args: Array[String]): Unit = {
@@ -321,6 +340,7 @@ object while循环 {
 ```
 
 ### for
+
 ```scala
 object for循环范围 {
   private def loop1(): Unit = {
@@ -349,6 +369,7 @@ object for循环范围 {
 ```
 
 ### foreach
+
 ```scala
 object foreach {
   private def forEachA(): Unit = {
@@ -390,6 +411,7 @@ object foreach {
 ```
 
 ### 循环守卫
+
 ```scala
 object for循环守卫 {
   private def conditionLoop(): Unit = {
@@ -406,6 +428,7 @@ object for循环守卫 {
 ```
 
 ### yield
+
 ```scala
 object for_yield {
   type AI = Array[Int]
@@ -420,7 +443,9 @@ object for_yield {
 ```
 
 ### 手搓一个 while 循环
+
 借助于闭包、递归、控制抽象、柯里化等实现 while 循环的功能，以加深对于高阶函数的理解。
+
 ```scala
 package Loop
 
@@ -494,6 +519,7 @@ object 手搓while循环 {
 ## 类与对象
 
 ### 类的定义
+
 ```scala
 class 类名(构造参数1: 类型, 构造参数2: 类型, ...) {
   val 属性名: 类型 = 默认值
@@ -511,7 +537,9 @@ class 类名(构造参数1: 类型, 构造参数2: 类型, ...) {
 ```
 
 ### 测试
+
 与 Java 相同，类也是可以嵌套的：
+
 ```scala
 class Outter {
   private[Outter] class Inner(_name: String, _age: Int) {
@@ -555,6 +583,7 @@ object cs {
 ```
 
 ### 单例默认行为
+
 ```scala
 object Test {
   def apply(msg: String): Unit = {
@@ -570,6 +599,7 @@ object Main {
 ```
 
 ### 伴生对象
+
 ```scala
 class 伴生对象(_name: String, _age: Int) {
   private val name: String = _name
@@ -588,6 +618,7 @@ object 伴生对象 {
 ```
 
 ### 运算符重载
+
 ```scala
 class SymbolReload(_num: Int) {
   private var num: Int = _num
@@ -616,6 +647,7 @@ object 运算符重载 {
 ```
 
 ### 重载构造器
+
 ```scala
 package Class
 
@@ -638,4 +670,8 @@ object 重载构造器 {
 }
 ```
 
-### 未完待续...
+### 未完待续
+
+## 快速跳转
+
+[回到顶部](#SCALA-语法备忘)
