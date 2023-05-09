@@ -2,57 +2,6 @@
 
 本文档为助记 SCALA 语法诞生。请自行百度解惑，此处不提供任何教程。
 
-## 杂项
-
-### 字符串模板
-
-```scala
-object 字符串模板 {
-  def main(args: Array[String]): Unit = {
-    // 九九乘法表
-    for (i <- 1 to 9) {
-      for (j <- 1 to i) {
-        val sum: Int = i * j
-        print(s"$j x $i = $sum \t")
-      }
-      println()
-    }
-  }
-}
-```
-
-### 类型别名
-
-```scala
-object type_alias {
-  type A = Array[Int]
-
-  def main(args: Array[String]): Unit = {
-    type T = Int
-
-    val a: Int = 1
-    val b: T = 1
-    println(a == b) // true
-
-    val arr1: Array[Int] = Array(1, 2, 3)
-    val arr2: A = Array(1, 2, 3)
-    arr1.foreach(print) // 123
-    arr2.foreach(print) // 123
-  }
-}
-```
-
-### 字面量亦是对象
-
-```scala
-object 字面量亦是对象 {
-  def main(args: Array[String]): Unit = {
-    println( 0.to(3) )
-    println( 0.until(3) )
-  }
-}
-```
-
 ## 函数
 
 ### 函数的定义
@@ -368,6 +317,41 @@ object for循环范围 {
 }
 ```
 
+### 扁平化的 for 循环
+
+```scala
+object 扁平化for {
+  /**
+   * 九九乘法表
+   */
+  private def before(): Unit = {
+    for (i <- 1 to 9) {
+      for (j <- 1 to i) {
+        val sum: Int = i * j
+        print(s"$j x $i = $sum \t")
+      }
+      println()
+    }
+  }
+
+  /**
+   * 九九乘法表
+   */
+  private def after(): Unit = {
+    for (i <- 1 to 9; j <- 1 to i) {
+      val sum: Int = i * j
+      print(s"$j x $i = $sum \t")
+      if (j == i) println()
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    before()
+    after()
+  }
+}
+```
+
 ### foreach
 
 ```scala
@@ -486,7 +470,7 @@ object 手搓while循环 {
    * @return 代码执行器
    */
   private def while3(condition: => Boolean): (=> Unit) => Unit = {
-    (code: => Unit) => {
+    code => {
       if (condition) {
         code
         while3(condition)(code)
@@ -670,7 +654,190 @@ object 重载构造器 {
 }
 ```
 
-### 未完待续
+## 集合
+
+### 不可变数组（Array）
+
+```scala
+object 不可变数组Array {
+  private type AI = Array[Int]
+
+  private def printArray(title: String, arr: AI): Unit = {
+    println(s"============== $title ===============")
+    arr.foreach(i => {
+      print(i + " ")
+    })
+    println()
+  }
+
+  def main(args: Array[String]): Unit = {
+    val arr1: AI = Array(1, 2, 3, 4)
+    printArray("arr1", arr1)
+
+    val arr2: AI = new Array[Int](3)
+    printArray("arr2", arr2)
+
+    val arr3: AI = Array.fill[Int](5)(9)
+    printArray("arr3", arr3)
+  }
+}
+```
+
+### 可变数组（ArrayBuffer）
+
+```sql
+object 可变数组ArrayBuffer {
+  type AI = ArrayBuffer[Int]
+
+  private def printArray(title: String, arr: AI): Unit = {
+    println(s"============== $title ===============")
+    arr.foreach(i => {
+      print(i + " ")
+    })
+    println()
+  }
+
+  def main(args: Array[String]): Unit = {
+    val arr: AI = ArrayBuffer[Int](1, 2, 3)
+    printArray("修改前", arr)
+    arr.+=(4, 5, 6)
+    arr.+=:(0)
+    printArray("修改后", arr)
+  }
+}
+```
+
+### 构造数组（ArrayBuilder）
+
+```scala
+object 构造数组ArrayBuilder {
+  def main(args: Array[String]): Unit = {
+    val b = mutable.ArrayBuilder.make[Int]
+    b ++= Array(1, 2, 3)
+    b ++= Array(4, 5, 6)
+
+    b.result().foreach(println)
+  }
+}
+```
+
+### 数组拼接
+
+```scala
+object 数组拼接 {
+  def main(args: Array[String]): Unit = {
+    type AI = Array[Int]
+    val arr1: AI = Array(1, 2, 3)
+    val arr2: AI = Array(4, 5, 6)
+    val arr3: AI = arr1.concat(arr2)
+
+    arr3.foreach(println)
+  }
+}
+```
+
+### 数组筛选与过滤
+
+```scala
+object 数组筛选与过滤 {
+  private type AI = Array[Int]
+  private type AS = Array[String]
+
+  /**
+   * Array.map(lambda)
+   * map 会把每次返回的结果合并到最终的返回值里
+   * 功能：奇数个元素 + 1，偶数个元素不变
+   */
+  private def arrayMap(): Unit = {
+    var arr: AI = Array(1, 2, 3, 4, 5, 6)
+    arr = arr.map(i => if (i % 2 == 0) i else i + 1)
+
+    arr.foreach(println)
+  }
+
+  /**
+   * Array.flatMap(lambda)
+   * flatMap 与 map 功能大体相同区别在于如果返回了一个数组，
+   * 那么 flatMap 会把数组内的元素逐个合并到最终的返回值里（数组降维/扁平化处理）
+   * 功能：提取所有短语中的单词
+   */
+  private def arrayFlatMap(): Unit = {
+    var arr: AS = Array("hello world", "good morning")
+    arr = arr.flatMap(i => i.split(" "))
+
+    arr.foreach(println)
+  }
+
+  /**
+   * Array.filter(lambda)
+   * 数组条件过滤
+   * 功能：过滤奇数
+   */
+  private def arrayFilter(): Unit = {
+    var arr: AI = Array(5, 6, 7, 2, 9, 3)
+    arr = arr.filter(i => i % 2 == 0)
+
+    arr.foreach(println)
+  }
+
+  def main(args: Array[String]): Unit = {
+    arrayMap()
+    arrayFlatMap()
+    arrayFilter()
+  }
+}
+```
+
+## 杂项
+
+### 字符串模板
+
+```scala
+object 字符串模板 {
+  def main(args: Array[String]): Unit = {
+    // 九九乘法表
+    for (i <- 1 to 9) {
+      for (j <- 1 to i) {
+        val sum: Int = i * j
+        print(s"$j x $i = $sum \t")
+      }
+      println()
+    }
+  }
+}
+```
+
+### 类型别名
+
+```scala
+object type_alias {
+  type A = Array[Int]
+
+  def main(args: Array[String]): Unit = {
+    type T = Int
+
+    val a: Int = 1
+    val b: T = 1
+    println(a == b) // true
+
+    val arr1: Array[Int] = Array(1, 2, 3)
+    val arr2: A = Array(1, 2, 3)
+    arr1.foreach(print) // 123
+    arr2.foreach(print) // 123
+  }
+}
+```
+
+### 字面量亦是对象
+
+```scala
+object 字面量亦是对象 {
+  def main(args: Array[String]): Unit = {
+    println( 0.to(3) )
+    println( 0.until(3) )
+  }
+}
+```
 
 ## 快速跳转
 
