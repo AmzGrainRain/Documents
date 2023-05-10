@@ -788,6 +788,106 @@ object 数组筛选与过滤 {
 }
 ```
 
+### 数组统计
+
+```scala
+object 数组统计 {
+  def main(args: Array[String]): Unit = {
+    val arr: Array[Int] = Array(7, 1, 3, 8, 2)
+    // 统计 arr 数组中，大于 3 的元素个数
+    val result: Int = arr.count(i => i > 3)
+    println(result)
+  }
+}
+```
+
+### 集合速览
+
+```scala
+package Collection
+
+object 集合 {
+  private type SI = Set[Int]
+
+  private def printSets(sets: SI): Unit = {
+    println(sets.mkString("[", ", ", "]"))
+  }
+
+  /**
+   * 计算 sets1 和 sets2 的交集
+   * @param sets1 集合1
+   * @param sets2 集合2
+   */
+  private def setsIntersect(sets1: SI, sets2: SI): Unit = {
+    println("sets1 和 sets2 的交集：")
+    // 语法1: Set.intersect(Set) 或 Set intersect Set
+    printSets(sets1.intersect(sets2))
+    printSets(sets1 intersect sets2)
+
+    // 语法2: Set & Set 或 Set.&(Set)
+    printSets(sets1 & sets2)
+    printSets(sets1.&(sets2))
+  }
+
+  /**
+   * 计算 sets1 和 sets2 的差集（sets1 有但 set2 没有的元素组成的集合）
+   * @param sets1 集合1
+   * @param sets2 集合2
+   */
+  private def setsDiff(sets1: SI, sets2: SI): Unit = {
+    println("sets1 有但 set2 没有的元素：")
+    // 语法1: Set.diff(Set) 或 Set diff Set
+    printSets(sets1.diff(sets2))
+    printSets(sets1 diff sets2)
+
+    // 语法2: Set &~ Set 或 Set.&~(Set)
+    printSets(sets1 &~ sets2)
+    printSets(sets1.&~(sets2))
+  }
+
+  /**
+   * 计算 set1 和 set2 的并集
+   * @param sets1 集合1
+   * @param sets2 集合2
+   */
+  private def setsUnion(sets1: SI, sets2: SI): Unit = {
+    println("sets1 于 sets2 的并集：")
+
+    // 语法1: Set.union(Set) 或 Set union Set
+    printSets(sets1.union(sets2))
+    printSets(sets1 union sets2)
+
+    // 语法2: Set.concat(Set) 或 Set concat Set
+    printSets(sets1.concat(sets2))
+    printSets(sets1 concat sets2)
+
+    // 语法3: Set | Set 或 Set.|(Set)
+    printSets(sets1 | sets2)
+    printSets(sets1.|(sets2))
+  }
+
+  def main(args: Array[String]): Unit = {
+    // 声明两个集合
+    val sets1: SI = Set(1, 2, 3, 4)
+    val sets2: SI = Set(3, 4, 5, 6)
+
+    println("sets1:")
+    printSets(sets1)
+    println("sets2:")
+    printSets(sets2)
+
+    // 交集计算
+    setsIntersect(sets1, sets2)
+
+    // 差集计算
+    setsDiff(sets1, sets2)
+
+    // 并集计算
+    setsUnion(sets1, sets2)
+  }
+}
+```
+
 ## 杂项
 
 ### 字符串模板
