@@ -13,4 +13,4 @@
   - [SQL 基础文档](/docs/sql/README)
   - [SQL 进阶文档](/docs/sql_adv/README)
   - [Scala 语法助记](/docs/scala/README)
-  - [C++11 新特性与规范](/docs/c++11/README)
+  - [C++11 新特性与规范](/docs/modern_cpp/README)

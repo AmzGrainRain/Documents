@@ -4,7 +4,7 @@
 - [SQL 语法基础](/docs/sql/README)
 - [SQL 进阶理论](/docs/sql_adv/README)
 - [Scala 语法备忘](/docs/scala/README)
-- [C++11 新特性与规范](/docs/c++11/README)
+- [C++11 新特性与规范](/docs/modern_cpp/README)
 
 ## 大数据组件搭建
 - [Hadoop 安装](/docs/hadoop/README)  
