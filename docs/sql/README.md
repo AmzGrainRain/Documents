@@ -306,13 +306,13 @@ SELECT * FROM 员工表 WHERE 员工表.age < 30 OR 员工表.age > 40;
 ```
 
 #### IN
->
+
 > IN 在查询的时候，首先查询子查询的表，然后将内表和外表做一个笛卡尔积，然后按照条件进行筛选。所以相对内表比较小的时候，IN 的速度较快。
 
 查询年龄为 31, 33, 36 的员工：
 
 ```sql
-SELECT * FROM 员工表 WHERE 员工表.age > IN (31, 33, 36);
+SELECT * FROM 员工表 WHERE 员工表.age IN (31, 33, 36);
 ```
 
 #### NOT IN
@@ -508,21 +508,21 @@ SELECT SUBSTRING(RAND(), 3, 6);
 
 #### 进制转换
 
-##### 十进制 -> 十六进制
+##### 十进制 转 十六进制
 
 ```sql
 SELECT HEX(10);
 -- 输出 "A"
 ```
 
-##### 十进制 -> 八进制
+##### 十进制 转 八进制
 
 ```sql
 SELECT OCT(10);
 -- 输出 "12"
 ```
 
-##### 十进制 -> 二进制
+##### 十进制 转 二进制
 
 ```sql
 SELECT BIN(4);
@@ -758,13 +758,13 @@ ALTER TABLE 表名 DROP 约束名;
 
 #### 示例
 
-创建一个员工表 employee ，对于其字段有下列要求：
+创建一个员工表 employee：
 
 字段名|含义|字段类型|约束条件
 -|-|-|-
 id|编号|INT|自增、主键
 name|姓名|VARCHAR(10)|非空、唯一
-age|年龄|TINYINT UNSIGNED|在 (0, 80] 之间
+age|年龄|TINYINT UNSIGNED|在 \(0, 80\] 之间
 status|状态|TINYINT UNSIGNED|默认为 1
 gender|性别|CHAR(1)|值为 “男” 或 “女”
 

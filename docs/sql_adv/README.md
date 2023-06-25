@@ -941,13 +941,14 @@ Using temporary：分组时使用了临时表，效率很低。可以理解为�
 #### 前提条件
 
 tb_user 表：
+
 字段|类型|索引|注释
 -|-|-|-
 id|INT|Primary|主键
-name|VARCHAR(10)||姓名
-gender|CHAR(1)||性别
-age|TINYINT||年龄
-phone|VARCHAR(11)||手机号
+name|VARCHAR(10)|无|姓名
+gender|CHAR(1)|无|性别
+age|TINYINT|无|年龄
+phone|VARCHAR(11)|无|手机号
 
 #### 只有主键索引
 
@@ -1032,9 +1033,9 @@ InnoDB 引擎在执行 COUNT(\*) 时会一行一行的读取数据，然后累�
 
 MySQL 没有方法优化 COUNT()，建议自行计数。
 
-### 更新数据优化
+<!-- ### 更新数据优化
 
-略
+至此弃坑 -->
 
 ## 快速跳转
 
