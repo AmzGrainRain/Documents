@@ -25,8 +25,8 @@ window.$docsify = {
   nameLink: '/',
   themeColor: '#000000',
   noEmoji: false,
-  mergeNavbar: true,
   routerMode: 'history',
+  coverpage: true,
   // hideSidebar: true,
   onlyCover: true,
   requestHeaders: {
