@@ -1,10 +1,10 @@
 - [首页](/)
-- [文档清单](/docs/README)  
+- [文档清单](/README)  
 - 语言相关
-  - [SQL 基础文档](/docs/sql/README)
-  - [SQL 进阶文档](/docs/sql_adv/README)
-  - [Scala 语法助记](/docs/scala/README)
-  - [C++11 新特性与规范](/docs/modern_cpp/README)
+  - [SQL 基础文档](/lang/sql/README)
+  - [SQL 进阶文档](/lang/sql_adv/README)
+  - [Scala 语法助记](/lang/scala/README)
+  - [C++11 新特性与规范](/lang/modern_cpp/README)
 - 大数据
   - [Hadoop 搭建文档](/docs/hadoop/README)
   - [Zookeeper 搭建文档](/docs/zookeeper/README)

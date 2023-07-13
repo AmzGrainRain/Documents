@@ -2,10 +2,10 @@
 
 ## 语言相关
 
-- [SQL 语法基础](/docs/sql/README)
-- [SQL 进阶理论](/docs/sql_adv/README)
-- [Scala 语法备忘](/docs/scala/README)
-- [C++11 新特性与规范](/docs/modern_cpp/README)
+- [SQL 语法基础](/lang/sql/README)
+- [SQL 进阶理论](/lang/sql_adv/README)
+- [Scala 语法备忘](/lang/scala/README)
+- [C++11 新特性与规范](/lang/modern_cpp/README)
 
 ## 大数据组件搭建
 

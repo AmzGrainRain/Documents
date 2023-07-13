@@ -1055,4 +1055,4 @@ int main() {
 
 ## [模块](https://zh.cppreference.com/w/cpp/language/modules)
 
-自此开始，彻底改变了先前的开发方式，目前由很多编译器不支持这个特性，这里就不再展开说，具体请参考 [cppreference](https://zh.cppreference.com/w/cpp/language/modules)。
+自此开始，彻底改变了先前的开发方式，目前由很多编译器不支持这个特性，这里就不再展开说，具体请参考 [cppreference - modules](https://zh.cppreference.com/w/cpp/language/modules)。
