@@ -20,6 +20,11 @@ server {
     try_files $uri $uri/ =404;
   }
 
+  # _navbar.md
+  location ~ _navbar.md$ {
+    try_files /_navbar.md =404;
+  }
+
   # Vue history mode
   location ~ README$ {
     try_files $uri $uri/ /index.html;
