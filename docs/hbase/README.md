@@ -152,6 +152,14 @@ slave2
 
 ![regionservers](images/3_1.png)
 
+进入此目录将相应的 jar 包重命名，否则会与 Hadoop 冲突：
+
+```bash
+cd $HBASE_HOME/lib/client-facing-thirdparty/
+
+mv ./slf4j-log4j12-1.7.25.jar slf4j-log4j12-1.7.25.jar.bak
+```
+
 ---
 
 ## 4.分发文件
@@ -202,9 +210,14 @@ jps
 ```
 
 master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 进程：
+
+> 如果 slave1、slave2 上没有出现 HregionServer 进程，请参考 [FAQ](#FAQ) 部分章节。
+
 ![img.png](images/6_1.png)
 
-浏览器打开 16010 端口查看 hbase 的 WebUI 启动情况。
+浏览器打开 16010 端口查看 hbase 的 WebUI 启动情况：
+
+![img.png](images/6_2.png)
 
 ---
 
@@ -265,6 +278,36 @@ exit
 ```
 
 ---
+
+## FAQ
+
+### slave1、slave2 上没有出现 HregionServer 进程
+
+确保所有节点的时区一致、时间误差±3s。
+
+检查时区：
+
+```bash
+date -R
+```
+
+通过 ntp 工具联网校时：
+
+```bash
+# 安装 ntp
+yum -y install ntp
+
+# 同步网络时间
+ntpdate cn.pool.ntp.org
+```
+
+如果没有网络环境，也可以通过手动设置时间来减小节点之间的误差：
+
+```bash
+date -s "hh:mm:ss"
+ssh slave1 "date -s 'hh:mm:ss'"
+ssh slave2 "date -s 'hh:mm:ss'"
+```
 
 ## 快速跳转
 
