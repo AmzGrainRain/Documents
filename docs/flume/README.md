@@ -165,7 +165,7 @@ test.sinks.testSink.type = logger
 > `-Dflume.root.logger=INFO,console` 输出日志级别
 
 ```bash
-flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO.console
+flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO,console
 ```
 
 进入测试目录写一个日志：
