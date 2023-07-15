@@ -6,15 +6,11 @@
 - apache-zookeeper-3.5.7-bin.tar.gz（位于 /opt/tar/）
 - 分布式搭建
 
----
-
 ## 假设
 
 第一台服务器的IP: 192.168.56.101（主机名 master）  
 第二台服务器的IP: 192.168.56.102（主机名 slave1）  
 第三台服务器的IP: 192.168.56.103（主机名 slave2）
-
----
 
 ## 1.解压 zookeeper
 
@@ -30,8 +26,6 @@ tar -zxf /opt/tar/apache-zookeeper-3.5.7-bin.tar.gz
 # 重命名 zookeeper
 mv ./apache-zookeeper-3.5.7-bin ./zookeeper
 ```
-
----
 
 ## 2.配置 zookeeper
 
@@ -104,7 +98,7 @@ server.3=slave2:2888:3888
 ---
 
 ## 3.配置环境变量
->
+
 > 以下内容在 master 节点上操作
 
 编辑环境变量：
@@ -147,17 +141,15 @@ zkServer.sh
 
 ![结果](./images/5_1.png)
 
----
-
 ## 5.分发文件
->
+
 > 以下内容在 master 节点上操作
 
 下发 zookeeper：
 
 ```bash
-scp -r /opt/apps/zookeeper slave1:/opt/apps/ &
-scp -r /opt/apps/zookeeper slave2:/opt/apps/
+scp -r $ZK_HOME slave1:/opt/apps/ &
+scp -r $ZK_HOME slave2:/opt/apps/
 ```
 
 下发环境变量：
@@ -167,7 +159,7 @@ scp /etc/profile.d/big_data_env.sh slave1:/etc/profile.d/big_data_env.sh
 scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/big_data_env.sh
 ```
 
-下发环境变量的另一种方式（骚操作）：
+当然，如果你足够了解 shell 的话，可以使用这种方法简化路径：
 
 ```bash
 cd /etc/profile.d/
@@ -176,20 +168,18 @@ scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
 ## 6.生效环境变量
->
+
 > 以下内容在所有节点上操作
 
 ```bash
 env-update
 ```
 
----
-
 ## 6.配置 myid
->
+
 > 以下内容在 master 节点上操作
 
-每台服务器的 myid 必须与众不同。其实我们上一步已经为每一节点分配好了 myid！它在 [zoo.cfg](#配置 zookeeper) 最下方：
+每台服务器的 myid 必须是唯一的。其实我们上一步已经为每一节点分配好了 myid！它在 [zoo.cfg](#配置 zookeeper) 最下方：
 
 ```bash
 # server.myid=主机名:2888:3888
@@ -223,10 +213,8 @@ ssh slave1 "echo 2 > /opt/apps/zookeeper/data/myid"
 ssh slave2 "echo 3 > /opt/apps/zookeeper/data/myid"
 ```
 
----
-
 ## 7.启动与测试
->
+
 > 以下内容大部分在 master 节点上操作，小部分需要在所有节点上操作
 
 在所有节点上执行此命令来启动 zookeeper：
@@ -280,8 +268,6 @@ get /test
 ![master zookeeper cli](./images/8_3.png)
 
 slave1 与 slave2 均出现 "hello" 即视为部署成功。
-
----
 
 ## 快速跳转
 

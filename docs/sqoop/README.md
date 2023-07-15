@@ -9,8 +9,6 @@
 - sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz（位于/opt/tar下）
 - 非分布式搭建
 
----
-
 ## 1.解压
 
 进入 /opt/app/ 目录内：
@@ -31,8 +29,6 @@ tar -zxf /opt/tar/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 mv ./sqoop-1.4.7.bin__hadoop-2.6.0 ./sqoop
 ```
 
----
-
 ## 2.放入 MySQL 驱动包
 
 因为我们要通过 sqoop 操作 mysql，所以需要将java 连接 mysql 需要用到的驱动复制到 sqoop/lib 下：
@@ -40,8 +36,6 @@ mv ./sqoop-1.4.7.bin__hadoop-2.6.0 ./sqoop
 ```bash
 cp /opt/tar/mysql-connector-java-5.1.37.jar /opt/apps/sqoop/lib/
 ```
-
----
 
 ## 3.配置环境变量
 
@@ -64,8 +58,6 @@ export PATH=$PATH:$SQOOP_HOME/bin
 env-update
 ```
 
----
-
 ## 5.验证安装
 
 执行这条指令：
@@ -75,8 +67,6 @@ sqoop version
 ```
 
 ![结果](./images/4_1.png)
-
----
 
 ## 6.使用 sqoop 前的准备工作
 
@@ -141,8 +131,6 @@ CREATE TABLE test (
 
 ![SQL结果](./images/5_1.png)
 
----
-
 插入一些数据：
 
 ```sql
@@ -154,8 +142,6 @@ INSERT INTO test VALUES
 ```
 
 ![插入结果](./images/5_2.png)
-
----
 
 ## 7.sqoop 指令菜单
 
@@ -183,37 +169,46 @@ metastore|记录 Sqoop job 的元数据信息，如果不启动 Metastore 实例
 help|打印 sqoop 帮助信息
 version|打印 sqoop 版本信息
 
----
-
 ## 8.测试 sqoop 连接 mysql
 
 使用 sqoop 打印 mysql 内所有数据库名：
+
 > 通过 `sqoop help list-databases` 命令打印帮助信息。
 
 ```bash
-sqoop list-databases --connect jdbc:mysql://localhost:3306 --username root -P
+sqoop list-databases \
+--connect jdbc:mysql://localhost:3306 \
+--username root \
+-P
 ```
 
 ![数据库名](./images/7_1.png)
 
 使用 sqoop 打印 sqoop_test 数据库内所有的数据表名：
+
 > 通过 `sqoop help list-tables` 命令打印帮助信息。
 
 ```bash
-sqoop list-tables --connect jdbc:mysql://localhost:3306/sqoop_test --username root -P
+sqoop list-tables \
+--connect jdbc:mysql://localhost:3306/sqoop_test \
+--username root \
+-P
 ```
 
 ![数据库名](./images/7_2.png)
 
----
-
 ## 9.导出 mysql 数据表到 hdfs
->
+
 > 通过 `sqoop help import` 命令打印帮助信息。  
 > 在此之前，请确保 Hadoop 已经启动。
 
 ```bash
-sqoop import --connect jdbc:mysql://localhost:3306/sqoop_test --table test --username root -P --m 1
+sqoop import \
+--connect jdbc:mysql://localhost:3306/sqoop_test \
+--table test \
+--username root \
+-P \
+--m 1
 ```
 
 如果遇到这个错误：
@@ -263,10 +258,8 @@ hdfs dfs -cat /user/root/test/part-m-00000
 
 ![hdfs 内的数据表](./images/8_3.png)
 
----
-
 ## 10.导出 hdfs 数据表到 mysql
->
+
 > 在此之前，请确保 Hadoop 已经启动。
 
 进入 mysql ：
@@ -293,7 +286,14 @@ CREATE TABLE test_from_hdfs (
 退出 mysql，开始使用 sqoop 导入数据：
 
 ```bash
-sqoop export --connect jdbc:mysql://192.168.56.101:3306/sqoop_test --username root -P --table test_from_hdfs --m 1 --export-dir /user/root/test --input-fields-terminated-by ","
+sqoop export \
+--connect jdbc:mysql://192.168.56.101:3306/sqoop_test \
+--username root \
+-P \
+--table test_from_hdfs \
+--m 1 \
+--export-dir /user/root/test \
+--input-fields-terminated-by ","
 ```
 
 ![导入数据：](./images/9_2.png)
@@ -314,9 +314,7 @@ SELECT * FROM sqoop_test.test_from_hdfs;
 
 可以看到数据导入成功了，但是有一个新的问题。那就是所有的汉字都显示成了问号，篇幅原因我们放在下一节细说。
 
----
-
-## 11.解决从 hdfs 导入到 mysql 中的数据中，中文变问号的问题
+## 解决从 hdfs 导入到 mysql 中的数据中，中文变问号的问题
 
 进入 mysql ：
 
@@ -330,7 +328,7 @@ mysql -u root -p
 SHOW VARIABLES LIKE 'character%'; 
 ```
 
-![编码信息](./images/10_1.png)
+![编码信息](./images/faq_1_1.png)
 可以看到有些地方的编码是 latin1，这种编码并不能显示中文。
 
 编辑 my.cnf ：
@@ -362,7 +360,7 @@ systemctl start mysqld.service
 SHOW VARIABLES LIKE 'character%'; 
 ```
 
-![编码信息](./images/10_2.png)
+![编码信息](./images/faq_1_2.png)
 可以看到编码全是 utf8 了。
 
 清空我们在第九步从 hdfs 导出到 mysql 的 sqoop_test.test_from_hdfs 数据表：
@@ -389,10 +387,8 @@ mysql -u root -p
 SELECT * FROM sqoop_test.test_from_hdfs;
 ```
 
-![正常的输出](./images/10_3.png)
+![正常的输出](./images/faq_1_3.png)
 完美解决！
-
----
 
 ## 快速跳转
 

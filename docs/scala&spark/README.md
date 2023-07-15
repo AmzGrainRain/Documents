@@ -7,10 +7,8 @@
 - spark-3.1.1-bin-hadoop3.2.tgz（位于/opt/tar下）
 - 分布式搭建
 
----
-
 ## 1.解压
->
+
 > 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
@@ -33,10 +31,8 @@ mv ./scala3-3.2.2 ./scala
 mv ./spark-3.1.1-bin-hadoop3.2 ./spark
 ```
 
----
-
 ## 2.配置环境变量
->
+
 > 以下内容在 master 节点上操作
 
 编辑环境变量：
@@ -53,16 +49,14 @@ export SCALA_HOME=/opt/apps/scala
 export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin:$SCALA_HOME/bin
 ```
 
----
-
 ## 3.配置 spark-env.sh
->
+
 > 以下内容在 master 节点上操作
 
 进入配置目录：
 
 ```bash
-cd /opt/apps/spark/conf
+cd $SPARK_HOME/conf
 ```
 
 使用预置模板：
@@ -93,11 +87,15 @@ export SPARK_WORKER_HOST=master
 export SPARK_WORKER_PORT=7078
 ```
 
----
-
 ## 4.配置 slaves
->
-> 以下内容在 master 节点上操作
+
+> 以下内容在 master 节点上操作  
+
+进入配置目录：
+
+```bash
+cd $SPARK_HOME/conf
+```
 
 使用预置模板：
 
@@ -119,20 +117,18 @@ slave1
 slave2
 ```
 
----
-
 ## 5.分发文件
->
+
 > 以下内容在 master 节点上操作
 
 分发 scala、spark 到 slave1、slave2：
 
 ```bash
-scp -r /opt/apps/scala slave1:/opt/apps/
-scp -r /opt/apps/scala slave2:/opt/apps/
+scp -r $SCALA_HOME slave1:/opt/apps/
+scp -r $SCALA_HOME slave2:/opt/apps/
 
-scp -r /opt/apps/spark slave1:/opt/apps/
-scp -r /opt/apps/spark slave2:/opt/apps/
+scp -r $SPARK_HOME slave1:/opt/apps/
+scp -r $SPARK_HOME slave2:/opt/apps/
 ```
 
 分发环境变量文件到 slave1、slave2（正常版）：
@@ -150,28 +146,24 @@ scp ./big_data_env.sh slave1:$(pwd)/
 scp ./big_data_env.sh slave2:$(pwd)/
 ```
 
----
-
 ## 6.生效环境变量
->
+
 > 以下内容在所有节点上操作
 
 ```bash
 env-update
 ```
 
----
-
 ## 7.启动与测试
->
+
 > 以下内容在 master 节点上操作
 
-由于环境变量所映射的目录内存在同名文件，所以我们需要进入目录去执行脚本来启动某些服务。
+由于环境变量所映射的目录内存在同名文件（名称冲突），所以我们需要进入目录去执行脚本来启动某些服务。
 
 启动 spark ：
 
 ```bash
-/opt/apps/spark/sbin/start-all.sh
+$SPARK_HOME/sbin/start-all.sh
 ```
 
 先往 hdfs 内创建一个测试目录：
@@ -221,8 +213,6 @@ file.count()
 ```scala
 :quit
 ```
-
----
 
 ## 快速跳转
 

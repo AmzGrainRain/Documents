@@ -22,8 +22,6 @@ Hive 使得开发者专注于编写 HQL 进行数据分析，避免了 MapReduce
 - mysql-connector-java-5.1.37.jar（位于/opt/tar下）
 - 非分布式搭建
 
----
-
 ## 1.解压 hive
 
 ```bash
@@ -36,8 +34,6 @@ tar -zxf /opt/tar/apache-hive-3.1.2-bin.tar.gz
 # 重命名 hive
 mv ./apache-hive-3.1.2-bin ./hive
 ```
-
----
 
 ## 2.置入 jar 包
 
@@ -60,8 +56,6 @@ rm -f guava-19.0.jar
 cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar ./
 ```
 
----
-
 ## 3.配置环境变量
 
 编辑环境变量：
@@ -83,14 +77,12 @@ export PATH=$PATH:$HIVE_HOME/bin
 env-update
 ```
 
----
-
 ## 4.配置 hive-env.sh
 
 进入到 hive 配置文件的目录下：
 
 ```bash
-cd /opt/apps/hive/conf
+cd $HIVE_HOME/conf
 ```
 
 拷贝模板：
@@ -114,9 +106,9 @@ export HIVE_HOME=/opt/apps/hive
 export HIVE_CONF_DIR=$HIVE_HOME/conf
 ```
 
----
-
 ## 5.配置 hive-site.xml
+
+> 请确保您已进入 Hive 的配置目录
 
 拷贝模板：
 
@@ -131,6 +123,7 @@ vi ./hive-site.xml
 ```
 
 修改以下配置：
+
 > 直接在 hive-site.xml 文件查找对应项修改参数，切勿全部删除！！！  
 > vi 编辑器命令模式下使用 "/关键字" 搜索，按 N 键跳转到下一个搜索结果。
 
@@ -178,9 +171,9 @@ vi ./hive-site.xml
 
 ```
 
----
-
 ## 6.配置 log4j.properties
+
+> 请确保您已进入 Hive 的配置目录
 
 拷贝模板即可：
 
@@ -206,7 +199,8 @@ schematool -dbType mysql -initSchema
 vi ./hive-site.xml
 ```
 
-在 vi 命令模式下输入 `:3215` 来快速跳转到第 3215 行，删掉 `&#8;` 这四个符号：
+在 vi 命令模式下输入 `:3215` 来快速跳转到第 3215 行，删掉 `&#8;` 这四个字符：
+
 ![删掉字符](images/7_2.png)
 
 再次尝试初始化：
@@ -217,8 +211,6 @@ schematool -dbType mysql -initSchema
 
 ![结果](images/7_3.png)
 
----
-
 ## 8.启动 hive
 
 启动 hive ：
@@ -228,13 +220,14 @@ hive
 ```
 
 如果出现这个报错：（绝对URI中的相对路径）
+
 ![示意图](./images/8_1.png)
 
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 
 ```bash
-# sed -i "s/要替换的/替换为/g" 文件路径
-# 此命令用于替换内容
+# sed 命令用于批量替换文本内容
+# sed -i "s/要替换的/替换为/g" 目标文件路径
 sed -i "s/system://g" /opt/apps/hive/conf/hive-site.xml
 ```
 
@@ -247,9 +240,7 @@ hive
 成功：
 ![结果](./images/8_2.png)
 
-不要忘记输入 `exit;` 或按下 `ctrl + d` 退出 hive cli。
-
----
+输入 `exit;` 或按下 `ctrl + d` 即可退出 hive cli。
 
 ## 9.使用 hive
 
@@ -310,7 +301,7 @@ hdfs dfs -put ~/test.txt /test_hive/test.txt
 > start-all.sh
 > ```
 >
-> 具体请参考 [hadoop 搭建文档](../hadoop/README.md)第八步的引用部分。  
+> 具体请参考 [hadoop 搭建文档](../hadoop/README) 第八步的引用部分。  
 
 回到正题，cat 一下，证明已经发送到 hdfs 里了：
 
@@ -367,8 +358,6 @@ hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ```
 
 ![文本内容](./images/9_6.png)
-
----
 
 ## 快速跳转
 

@@ -7,15 +7,11 @@
 - hadoop-3.1.3.tar.gz（位于 /opt/tar/）
 - 三台互通的虚拟机
 
----
-
 ## 假设
 
 第一台服务器的IP: 192.168.56.101  
 第二台服务器的IP: 192.168.56.102
 第三台服务器的IP: 192.168.56.103
-
----
 
 ## 介绍
 
@@ -79,13 +75,9 @@ YARN 是一种资源协调者，是 Hadoop 的资源管理器。
 
 ![MapReduce](./images/overview_2.png)
 
----
-
 ## 大数据技术生态体系图
 
 ![System](./images/overview_3.png)
-
----
 
 ## 1.修改主机名
 
@@ -114,10 +106,8 @@ hostnamectl set-hostname slave2
 
 执行以上操作，依次为每一台主机设置一个主机名。
 
----
-
 ## 2.修改 hosts 规则
->
+
 > 以下内容仅在 master 节点上操作  
 > [hosts 有什么作用？](https://baike.baidu.com/item/hosts/10474546)
 
@@ -130,10 +120,8 @@ vi /etc/hosts
 在尾部追加几条规则，修改后的内容如图所示：
 ![修改后](./images/4-1_1.png)
 
----
-
 ## 3.同步 hosts 规则
->
+
 > 以下内容仅在 master 节点上操作
 
 通过 scp 命令将 master 节点上已经修改过的 hosts 文件发送到 slave1 和 slave2：
@@ -145,7 +133,7 @@ scp /etc/hosts slave2:/etc/hosts
 ```
 
 ## 4.关闭防火墙
->
+
 > 以下内容在所有节点上操作一次
 
 systemctl 用于控制服务，使用 systemctl 关闭防火墙：
@@ -167,10 +155,8 @@ systemctl status firewalld.service
 
 ![结果](./images/6_1.png)
 
----
-
 ## 5.配置 SSH 免密登录
->
+
 > 以下内容仅在 master 节点上操作  
 > [什么是 RSA 密钥？](https://zhuanlan.zhihu.com/p/26810938)
 
@@ -199,10 +185,8 @@ ssh-copy-id slave2
 测试是否配置成功免密登录
 ![结果](./images/7_2.png)
 
----
-
 ## 6.Hadoop 集群部署
->
+
 > 以下内容在 master 节点上操作
 
 ```bash
@@ -224,7 +208,7 @@ mv ./jdk1.8.0_212 ./jdk
 ```
 
 ## 7.配置环境变量
->
+
 > 以下内容仅在 master 节点上操作  
 > [什么是环境变量？](https://baike.baidu.com/item/%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F/1730949)  
 > 当一个用户登录 Linux 系统或使用 su 命令切换到另一个用户时，首先要确保执行的启动脚本就是 `/etc/profile`，此文件内部内部有一段代码会遍历执行 `/etc/profile.d/` 目录内部的所有脚本。
@@ -250,7 +234,7 @@ alias env-update='source /etc/profile.d/big_data_env.sh'
 source /etc/profile.d/big_data_env.sh
 ```
 
-这样一来我们就创建了两个新的命令，其中:
+这样一来我们就“创造”了两个新的命令，其中:
 
 - env-edit 命令用来编辑环境变量
 - env-update 命令用来生效您对环境变量的修改
@@ -292,10 +276,8 @@ whereis hdfs
 
 ![java](./images/9_2.png)
 
----
-
 ## 8.Hadoop 集群配置
->
+
 > 以下内容在 master 节点上操作
 
 进入到 hadoop 配置文件的目录下：
@@ -333,7 +315,7 @@ export YARN_RESOURCEMANAGER_USER=root
 export YARN_NODEMANAGER_USER=root
 ```
 
-### 配置 core-site.xml</span>
+### 配置 core-site.xml
 
 我们需要在此文件里设置 hadoop 用于接收各种请求的端口和 hadoop 的缓存目录。
 
@@ -529,10 +511,8 @@ slave1
 slave2
 ```
 
----
-
 ## 9.分发文件
->
+
 > 以下内容仅在 master 节点上操作
 
 下发 apps 目录到 slave1 和 slave2 节点：
@@ -560,7 +540,7 @@ scp /etc/profile.d/big_data_env.sh slave2:/etc/profile.d/
 ```
 
 ## 10.生效环境变量
->
+
 > 以下内容在所有节点上操作
 
 ```bash
@@ -568,7 +548,7 @@ source /etc/profile.d/big_data_env.sh
 ```
 
 ## 11.启动 Hadoop 集群
->
+
 > 以下内容仅在 master 节点上操作
 
 格式化元数据：（仅在 master 节点上执行一次此命令）
@@ -609,10 +589,8 @@ start-all.sh
 hdfs dfsadmin -safemode leave
 ```
 
----
-
 ## 12.检查启动情况
->
+
 > 以下内容仅在 master 节点上操作
 
 检查 hadoop ：
@@ -628,21 +606,24 @@ jps
 > 只需要把 master 替换成对应的 IP 地址即可
 > master -> 192.168.56.101
 
-检查端口启动状态的方法有很多种，这里我们使用最简单的浏览器测试法。  
+检查端口启动状态的方法有很多种，这里我们使用最简单的浏览器测试法：
 
-浏览器打开 <http://192.168.56.101:9870>  
+浏览器打开 <http://192.168.56.101:9870>
+
 ![master:50070](./images/12_2.png)
 
-浏览器打开 <http://192.168.56.101:8088>  
+浏览器打开 <http://192.168.56.101:8088>
+
 ![master:50070](./images/12_3.png)
 
-浏览器打开 <http://192.168.56.101:9000>  
+浏览器打开 <http://192.168.56.101:9000>
+
 ![master:50070](./images/12_4.png)
 
 以上代表正常工作。
 
 ## 13.测试 Hadoop
->
+
 > 以下内容在 master 节点上操作
 
 计算测试：
@@ -662,8 +643,6 @@ hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 5 5
 ```bash
 hdfs dfsadmin -report
 ```
-
----
 
 ## 快速跳转
 

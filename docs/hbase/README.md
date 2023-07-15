@@ -12,7 +12,7 @@
 ---
 
 ## 1.解压
->
+
 > 以下内容在 master 节点上操作
 
 进入 /opt/app/ 目录内：
@@ -36,7 +36,7 @@ mv ./hbase-2.2.3 ./hbase
 ---
 
 ## 2.配置环境变量
->
+
 > 以下内容在 master 节点上操作
 
 编辑环境变量：
@@ -55,7 +55,7 @@ export PATH=$PATH:$HBASE_HOME/bin
 ---
 
 ## 3.修改配置文件
->
+
 > 以下内容在 master 节点上操作
 
 进入配置文件目录：
@@ -163,7 +163,7 @@ mv ./slf4j-log4j12-1.7.25.jar slf4j-log4j12-1.7.25.jar.bak
 ---
 
 ## 4.分发文件
->
+
 > 以下内容在 master 节点上操作
 
 分发文件到 slave1、slave2 ：
@@ -184,7 +184,7 @@ ssh slave2 "echo 'master' >> /opt/apps/hbase/conf/regionservers"
 ![img.png](images/4_1.png)
 
 ## 5.生效环境变量
->
+
 > 以下内容在所有节点上操作
 
 ```bash
@@ -194,7 +194,7 @@ env-update
 ---
 
 ## 6.启动测试
->
+
 > 以下内容在 master 节点上操作
 
 master 节点上启动：
@@ -211,7 +211,7 @@ jps
 
 master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 进程：
 
-> 如果 slave1、slave2 上没有出现 HregionServer 进程，请参考 [FAQ](#FAQ) 部分章节。
+> 如果 slave1、slave2 上没有出现 HregionServer 进程，请参考 [FAQ](#hbase-没有正常启动) 部分章节。
 
 ![img.png](images/6_1.png)
 
@@ -222,7 +222,7 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 ---
 
 ## 7.Hbase shell
->
+
 > 以下内容在 master 节点上操作  
 > 确保您已经启动了 hadoop 和 zookeeper
 
@@ -279,9 +279,7 @@ exit
 
 ---
 
-## FAQ
-
-### slave1、slave2 上没有出现 HregionServer 进程
+## HBase 没有正常启动
 
 确保所有节点的时区一致、时间误差±3s。
 

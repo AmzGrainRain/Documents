@@ -6,8 +6,6 @@
 - apache-flume-1.9.0-bin.tar.gz（位于/opt/tar下）
 - 非分布式搭建
 
----
-
 ## 介绍
 
 Flume 是 Cloudera 提供的一个高可用的，高可靠的，分布式的海量日志采集、聚合和传输系统。Flume 基于流式架构，灵活简单。
@@ -28,8 +26,6 @@ Sink 不断地轮询 Channel 中的事件且批量地移除它们，并将这些
 
 Source 可以搭配多个 Channel；但一个 Sink 只能搭配一个 Channel。
 
----
-
 ## 1.解压
 
 进入 /opt/app/ 目录内：
@@ -49,8 +45,6 @@ tar -zxf /opt/tar/apache-flume-1.9.0-bin.tar.gz
 ```bashl
 mv ./apache-flume-1.9.0-bin ./flume
 ```
-
----
 
 ## 2.配置环境变量
 
@@ -81,14 +75,12 @@ flume-ng version
 
 ![测试结果](./images/3_1.png)
 
----
-
 ## 4.修改配置文件
 
 进入配置文件目录：
 
 ```bash
-cd /opt/apps/flume/conf
+cd $FLUME_HOME/conf
 ```
 
 使用预置模板：
@@ -109,11 +101,9 @@ vi ./flume-env.sh
 export JAVA_HOME=/opt/apps/jdk
 ```
 
----
-
 ## 5.本地测试
 
-目的：监控指定目录，当目录有新的日志产生时，把日志一行行打印到控制台。
+> 监控指定目录，当目录有新的日志产生时，收集它。
 
 创建用于测试的目录：
 
@@ -135,6 +125,7 @@ vi ./test.conf
 ```
 
 test.conf 的内容是这样的：
+
 > 大坑：自定义 Agent 名称不能有下划线
 
 ```conf
@@ -165,7 +156,11 @@ test.sinks.testSink.type = logger
 > `-Dflume.root.logger=INFO,console` 输出日志级别
 
 ```bash
-flume-ng agent -n test -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test.conf -Dflume.root.logger=INFO,console
+flume-ng agent \
+-n test \
+-c /opt/apps/flume/conf \
+-f /opt/apps/flume/agent/test.conf \
+-Dflume.root.logger=INFO,console
 ```
 
 进入测试目录写一个日志：
@@ -188,11 +183,9 @@ ls ~/flume_test
 
 在启动 Agent 的终端窗口可以看到刚刚采集的消息内容（不显示也没关系）。另外，对于 Spooling Directory 中的文件，其内容写入 Channel 后，该文件将会被标记并且增加 **.COMPLETED** 的后缀。
 
----
-
 ## 6.hdfs 测试
 
-目的：监控指定目录，当目录有新的日志产生时，把日志保存到 hdfs。
+> 监控指定目录，当目录有新的日志产生时，把日志保存到 hdfs。
 
 创建用于测试的目录：
 
@@ -211,7 +204,6 @@ vi ./test_hdfs.conf
 ```
 
 test_hdfs.conf 的内容是这样的：
-> 大坑：自定义 Agent 名称不能有下划线
 
 ```conf
 # 其中 test_hdfs 为任务名
@@ -255,7 +247,11 @@ test_hdfs.sinks.sink2.hdfs.rollInterval = 60
 启动 flume agent:
 
 ```bash
-flume-ng agent -n test_hdfs -c /opt/apps/flume/conf -f /opt/apps/flume/agent/test_hdfs.conf -Dflume.root.logger=INFO,console
+flume-ng agent \
+-n test_hdfs \
+-c /opt/apps/flume/conf \
+-f /opt/apps/flume/agent/test_hdfs.conf \
+-Dflume.root.logger=INFO,console
 ```
 
 进入测试目录写一个日志：
@@ -271,9 +267,8 @@ echo "hello flume" > data.log
 ![写入日志](./images/6_1.png)
 
 查看 hdfs 目录变化：
-![成功示例](./images/6_2.png)
 
----
+![成功示例](./images/6_2.png)
 
 ## hdfs 测试时遇到错误？
 
@@ -305,8 +300,6 @@ rm -f guava-11.0.2.jar
 # 从 hadoop 复制高版本的 guava 到 hive
 cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar $FLUME_HOME/lib/
 ```
-
----
 
 ## 快速跳转
 

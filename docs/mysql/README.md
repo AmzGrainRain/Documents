@@ -15,8 +15,6 @@
 - mysql-community-test-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
 - 非分布式搭建
 
----
-
 ## 1.安装软件包
 
 进入 /opt/tar/MySQL/ 目录内：
@@ -50,8 +48,6 @@ rpm -ivh ./*.rpm --force --nodeps
 - --force：强制安装
 - --nodeps：不处理依赖问题（无网络环境下安装）
 
----
-
 ## 2.启动MySQL & 设置开机自启
 
 查看 mysqld 守护进程状态：
@@ -79,8 +75,6 @@ systemctl status mysqld.service
 ```
 
 ![操作结果](./images/3_1.png)
-
----
 
 ## 3.配置 MySQL
 
@@ -157,8 +151,6 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 ```sql
 FLUSH PRIVILEGES;
 ```
-
----
 
 ## 快速跳转
 
