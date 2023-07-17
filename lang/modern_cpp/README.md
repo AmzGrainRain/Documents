@@ -1,6 +1,6 @@
 # 现代 C++
 
-## auto
+## [auto](https://zh.cppreference.com/w/cpp/language/auto)
 
 这并不是动态类型，最终的类型取决于编译期间右值的类型。换句话说就是让编译器在编译期根据右值推导出这个变量的类型：
 
@@ -11,7 +11,7 @@ auto y = 'c';   // char
 
 当你觉得一个类型没必要明确写出来或者无论是写还是看都显得太长时，可以试试 auto 关键字。
 
-## constexpr
+## [constexpr](https://zh.cppreference.com/w/cpp/language/constexpr)
 
 constexpr 的语义是“常量表达式”，代表在编译期可求值的表达式，可用于修饰变量、函数、构造函数等。它可以用于声明变量、函数、构造函数等，使得它们可以在编译期计算出结果，提高程序的执行效率。constexpr 和 const 的主要区别是，const 变量的初始化可以推迟到运行时，而 constexpr 变量必须在编译时进行初始化。constexpr 函数或构造函数必须只接受并返回字面类型，并且函数体不能包含复杂的语句，如 goto、try 等。C++14 中放宽了一些限制，允许 constexpr 函数包含 if、switch、循环等语句，并且可以修改局部变量。
 
@@ -37,7 +37,7 @@ int main()
 
 ```
 
-## noexcept
+## [noexcept](https://zh.cppreference.com/w/cpp/language/noexcept_spec)
 
 noexcept 有两个作用：
 
@@ -70,7 +70,7 @@ void baz(T t) noexcept(noexcept(t.do_something())) {
 }
 ```
 
-## decltype
+## [decltype](https://zh.cppreference.com/w/cpp/language/decltype)
 
 decltype 用于推导**表达式类型**，这里只用于编译器分析表达式的类型，表达式实际不会进行运算：
 
@@ -82,123 +82,154 @@ int& m = x;
 decltype(m) n = y; // n 与 m 的类型相同
 ```
 
-## 右值引用 (万能引用)
+## [nullptr](https://zh.cppreference.com/w/cpp/language/nullptr)
+
+关键词 nullptr 代表指针字面量。它是 std::nullptr_t 类型的纯右值。存在从 nullptr 到任何指针类型及任何成员指针类型的隐式转换。同样的转换对于任何空指针常量也存在，空指针常量包括 std::nullptr_t 的值，以及宏 NULL：
 
 ```cpp
-// 以前（没啥用）
-const int& a = 1;
+#include <cassert>
 
-// 现在
-int&& b = 1;
-int&& c = b;
+int main() {
+    int num = 1;
+    int *p = &num;
+
+    // 从 nullptr 到任何指针类型及任何成员指针类型的隐式转换
+    p = nullptr;
+    
+    assert(nullptr == NULL);
+
+    return 0;
+}
 ```
 
-## std::string_view
+## [override](https://zh.cppreference.com/w/cpp/language/override)
 
-string_view 是 C++17 引入的一个类模板，它可以表示一个不可变的连续的字符序列。它不拥有字符串的内存，只是保存了一个指向字符串的指针和一个字符串的长度。它提供了类似于 std::string 的接口，可以方便地操作字符串，比如访问元素、获取子串、比较、查找等。
-
-string_view 的优点是它可以避免不必要的字符串拷贝和内存分配，从而提高程序的性能和效率。它可以用来替代一些接受 const char\* 或 const std::string& 作为参数的函数，使得函数可以接受任何类型的字符串，包括静态字符串、std::string、字符数组等。
-
-string_view 的缺点是它不保证字符串的生命周期，所以使用时要注意确保被引用的字符串在 string_view 存在期间不被销毁或修改。另外，string_view 不以空字符结尾，所以不能直接传递给一些需要空终止符的函数，比如 printf 等。
-
-下面是 string_view 的例子：
+指定一个虚函数覆盖另一个虚函数：
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <string_view>
+struct A {
+    virtual void foo() = 0;
+    void bar() {};
+};
 
-// 一个接受 string_view 作为参数的函数
-void print(std::string_view sv) {
-  std::cout << sv << "\n";
+struct B : A {
+    // 错误：B::foo 不覆盖 A::foo（签名不匹配）
+    void foo() const override;
+
+    // OK：B::foo 覆盖 A::foo
+    void foo() override {};
+
+    // 错误：A::bar 非虚函数
+    void bar() override;
+};
+```
+
+## [final](https://zh.cppreference.com/w/cpp/language/final)
+
+指定某个虚函数不能在派生类中被覆盖，或者某个类不能被派生。
+
+```cpp
+struct Base {
+    virtual void foo() = 0;
+};
+
+struct A : Base {
+    // 覆盖 Base::foo
+    void foo() final {}
+
+    // 错误：bar 非虚函数，因此它不能是 final 的
+    void bar() final;
+};
+
+struct B final : A {
+    // 错误：foo 不能被覆盖，因为它在 A 中是 final 的
+    void foo() override;
+};
+
+// 错误：B 是 final 的不可被派生
+struct C : B {};
+```
+
+## [尾随返回类型](https://zh.cppreference.com/w/cpp/language/function#.E5.87.BD.E6.95.B0.E5.A3.B0.E6.98.8E)
+
+单行声明的一个语法糖：
+
+```cpp
+#include <cassert>
+
+// 声明了一个变量、一个指针、一个函数、及一个函数指针
+int a = 1, *p = nullptr, f(), (*pf)(double);
+
+int f() {
+    return 1;
+}
+
+int p_f(double d) {
+    return 2 * d;
 }
 
 int main() {
-  // 静态字符串
-  print("Hello, world!");
+    p = new int(3);
+    pf = p_f;
 
-  // 字符数组
-  char arr[] = {'H', 'e', 'l', 'l', 'o'};
-  std::cout << std::string_view(arr, 5) << std::endl;
+    assert(a == 1);
+    assert(*p == 3);
+    assert(f() == 1);
+    assert(p_f(1.1) == 2);
+    assert(pf(1.1) == 2);
 
-  // std::string
-  std::string str = "Hello, C++17";
-  std::cout << str << std::endl;
-
-  // string_view 的子串
-  std::string_view sv = str;
-  std::cout << sv.substr(7) << std::endl;
-
-  return 0;
+    return 0;
 }
 ```
 
-std::string_view 与 std::string 的配合使用：
+## [值类别](https://zh.cppreference.com/w/cpp/language/value_category)
+
+每个 C++ 表达式（带有操作数的操作符、字面量、变量名等）可按照两种独立的特性加以辨别：类型和值类别。每个表达式都具有某种非引用类型，且每个表达式只属于三种基本值类别中的一种：纯右值、亡值、左值。
+
+简而言之，能取地址的就是左值、没有名字的临时变量和字面量就是右值：
 
 ```cpp
-#include <iostream>
-#include <string>
-#include <string_view>
-
-int main() {
-  // 从静态字符串构造 string_view
-  std::string_view sv = "Hello, world!";
-
-  // 从 string_view 构造 string
-  std::string str1(sv);
-
-  // 从 string_view 赋值给 string
-  std::string str2;
-  str2 = sv;
-
-  // 从 string 构造 string_view
-  std::string str3 = "Hello, C++17";
-  std::string_view sv2 = str3;
-
-  // 从 string_view 构造 string，优化为移动
-  std::string str4(sv2);
-
-  std::cout << "str1: " << str1 << std::endl;
-  std::cout << "str2: " << str2 << std::endl;
-  std::cout << "str3: " << str3 << std::endl;
-  std::cout << "str4: " << str4 << std::endl;
-
-  return 0;
-}
-```
-
-## std::bind（已弃用的特性）
-
-```cpp
-#include <iostream>
-#include <cmath>
-#include <functional>
-
-// 计算两点距离
-double distance_between_two_points(int x1, int y1, int x2, int y2) {
-    return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+int f() {
+    return 1;
 }
 
 int main() {
-    // 已知第一个点
-    int x1 = 3;
-    int y1 = 5;
+    // num 可以取地址所以是是左值
+    // 1 是字面量所以是右值
+    int num = 1;
 
-    // 固定前两个参数
-    auto x1_y1_to = std::bind(distance_between_two_points, x1, y1, std::placeholders::_1, std::placeholders::_2);
+    // num_p 出现在等号左侧所以是左值
+    // &num 返回了一个地址但它不具名所以只能出现在等号右侧（右值）
+    int *num_p = &num;
 
-    // (x1, y1) 到 (6, 8) 的距离
-    std::cout << x1_y1_to(6, 8) << std::endl;
+    // rtn 出现在等号左侧所以是左值
+    // f() 的返回值不具名所以是右值
+    int rtn = f();
 
-    // (x1, y1) 到 (2, 1) 的距离
-    std::cout << x1_y1_to(2, 1) << std::endl;
 
-    // (x1, y1) 到 (13, 20) 的距离
-    std::cout << x1_y1_to(13, 20) << std::endl;
+
+    return 0;
 }
 ```
 
-通常你不需要学习 std::bind，因为在新的标准中 lambda 表达式已经取代了 std::bind。
+使用左值去初始化对象或为对象赋值时，会调用拷贝构造函数或赋值构造函数。而使用一个右值来初始化或赋值时，会调用移动构造函数或移动赋值运算符来移动资源，从而避免拷贝，提高效率。而将亡值可以理解为通过移动构造其他变量内存空间的方式获取到的值。在确保其他变量不再被使用、或即将被销毁时，来延长变量值的生命期。而实际上该右值会马上被销毁，所以称之为：将亡值。
+
+```cpp
+#include <memory>
+#include <cassert>
+
+int main() {
+    auto p = std::make_unique<int>(1);
+    auto q = std::move(p);
+
+    assert(p == nullptr);
+    assert(*q == 2);
+
+    return 0;
+}
+```
+
+[右值引用](https://zh.cppreference.com/w/cpp/language/reference)
 
 ## [lambda](https://zh.cppreference.com/w/cpp/language/lambda)
 
@@ -456,6 +487,23 @@ int main() {
     std::cout << x1_y1_to(13, 20) << std::endl;
 
     system("pause");
+}
+```
+
+## [弃置函数](https://zh.cppreference.com/w/cpp/language/function#.E5.87.BD.E6.95.B0.E5.AE.9A.E4.B9.89)
+
+如果使用特殊语法 `= delete;` 取代函数体，那么该函数被定义为弃置的（此函数即被标记为废弃）。任何弃置函数的使用都是非良构的。这包含调用、显式（以函数调用运算符）、隐式（对弃置的重载运算符、特殊成员函数、分配函数等的调用），构成指向弃置函数的指针或成员指针，甚至是在不潜在求值的表达式中使用弃置函数。但是可以隐式 ODR 使用刚好被弃置的非纯虚成员函数。
+
+```cpp
+struct Test {
+    void d() = delete;
+};
+
+int main() {
+    Test* p = new Test;
+    p->d(); // 错误：尝试调用弃置的 Test::d
+
+    return 0;
 }
 ```
 
@@ -1053,6 +1101,262 @@ int main() {
 }
 ```
 
-## [模块](https://zh.cppreference.com/w/cpp/language/modules)
+## 模块
 
 自此开始，彻底改变了先前的开发方式，目前由很多编译器不支持这个特性，这里就不再展开说，具体请参考 [cppreference - modules](https://zh.cppreference.com/w/cpp/language/modules)。
+
+## [标准库参考](https://zh.cppreference.com/w/cpp/standard_library)
+
+[标准库标头文件](https://zh.cppreference.com/w/cpp/header)
+
+### 智能指针
+
+[unique_ptr：拥有独有对象所有权语义的智能指针](https://zh.cppreference.com/w/cpp/memory/unique_ptr)
+
+[shared_ptr：拥有共享对象所有权语义的智能指针](https://zh.cppreference.com/w/cpp/memory/shared_ptr)
+
+[weak_ptr：到 std::shared_ptr 所管理对象的弱引用](https://zh.cppreference.com/w/cpp/memory/weak_ptr)
+
+[auto_ptr：拥有严格对象所有权语义的智能指针](https://zh.cppreference.com/w/cpp/memory/auto_ptr)
+
+### [utility - std::swap](https://zh.cppreference.com/w/cpp/algorithm/swap)
+
+主要用于 STL 容器：
+
+```cpp
+#include <utility>
+#include <vector>
+#include <cassert>
+
+int main() {
+    std::vector<int> a{1, 2, 3};
+    std::vector<int> b{4, 5, 6};
+    // 交换两个 vector 的值
+    std::swap(a, b);
+
+    assert(a[0] == 4);
+    assert(b[0] == 1);
+
+    return 0;
+}
+```
+
+### [utility - std::move](https://zh.cppreference.com/w/cpp/utility/move)
+
+```cpp
+#include <memory>
+#include <cassert>
+
+int main() {
+    auto p = std::make_unique<int>(1);
+    // 使用 std::move 将 p 变为将亡值（右值）
+    auto q = std::move(p);
+
+    // p 被重置
+    assert(p == nullptr);
+
+    // 可以为 p 指定新的内存
+    p = std::make_unique<int>(int{2});
+    assert(*p == 2);
+
+    return 0;
+}
+```
+
+### [utility - std::in_range](https://zh.cppreference.com/w/cpp/utility/move)
+
+若 t 的值在能以 R 表示的值的范围内，即 t 能转换到 R 而无数据损失则为 true。
+
+若 t 或 R 不是有符号或无符号整数类型（包括标准整数类型与扩展整数类型），则为编译时错误。
+
+```cpp
+#include <utility>
+#include <cassert>
+
+int main() {
+    assert(std::in_range<size_t>(-1) == false);
+    assert(std::in_range<size_t>(42) == true);
+
+    return 0;
+}
+```
+
+### std::string_view
+
+string_view 是 C++17 引入的一个类模板，它可以表示一个不可变的连续的字符序列。它不拥有字符串的内存，只是保存了一个指向字符串的指针和一个字符串的长度。它提供了类似于 std::string 的接口，可以方便地操作字符串，比如访问元素、获取子串、比较、查找等。
+
+它优点是它可以避免不必要的字符串拷贝和内存分配，从而提高程序的性能和效率。它可以用来替代一些接受 const char\* 或 const std::string& 作为参数的函数，使得函数可以接受任何类型的字符串，包括静态字符串、std::string、字符数组等。
+
+它的缺点是不保证字符串的生命周期，所以使用时要注意确保被引用的字符串在 string_view 存在期间不被销毁或修改。另外，string_view 不以空字符结尾，所以不能直接传递给一些需要空终止符的函数，比如 printf 等。
+
+下面是 string_view 的例子：
+
+```cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+// 一个接受 string_view 作为参数的函数
+void print(std::string_view sv) {
+  std::cout << sv << "\n";
+}
+
+int main() {
+  // 静态字符串
+  print("Hello, world!");
+
+  // 字符数组
+  char arr[] = {'H', 'e', 'l', 'l', 'o'};
+  std::cout << std::string_view(arr, 5) << std::endl;
+
+  // std::string
+  std::string str = "Hello, C++17";
+  std::cout << str << std::endl;
+
+  // string_view 的子串
+  std::string_view sv = str;
+  std::cout << sv.substr(7) << std::endl;
+
+  return 0;
+}
+```
+
+std::string_view 与 std::string 的配合使用：
+
+```cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+int main() {
+  // 从静态字符串构造 string_view
+  std::string_view sv = "Hello, world!";
+
+  // 从 string_view 构造 string
+  std::string str1(sv);
+
+  // 从 string_view 赋值给 string
+  std::string str2;
+  str2 = sv;
+
+  // 从 string 构造 string_view
+  std::string str3 = "Hello, C++17";
+  std::string_view sv2 = str3;
+
+  // 从 string_view 构造 string，优化为移动
+  std::string str4(sv2);
+
+  std::cout << "str1: " << str1 << std::endl;
+  std::cout << "str2: " << str2 << std::endl;
+  std::cout << "str3: " << str3 << std::endl;
+  std::cout << "str4: " << str4 << std::endl;
+
+  return 0;
+}
+```
+
+## 拷贝构造函数
+
+```cpp
+#include <iostream>
+#include <utility>
+
+using string = std::string;
+struct Test {
+    string name_;
+
+    explicit Test(string name) : name_(std::move(name)) {
+        std::cout << "Default Constructor\n";
+    }
+
+    ~Test() {
+        std::cout << "Destroy Constructor\n";
+    }
+
+    Test(const Test& t) {
+        std::cout << "Copy Constructor\n";
+        name_ = t.name_ + "_new";
+    }
+};
+
+int main() {
+    Test t1{"lee"};
+    std::cout << t1.name_ << std::endl; // lee
+
+    Test t2 = t1;
+    std::cout << t2.name_ << std::endl; // lee_new
+}
+```
+
+## 移动构造函数
+
+```cpp
+#include <iostream>
+#include <utility>
+
+using string = std::string;
+struct Test {
+    string name_;
+
+    explicit Test(string name) : name_(std::move(name)) {
+        std::cout << "Default Constructor\n";
+    }
+
+    ~Test() {
+        std::cout << "Destroy Constructor\n";
+    }
+
+    Test(Test&& t)  noexcept {
+        std::cout << "Move Constructor\n";
+        name_ = std::move(t.name_) + "_new";
+    }
+};
+
+int main() {
+    Test t1{"lee"};
+    std::cout << t1.name_ << std::endl; // lee
+
+    Test t2 = std::move(t1);
+    Test t3 = (Test&& t2);
+    std::cout << t3.name_ << std::endl; // lee_new_new
+}
+```
+
+## 复制消除
+
+```cpp
+#include <iostream>
+
+struct Test {
+    Test() {
+        std::cout << "Default Constructor\n";
+    }
+
+    Test(Test&& t) noexcept {
+        std::cout << "Move Constructor\n";
+    }
+
+    Test(Test& t) {
+        std::cout << "Copy Constructor\n";
+    }
+};
+
+Test f1() {
+    Test t{};
+    return t;
+}
+
+Test f2() {
+    return f1();
+}
+
+Test f3() {
+    return f2();
+}
+
+int main() {
+    Test t = f3();  // Default Constructor
+}
+```
+
+## 完美转发
