@@ -106,7 +106,7 @@ int main()
 int main() {
     std::string str1;   // 默认构造
     std::string str4 = str3; // 拷贝构造
-    std::str1 = str2; // 运算符重载
+    str1 = str2; // 运算符重载
 
     return 0;
 }
