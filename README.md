@@ -2,22 +2,22 @@
 
 ## 语言相关
 
-- [SQL 语法基础](/lang/sql/README)
-- [SQL 进阶理论](/lang/sql_adv/README)
-- [Scala 语法备忘](/lang/scala/README)
-- [C++11 新特性与规范](/lang/modern_cpp/README)
+- [SQL 语法基础](/lang/sql/README.md)
+- [SQL 进阶理论](/lang/sql_adv/README.md)
+- [Scala 语法备忘](/lang/scala/README.md)
+- [C++11 新特性与规范](/lang/modern_cpp/README.md)
 
 ## 大数据组件搭建
 
-- [Hadoop 安装](/docs/hadoop/README)  
-- [Zookeeper 安装](/docs/zookeeper/README)  
-- [MySQL 安装](/docs/mysql/README)  
-- [Hive 安装](/docs/hive/README)  
-- [Sqoop 安装](/docs/sqoop/README)  
-- [HBase 安装](/docs/hbase/README)  
-- [Scala & Spark 安装](/docs/scala&spark/README)  
-- [Flume 安装](/docs/flume/README)  
-- [Kafka 安装](/docs/kafka/README)  
+- [Hadoop 安装](/docs/hadoop/README.md)
+- [Zookeeper 安装](/docs/zookeeper/README.md)
+- [MySQL 安装](/docs/mysql/README.md)
+- [Hive 安装](/docs/hive/README.md)
+- [Sqoop 安装](/docs/sqoop/README.md)
+- [HBase 安装](/docs/hbase/README.md)
+- [Scala & Spark 安装](/docs/scala&spark/README.md)
+- [Flume 安装](/docs/flume/README.md)
+- [Kafka 安装](/docs/kafka/README.md)
 
 ## 转载说明
 
