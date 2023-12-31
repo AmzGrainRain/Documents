@@ -2,10 +2,10 @@
 
 ## 前提条件
 
-- hadoop 集群已经启动
-- mysql 已部署完毕
-- hive 已部署完毕
-- zookeeper 已经启动
+- Hadoop 集群已经启动
+- MySQL 已经启动
+- Hive 已部署完毕
+- Zookeeper 已经启动
 - hbase-2.2.3-bin.tar.gz（位于/opt/tar下）
 - 分布式搭建
 
@@ -102,10 +102,10 @@ vi hbase-site.xml
         <value>hdfs://master:9000/hbase</value>
     </property>
     <!-- 是否是分布式环境 -->
-    <property> 
-        <name>hbase.cluster.distributed</name> 
-        <value>true</value> 
-    </property> 
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
     <!-- 冗余度 -->
     <property>
         <name>dfs.replication</name>
@@ -117,22 +117,22 @@ vi hbase-site.xml
         <value>2181</value>
     </property>
     <!-- zookeeper 数据目录 -->
-    <property> 
-        <name>hbase.zookeeper.property.dataDir</name> 
-        <value>/opt/apps/hbase</value>       
+    <property>
+        <name>hbase.zookeeper.property.dataDir</name>
+        <value>/opt/apps/hbase</value>
     </property>
     <!-- 配置 zookeeper 数据目录的地址，三个节点都启动 -->
-    <property> 
-        <name>hbase.zookeeper.quorum</name> 
-        <value>master,slave1,slave2</value>     
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>master,slave1,slave2</value>
     </property>
     <!--
         关闭 hbase kerberos 认证（使用本地文件系统存储，不使用 HDFS 的情况下需要将此配置设置为 false）
         王大拿踩的坑：https://blog.csdn.net/qq_58768870/article/details/121111992
     -->
-    <property> 
-        <name>hbase.unsafe.stream.capability.enforce</name> 
-        <value>false</value>     
+    <property>
+        <name>hbase.unsafe.stream.capability.enforce</name>
+        <value>false</value>
     </property>
 </configuration>
 ```
@@ -223,7 +223,7 @@ master 节点从出现 Hmaster 进程，slave1、slave2 上出现 HregionServer 
 
 ## 7.Hbase shell
 
-> 以下内容在 master 节点上操作  
+> 以下内容在 master 节点上操作
 > 确保您已经启动了 hadoop 和 zookeeper
 
 进入 hbase 命令行：
