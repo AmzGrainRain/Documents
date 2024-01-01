@@ -13,7 +13,7 @@
 
 ## 警告
 
-**\*Sqoop、Sqoop2 已与 2021 年停止维护。这意味着 Sqoop 已经过时并且不再是我们首要考虑的工具集。将它与最新的 Hadoop 一同使用是不明智的，出现一些兼容问题也是在所难免的。如非必要，请使用替代品而不是已经过时的 Sqoop。\*\***
+***Sqoop、Sqoop2 已与 2021 年停止维护。这意味着 Sqoop 已经过时并且不再是我们首要考虑的工具集。将它与最新的 Hadoop 一同使用是不明智的，出现一些兼容问题也是在所难免的。如非必要，请使用替代品而不是已经过时的 Sqoop。***
 
 ## 1.解压
 
@@ -22,7 +22,7 @@
 ```bash
 cd ~/Downloads
 tar -zxf ./sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
-mv sqoop-1.4.7.bin__hadoop-2.6.0 ../sqoop
+mv ./sqoop-1.4.7.bin__hadoop-2.6.0 ../sqoop
 ```
 
 ## 2.置入 MySQL 驱动包
@@ -31,7 +31,7 @@ mv sqoop-1.4.7.bin__hadoop-2.6.0 ../sqoop
 
 ```bash
 cd ~/Downloads
-cp ./mysql-connector-j-8.2.0.jar ~/sqoop/lib/
+cp ./mysql-connector-j-8.2.0.jar ../sqoop/lib/
 ```
 
 ## 3.配置环境变量
@@ -45,7 +45,7 @@ env-edit
 在文件末尾添加：
 
 ```bash
-export SQOOP_HOME=/opt/apps/sqoop
+export SQOOP_HOME=~/sqoop
 export PATH=$PATH:$SQOOP_HOME/bin
 ```
 
@@ -132,8 +132,6 @@ INSERT INTO test VALUES
 ```bash
 sqoop help
 ```
-
-这是汉化的指令帮助：
 
 | 命令              | 解释                                                                                      |
 | ----------------- | ----------------------------------------------------------------------------------------- |
@@ -307,10 +305,10 @@ SHOW VARIABLES LIKE 'character%';
 ![编码信息](./images/faq_1_1.png)
 可以看到有些地方的编码是 latin1，这种编码并不能显示中文。
 
-编辑 my.cnf ：
+退出数据库，编辑 my.cnf ：
 
 ```bash
-vim /etc/my.cnf
+sudo vim /etc/my.cnf
 ```
 
 添加这两行到末尾：
@@ -323,42 +321,7 @@ init_connect='SET NAMES utf8'
 重启 MySQL 服务：
 
 ```bash
-systemctl restart mysqld.service
-
-# 如果上一条命令卡住的话用这两条
-systemctl stop mysqld.service
-systemctl start mysqld.service
-```
-
-进入 MySQL 查看编码信息：
-
-````sql
-SHOW VARIABLES LIKE 'character%';
-```
-
-可以看到有些地方的编码是 latin1，这种编码并不能显示中文。
-
-编辑 my.cnf ：
-
-```bash
-vim /etc/my.cnf
-````
-
-添加这两行到末尾：
-
-```conf
-characterset-server=utf8
-init_connect='SET NAMES utf8'
-```
-
-重启 MySQL 服务：
-
-```bash
-systemctl restart mysqld.service
-
-# 如果上一条命令卡住的话用这两条
-systemctl stop mysqld.service
-systemctl start mysqld.service
+sudo systemctl restart mysql.service
 ```
 
 进入 MySQL 查看编码信息：

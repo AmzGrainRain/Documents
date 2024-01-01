@@ -1,20 +1,19 @@
 # HIVE 搭建文档
 
-## 前提条件
+## 先决条件
 
 - 确保 Hadoop 集群已经启动
 - 确保 MySQL 已经启动
 - [apache-hive-3.1.3-bin.tar.gz](https://dlcdn.apache.org/hive/hive-3.1.3/)（位于 `~/Downloads`）
 - [mysql-connector-j-8.2.0.tar.gz](https://dev.mysql.com/downloads/connector/j/)（位于 `~/Downloads`）
-- 非分布式搭建
+- 单机搭建
 
 **我的用户名是 khlee，所以下面出现的所有 khlee 字眼请全部根据自己的实际用户名填写。**
 
-## 1.解压 Hive
+## 1.解压 Hive 并重命名
 
 ```bash
 cd ~/Downloads
-
 tar -zxf ./apache-hive-3.1.3-bin.tar.gz
 mv ./apache-hive-3.1.3-bin ../hive
 ```
@@ -25,25 +24,9 @@ mv ./apache-hive-3.1.3-bin ../hive
 
 ```bash
 cd ~/Downloads
-
 tar -zxf ./mysql-connector-j-8.2.0.tar.gz
 mv ./mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar ../hive/lib/
 rm -rf ./mysql-connector-j-8.2.0
-```
-
-## 可选步骤 - guava 相关
-
-`guava` 是一个 Java 库，内部提供了很多高级的数据结构，如不可变的集合、图库，以及并发、I/O、散列、缓存、基元、字符串等实用工具。而 Hive 与 Hadoop 则使用到了其中的一些功能。但是随着版本的更新，其中的一些代码与旧版本无法互通，必要情况下我们需要手动使 Hive 与 Hadoop 依赖的 guava 版本保持一致：
-
-```bash
-# 进入 hive 的 jar 库目录
-cd ~/hive/lib
-
-# 删除 hive 里的 guava
-rm -f guava-*.jar
-
-# 从 hadoop 复制高版本的 guava 到 hive
-cp $HADOOP_HOME/share/hadoop/common/lib/guava-*.jar ./
 ```
 
 ## 3.配置环境变量
@@ -57,6 +40,7 @@ env-edit
 在文件末尾添加：
 
 ```bash
+# 此处不再将 hive/bin/* 导出到环境变量，原因自行体会
 export HIVE_HOME=~/hive
 ```
 
@@ -66,12 +50,19 @@ export HIVE_HOME=~/hive
 env-update
 ```
 
-## 4.配置 hive-env.sh
+## 4.配置 Hive
+
+进入 Hive 配置目录：
+
+```bash
+cd $HIVE_HOME/conf
+```
+
+### hive-env.sh
 
 拷贝模板：
 
 ```bash
-cd $HIVE_HOME/conf
 cp ./hive-env.sh.template ./hive-env.sh
 ```
 
@@ -90,12 +81,11 @@ export HIVE_HOME=/opt/apps/hive
 export HIVE_CONF_DIR=$HIVE_HOME/conf
 ```
 
-## 5.配置 hive-site.xml
+### hive-site.xml
 
 拷贝模板：
 
 ```bash
-cd $HIVE_HOME/conf
 cp ./hive-default.xml.template ./hive-site.xml
 ```
 
@@ -154,16 +144,15 @@ vim ./hive-site.xml
 
 ```
 
-## 6.配置 log4j.properties
+### 配置 log4j.properties
 
-拷贝模板即可：
+拷贝模板：
 
 ```bash
-cd $HIVE_HOME/conf
 cp hive-log4j2.properties.template hive-log4j2.properties
 ```
 
-## 7.schema 初始化
+## 5.schema 初始化
 
 执行初始化：
 
@@ -171,9 +160,9 @@ cp hive-log4j2.properties.template hive-log4j2.properties
 $HIVE_HOME/bin/schematool -dbType mysql -initSchema
 ```
 
-![报错了](images/7-1.png)
+![报错了](images/5-1.png)
 
-芜湖寄了！根据错误提示，hive-site.xml 文件的第 3215 行存在一个会导致 schema 初始化失败的非法字符，我们来编辑 hive-site.xml：
+根据错误提示，hive-site.xml 文件的第 3215 行存在一个会导致 schema 初始化失败的非法字符，我们来编辑 hive-site.xml：
 
 ```bash
 vim $HIVE_HOME/conf/hive-site.xml
@@ -181,17 +170,17 @@ vim $HIVE_HOME/conf/hive-site.xml
 
 在 vim 命令模式下输入 `:3215` 来快速跳转到第 3215 行，删掉 `&#8;` 这四个字符：
 
-![删掉字符](images/7-2.png)
+![删掉字符](images/5-2.png)
 
 再次尝试初始化：
 
 ```bash
-schematool -dbType mysql -initSchema
+$HIVE_HOME/bin/schematool -dbType mysql -initSchema
 ```
 
-![结果](images/7-3.png)
+![结果](images/5-3.png)
 
-## 8.启动 Hive
+## 6.启动 Hive
 
 启动 Hive ：
 
@@ -201,7 +190,7 @@ $HIVE_HOME/bin/hive
 
 如果出现这个报错：（绝对URI中的相对路径）
 
-![示意图](./images/8-1.png)
+![示意图](./images/6-1.png)
 
 解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 
@@ -214,16 +203,16 @@ sed -i "s/system://g" $HIVE_HOME/conf/hive-site.xml
 再次尝试启动 Hive：
 
 ```bash
-hive
+$HIVE_HOME/bin/hive
 ```
 
 成功：
 
-![结果](./images/8-2.png)
+![结果](./images/6-2.png)
 
-输入 `exit;` 或按下 `ctrl + d` 即可退出 hive cli。
+输入 `exit;` 或按下 `ctrl + d` 即可退出 Hive Cli。
 
-## 9.使用 Hive
+## 7.使用 Hive
 
 目的：使用 Hive 处理存储在 HDFS 内的结构化数据，使得我们可以通过 SQL 语句操作这些数据。
 
@@ -241,8 +230,6 @@ vim ~/test.txt
 老张,31
 老刘,29
 ```
-
-![文本内容](./images/9-1.png)
 
 在 HDFS 里创建一个 test_hive 目录：
 
@@ -290,9 +277,9 @@ hdfs dfs -put ~/test.txt /test_hive/test.txt
 hdfs dfs -cat /test_hive/test.txt
 ```
 
-![文本内容](./images/9-2.png)
+![文本内容](./images/7-1.png)
 
-启动 hive ：
+启动 Hive ：
 
 ```bash
 $HIVE_HOME/bin/hive
@@ -307,7 +294,7 @@ CREATE TABLE test (
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ",";
 ```
 
-![文本内容](./images/9-3.png)
+![文本内容](./images/7-1.png)
 
 从 HDFS 导入 `/test_hive/test.txt` 内的数据到 test 数据表：
 
@@ -316,7 +303,7 @@ CREATE TABLE test (
 LOAD DATA INPATH '/test_hive/test.txt' INTO TABLE test;
 ```
 
-![文本内容](./images/9-4.png)
+![文本内容](./images/7-3.png)
 
 执行一个熟悉的命令来验证下：
 
@@ -324,21 +311,21 @@ LOAD DATA INPATH '/test_hive/test.txt' INTO TABLE test;
 SELECT * FROM test;
 ```
 
-![文本内容](./images/9-5.png)
+![文本内容](./images/7-4.png)
 
-输入 `exit` 或按下 `ctrl + d` 退出 hive cli：
+输入 `exit` 或按下 `ctrl + d` 退出 Hive：
 
 ```bash
 exit;
 ```
 
-在 HDFS 里可查看到 hive 的数据表信息：
+在 HDFS 里可查看到 Hive 的数据表信息：
 
 ```bash
 hdfs dfs -cat /user/hive/warehouse/test/test.txt
 ```
 
-![文本内容](./images/9-6.png)
+![文本内容](./images/7-5.png)
 
 ## 快速跳转
 

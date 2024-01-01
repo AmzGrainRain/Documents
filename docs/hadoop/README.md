@@ -144,12 +144,12 @@ alias env-sync-to-node2='scp /etc/profile.d/big_data_env.sh root@node2:/etc/prof
 source /etc/profile.d/big_data_env.sh
 ```
 
-这样一来我们就“创造”了两个新的命令，其中:
+这样一来我们就“创造”了四个新的命令，其中:
 
-- env-edit 命令用来编辑环境变量
-- env-update 命令用来生效您对环境变量的修改
-- env-sync-to-node1 将环境变量同步到 node1
-- env-sync-to-node2 将环境变量同步到 node2
+- `env-edit` 命令用来编辑环境变量
+- `env-update` 命令用来生效您对环境变量的修改
+- `env-sync-to-node1` 命令用来将环境变量同步到 node1
+- `env-sync-to-node2` 命令用来将环境变量同步到 node2
 
 不要忘了给其他节点同步一下修改：
 
@@ -209,7 +209,7 @@ whereis hdfs
 
 > 注意：请在 master 节点上操作
 
-进入到 hadoop 配置文件的目录下：
+进入 Hadoop 配置文件目录：
 
 ```bash
 cd ~/hadoop/etc/hadoop/
@@ -217,7 +217,9 @@ cd ~/hadoop/etc/hadoop/
 
 ### 配置 hadoop-env.sh
 
-由于 hadoop 运行时依赖 Java，所以我们需要在此文件里为 hadoop 配置环境变量；我们还需要在此文件里指定启动 namenode、datanode、secondary namenode、resource manager、node manager 时所使用的用户。
+由于 Hadoop 运行时依赖 Java，所以我们需要在此文件里为 Hadoop 配置环境变量；
+
+我们还需要在此文件里指定启动 NameNode、DataNode、SecondaryNameNode、ResourceManager、NodeManager 时所使用的用户。
 
 编辑 hadoop-env.sh：
 
@@ -469,7 +471,7 @@ node2
 
 > 注意：请在 master 节点上操作
 
-发送 haddop 到 `node1`、`node2` 节点：
+发送 Hadoop 到 `node1`、`node2` 节点：
 
 ```bash
 # 可以先删掉 $HADOOP_HOME/share/doc 目录后再发送，更快
@@ -554,27 +556,25 @@ jps
 
 ![进程运行情况](./images/13-2.png)
 
-可以看到 master 上出现了 NameNode 进程；节点 node1 和 node2 上出现了 DataNode、NodeManager 进程；node2 作为辅助节点，也出现了 SecondaryNameNode 进程。
+可以看到 master 上出现了 NameNode 进程；节点 node1 和 node2 上出现了 DataNode、NodeManager 进程；node1 作为辅助节点，也出现了 SecondaryNameNode 进程。
 
 ### 测试 WEB UI
 
-浏览器打开 <http://192.168.100.100:9870>
+浏览器打开 <http://192.168.100.100:9870>：
 
 ![master:9870](./images/13-3.png)
 
-浏览器打开 <http://192.168.100.101:8088>
+浏览器打开 <http://192.168.100.100:8088>：
 
 ![master:8088](./images/13-4.png)
 
-浏览器打开 <http://192.168.100.101:9000>
+浏览器打开 <http://192.168.100.100:9000>：
 
 ![master:9000](./images/13-5.png)
 
-以上代表正常工作。
-
 ## 14.测试 Hadoop
 
-> 以下内容在 master 节点上操作
+> 注意：请在 master 节点上操作
 
 计算测试：
 

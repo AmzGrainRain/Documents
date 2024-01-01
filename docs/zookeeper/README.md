@@ -1,6 +1,6 @@
 # ZOOKEEPER 搭建文档
 
-## 前提条件
+## 先决条件
 
 - 已经成功部署 Hadoop 3.3.6
 - [apache-zookeeper-3.8.3-bin.tar.gz](https://zookeeper.apache.org/releases.html)（位于 `~/Downloads`）
@@ -16,7 +16,7 @@
 |     2      | 192.168.100.101 | node1  |
 |     3      | 192.168.100.102 | node2  |
 
-## 1.解压 zookeeper
+## 1.解压
 
 > 注意：请在 master 节点上操作
 
@@ -29,15 +29,15 @@ mv ./apache-zookeeper-3.8.3-bin ../zookeeper
 
 ## 2.配置 zookeeper
 
-> 以下内容在 master 节点上操作
+> 注意：请在 master 节点上操作
 
-创建 data 目录用于存储数据：
+创建 `data` 目录用于存储数据：
 
 ```bash
 mkdir ~/zookeeper/data
 ```
 
-创建 logs 目录用于存储日志：
+创建 `logs` 目录用于存储日志：
 
 ```bash
 mkdir ~/zookeeper/logs
@@ -120,7 +120,6 @@ server.3=node2:2888:3888
 编辑环境变量：
 
 ```bash
-# 这个命令是我们在 hadoop 篇通过 alias 创建的，除此之外还有一个 env-update 用于更新环境变量
 env-edit
 ```
 
@@ -131,7 +130,7 @@ export ZK_HOME=/home/khlee/zookeeper
 export PATH=$PATH:$ZK_HOME/bin:$JAVA_HOME/bin
 ```
 
-刷新环境变量：
+生效环境变量：
 
 ```bash
 env-update
@@ -165,7 +164,7 @@ env-sync-to-node2
 
 ## 5.生效环境变量
 
-> 以下内容在所有节点上操作
+> 注意：请在所有节点上操作
 
 ```bash
 env-update
@@ -196,14 +195,14 @@ server.3=node2:2888:3888
 echo 1 > ~/zookeeper/data/myid
 ```
 
-设置 slave1 节点的 myid：
+设置 node1 节点的 myid：
 
 ```bash
-# 远程执行命令：ssh [主机名@]地址 "命令"
+# 语法：ssh [主机名@]地址 "远程执行的命令"
 ssh node1 "echo 2 > ~/zookeeper/data/myid"
 ```
 
-设置 slave2 节点的 myid：
+设置 node2 节点的 myid：
 
 ```bash
 ssh node2 "echo 3 > ~/zookeeper/data/myid"
@@ -211,7 +210,7 @@ ssh node2 "echo 3 > ~/zookeeper/data/myid"
 
 ## 7.启动与测试
 
-在所有节点上执行此命令来启动 zookeeper：
+在所有节点上执行此命令来启动 Zookeeper：
 
 ```bash
 # zkServer.sh 支持下列参数：
@@ -219,41 +218,35 @@ ssh node2 "echo 3 > ~/zookeeper/data/myid"
 zkServer.sh start
 ```
 
-在 master 节点打开 zookeeper cli：
+分别检查三个节点的 Zookeeper Server 状态：
+
+```bash
+zkServer.sh status
+```
+
+![正常情况](./images/8-1.png)
+
+在 master 节点打开 Zookeeper Cli：
 
 ```bash
 zkCli.sh
 ```
 
-在 master 节点的 zookeeper cli 里执行此命令：
+在 master 节点的 Zookeeper Cli 里执行此命令：
 
 ```bash
 create /test "hello"
 ```
 
-![master zookeeper cli](./images/8-1.png)
-
-在 slave1 节点打开 zookeeper cli：
-
-```bash
-zkCli.sh
-```
-
-在 node1 节点的 zookeeper cli 执行此命令：
-
-```bash
-get /test
-```
-
 ![master zookeeper cli](./images/8-2.png)
 
-在 node2 节点打开 zookeeper cli：
+在 slave1 节点打开 Zookeeper Cli：
 
 ```bash
 zkCli.sh
 ```
 
-在 node2 节点的 zookeeper cli 执行此命令：
+在 node1 节点的 Zookeeper Cli 执行此命令：
 
 ```bash
 get /test
@@ -261,9 +254,32 @@ get /test
 
 ![master zookeeper cli](./images/8-3.png)
 
-slave1 与 slave2 均出现 "hello" 即视为部署成功。
+在 node2 节点打开 Zookeeper Cli：
+
+```bash
+zkCli.sh
+```
+
+在 node2 节点的 Zookeeper Cli 执行此命令：
+
+```bash
+get /test
+```
+
+![master zookeeper cli](./images/8-4.png)
+
+node1 与 node2 均出现 "hello" 即视为部署成功。
+
+## 后续问题
+
+如果下次启动时发现无法启动，三个节点怎么都连不上。
+
+那么请在各个节点上执行 `zkServer.sh restart` 命令重启 Zookeeper Server，直到它恢复为止。
+
+这不是你的错。
 
 ## 快速跳转
 
 [回到顶部](#zookeeper-搭建文档)
+
 [MySQL 搭建文档](../mysql/README.md)

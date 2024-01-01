@@ -1,6 +1,6 @@
 # Kafka 搭建文档
 
-## 前提条件
+## 先决条件
 
 - hadoop 集群已经启动
 - zookeeper 已经启动

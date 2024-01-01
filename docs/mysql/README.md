@@ -1,6 +1,6 @@
-# MYSQL 搭建文档
+# MySQL 搭建文档
 
-## 前提条件
+## 先决条件
 
 - [mysql-server_8.2.0-1debian12_amd64.deb-bundle.tar](https://dev.mysql.com/downloads/mysql/)（位于 `~/Downloads`）
 - 单机搭建
@@ -11,9 +11,7 @@
 
 ```bash
 cd ~/Downloads
-
 tar -xf ./mysql-server_8.2.0-1debian12_amd64.deb-bundle.tar
-
 sudo dpkg -i ./libmysqlclient*.deb
 sudo dpkg -i ./mysql-*.deb
 ```
@@ -21,6 +19,7 @@ sudo dpkg -i ./mysql-*.deb
 如果这一步出现意外，一般是因为依赖缺失导致的，可以通过这个命令修复一下：
 
 ```bash
+# 此命令需要网络
 sudo apt --fix-broken install
 ```
 
@@ -31,13 +30,13 @@ sudo apt --fix-broken install
 清理安装包：
 
 ```bash
-rm ~/Downloads/libmysqlclient*.deb
-rm ~/Downloads/mysql-*.deb
+cd ~/Downloads
+rm ./libmysqlclient*.deb ./mysql-*.deb
 ```
 
-## 2.启动MySQL & 设置开机自启
+## 2.启动 MySQL 并设置开机自启
 
-查看 mysqld 守护进程状态：
+查看 mysql 守护进程状态：
 
 ```bash
 sudo systemctl status mysql.service
@@ -46,13 +45,13 @@ sudo systemctl status mysql.service
 如果 mysqld 没有启动，则手动启动它：
 
 ```bash
-sudo systemctl start mysqld.service
+sudo systemctl start mysql.service
 ```
 
 默认情况下 mysql 会自动设置开机启动，如果没有则进行一个手动操作：
 
 ```bash
-sudo systemctl enable mysqld.service
+sudo systemctl enable mysql.service
 ```
 
 再次查看 mysqld 守护进程状态：
@@ -65,7 +64,7 @@ sudo systemctl status mysql.service
 
 ## 3.配置 MySQL
 
-以 root 身份登录到 mysql：
+以 root 身份登录到 MySQL：
 
 ```bash
 mysql -u root -p
@@ -105,8 +104,18 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 ```
 
+不要忘了退出 MySQL：
+
+```bash
+\q
+```
+
 ## 快速跳转
 
-[回到顶部](#mysql-搭建文档)
+[回到顶部](#MySQL-搭建文档)
+
+[MySQL 基础](../../lang/sql/README.md)
+
+[MySQL 进阶](../../lang/sql_adv/README.md)
 
 [Hive 安装](../hive/README.md)
