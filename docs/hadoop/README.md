@@ -1,8 +1,8 @@
-# HADOOP 搭建文档
+# Hadoop 安装
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)（位于 `~/Downloads`）
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - [openjdk-8u43-linux-x64.tar.gz](https://jdk.java.net/java-se-ri/8-MR5)（位于 `~/Downloads`）
 - [hadoop-3.3.6.tar.gz](https://hadoop.apache.org/releases.html)
 - 三台互通的虚拟机
@@ -506,7 +506,7 @@ source /etc/profile.d/big_data_env.sh
 hdfs namenode -format
 ```
 
-> 如果不小心多次执行了此命令，或在发送文件到 hdfs 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#配置-core-site.xml) 里配置的数据缓存目录并重新格式化 namenode 解决：
+> 如果不小心多次执行了此命令，或在发送文件到 HDFS 时遇到问题，请尝试在所有节点上清空您在 [core-site.xml](#配置-core-site.xml) 里配置的数据缓存目录并重新格式化 namenode 解决：
 >
 > ```bash
 > # 在所有节点上执行
@@ -524,7 +524,7 @@ hdfs namenode -format
 
 ![正常输出](./images/12-1.png)
 
-启动 hdfs 和 yarn：
+启动 HDFS 和 yarn：
 
 ```bash
 start-dfs.sh && start-yarn.sh
@@ -588,7 +588,7 @@ hadoop jar hadoop-mapreduce-examples-3.1.3.jar pi 5 5
 
 ![MapReduce计算测试](./images/14-1.png)
 
-查看 hdfs 报告：
+查看 HDFS 报告：
 
 ```bash
 hdfs dfsadmin -report
@@ -598,6 +598,6 @@ hdfs dfsadmin -report
 
 ## 快速跳转
 
-[回到顶部](#hadoop-搭建文档)
+[回到顶部](#hadoop-安装)
 
-[Zookeeper 搭建文档](../zookeeper/README.md)
+[Zookeeper 安装](../zookeeper/README.md)

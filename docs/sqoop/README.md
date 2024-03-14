@@ -1,10 +1,11 @@
-# Sqoop 搭建文档
+# Sqoop 安装
 
 ## 先决条件
 
-- Hadoop 集群已经启动
-- MySQL 已经启动
-- Hive 已部署完毕
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
+- 确保 Hadoop 集群已经启动
+- 确保 MySQL 已经启动
+- 确保 Hive 已部署完毕
 - [mysql-connector-j-8.2.0.tar.gz](https://dev.mysql.com/downloads/connector/j/)（位于 `~/Downloads`）
 - [sqoop-1.4.7.bin\_\_hadoop-2.6.0.tar.gz](https://archive.apache.org/dist/sqoop/1.4.7/)（位于 `~/Downloads`）
 - 非分布式搭建
@@ -336,6 +337,6 @@ SHOW VARIABLES LIKE 'character%';
 
 ## 快速跳转
 
-[回到顶部](#Soop-搭建文档)
+[回到顶部](#Soop-安装)
 
-[HBase 搭建文档](../hbase/README.md)
+[HBase 安装](../hbase/README.md)

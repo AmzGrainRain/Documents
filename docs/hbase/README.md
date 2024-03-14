@@ -1,11 +1,10 @@
-# HBase 搭建文档
+# HBase 安装
 
 ## 先决条件
 
-- Hadoop 集群已经启动
-- MySQL 已经启动
-- Hive 已部署完毕
-- Zookeeper 已经启动
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
+- 确保 Hadoop 集群已经启动
+- 确保 Zookeeper 已经启动
 - [hbase-2.5.7-hadoop3-bin.tar.gz](https://www.apache.org/dyn/closer.lua/hbase/2.5.7/hbase-2.5.7-hadoop3-bin.tar.gz)（位于 `~/Downloads`）
 - 分布式搭建
 
@@ -296,6 +295,6 @@ ssh slave2 "date -s 'hh:mm:ss'"
 
 ## 快速跳转
 
-[回到顶部](#HBase-搭建文档)
+[回到顶部](#HBase-安装)
 
 [Scala 安装](../scala/README.md)

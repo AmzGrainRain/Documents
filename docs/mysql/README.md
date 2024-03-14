@@ -1,7 +1,8 @@
-# MySQL 搭建文档
+# MySQL 安装
 
 ## 先决条件
 
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - [mysql-server_8.2.0-1debian12_amd64.deb-bundle.tar](https://dev.mysql.com/downloads/mysql/)（位于 `~/Downloads`）
 - 单机搭建
 
@@ -112,7 +113,7 @@ FLUSH PRIVILEGES;
 
 ## 快速跳转
 
-[回到顶部](#MySQL-搭建文档)
+[回到顶部](#MySQL-安装)
 
 [MySQL 基础](../../lang/sql/README.md)
 

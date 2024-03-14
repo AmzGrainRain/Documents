@@ -1,8 +1,9 @@
-# ZOOKEEPER 搭建文档
+# Zookeeper 安装
 
 ## 先决条件
 
-- 已经成功部署 Hadoop 3.3.6
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
+- 确保 Hadoop 集群已经启动
 - [apache-zookeeper-3.8.3-bin.tar.gz](https://zookeeper.apache.org/releases.html)（位于 `~/Downloads`）
 - 分布式搭建
 
@@ -280,6 +281,6 @@ node1 与 node2 均出现 "hello" 即视为部署成功。
 
 ## 快速跳转
 
-[回到顶部](#zookeeper-搭建文档)
+[回到顶部](#zookeeper-安装)
 
-[MySQL 搭建文档](../mysql/README.md)
+[MySQL 安装](../mysql/README.md)

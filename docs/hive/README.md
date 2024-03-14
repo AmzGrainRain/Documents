@@ -1,7 +1,8 @@
-# HIVE 搭建文档
+# Hive 安装
 
 ## 先决条件
 
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
 - 确保 MySQL 已经启动
 - [apache-hive-3.1.3-bin.tar.gz](https://dlcdn.apache.org/hive/hive-3.1.3/)（位于 `~/Downloads`）
@@ -329,6 +330,6 @@ hdfs dfs -cat /user/hive/warehouse/test/test.txt
 
 ## 快速跳转
 
-[回到顶部](#hive-搭建文档)
+[回到顶部](#hive-安装)
 
-[Sqoop 搭建文档](../sqoop/README.md)
+[Sqoop 安装](../sqoop/README.md)
