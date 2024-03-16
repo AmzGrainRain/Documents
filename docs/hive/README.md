@@ -4,7 +4,7 @@
 
 - [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
-- 确保 MySQL 已经启动
+- 确保 MySQL 8.2.0 已经启动
 - [apache-hive-3.1.3-bin.tar.gz](https://dlcdn.apache.org/hive/hive-3.1.3/)（位于 `~/Downloads`）
 - [mysql-connector-j-8.2.0.tar.gz](https://dev.mysql.com/downloads/connector/j/)（位于 `~/Downloads`）
 - 单机搭建
@@ -29,6 +29,10 @@ tar -zxf ./mysql-connector-j-8.2.0.tar.gz
 mv ./mysql-connector-j-8.2.0/mysql-connector-j-8.2.0.jar ../hive/lib/
 rm -rf ./mysql-connector-j-8.2.0
 ```
+
+如果你尝试使用开源的 MariaDB 10.X 配合 Hive，那么驱动就使用 MySQL 5.X 的驱动。如果 MariaDB 13.X，那么请使用 MariaDB 自有的驱动，并在后面的 hive-site.xml 内指定 MariaDB 数据库驱动的类名。
+
+其他数据库如 PostgreSQL 也是一样的道理。
 
 ## 3.配置环境变量
 
@@ -142,7 +146,6 @@ vim ./hive-site.xml
  <name>hive.exec.mode.local.auto</name>
  <value>true</value>
 </property>
-
 ```
 
 ### 配置 log4j.properties
@@ -189,17 +192,65 @@ $HIVE_HOME/bin/schematool -dbType mysql -initSchema
 $HIVE_HOME/bin/hive
 ```
 
+### 意外情况
+
 如果出现这个报错：（绝对URI中的相对路径）
 
 ![示意图](./images/6-1.png)
 
-解决方案是把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
+#### 方法一
+
+在 HDFS 内创建以下目录：
+
+```shell
+hdfs dfs -mkdir -p /home/khlee/.hive/scratch
+hdfs dfs -mkdir -p /home/khlee/.hive/warehouse
+hdfs dfs -mkdir -p /home/khlee/.hive/query_log
+```
+
+打开 `hive-site.xml` 找到并修改为以下内容:
+
+```xml
+<property>
+ <name>hive.exec.scratchdir</name>
+ <value>/home/khlee/.hive/scratch</value>
+</property>
+
+<property>
+ <name>hive.metastore.warehouse.dir</name>
+ <value>/home/khlee/.hive/warehouse</value>
+</property>
+
+<property>
+ <name>hive.querylog.location</name>
+ <value>/home/khlee/.hive/query_log</value>
+</property>
+```
+
+然后在终端执行：
+
+```shell
+# sed 命令用于批量替换文本内容
+# sed -i "s/要替换的/替换为/g" 目标文件路径
+
+# 把所有的 ${system:java.io.tmpdir} 替换为 /home/khlee/.hive/tmp
+sed -i "s/${system:java.io.tmpdir}/\/home\/khlee\/.hive\/tmp/g" $HIVE_HOME/conf/hive-site.xml
+
+# 把所有的 system: 删掉
+sed -i "s/system://g" $HIVE_HOME/conf/hive-site.xml
+```
+
+#### 方法二
+
+把 hive-site.xml 文件中绝对路径字眼 “system:” 全部删掉：
 
 ```bash
 # sed 命令用于批量替换文本内容
 # sed -i "s/要替换的/替换为/g" 目标文件路径
 sed -i "s/system://g" $HIVE_HOME/conf/hive-site.xml
 ```
+
+上面两个方法实测都可以，请自行根据实际情况选择。
 
 再次尝试启动 Hive：
 

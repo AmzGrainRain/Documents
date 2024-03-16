@@ -1,20 +1,22 @@
 # Sqoop 安装
 
+## 警告
+
+***Sqoop、Sqoop2 已与 2021 年停止维护。这意味着 Sqoop 已经过时并且不再是我们首要考虑的工具集。将它与最新的 Hadoop 一同使用是不明智的，出现一些兼容问题也是在所难免的。如非必要，请使用替代品而不是已经过时的 Sqoop。***
+
+***此页面的内容不再维护***
+
 ## 先决条件
 
 - [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
-- 确保 MySQL 已经启动
+- 确保 MySQL8.2.0 已经启动
 - 确保 Hive 已部署完毕
 - [mysql-connector-j-8.2.0.tar.gz](https://dev.mysql.com/downloads/connector/j/)（位于 `~/Downloads`）
 - [sqoop-1.4.7.bin\_\_hadoop-2.6.0.tar.gz](https://archive.apache.org/dist/sqoop/1.4.7/)（位于 `~/Downloads`）
 - 非分布式搭建
 
 **我的用户名是 khlee，所以下面出现的所有 khlee 字眼请全部根据自己的实际用户名填写。**
-
-## 警告
-
-***Sqoop、Sqoop2 已与 2021 年停止维护。这意味着 Sqoop 已经过时并且不再是我们首要考虑的工具集。将它与最新的 Hadoop 一同使用是不明智的，出现一些兼容问题也是在所难免的。如非必要，请使用替代品而不是已经过时的 Sqoop。***
 
 ## 1.解压
 
