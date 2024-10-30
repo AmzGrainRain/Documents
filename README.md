@@ -5,7 +5,7 @@
 - [SQL 语法基础](/lang/sql/README.md)
 - [SQL 进阶理论](/lang/sql_adv/README.md)
 - [Scala 语法备忘](/lang/scala/README.md)
-- [C++11 新特性与规范](/lang/modern_cpp/README.md)
+- [C++ 语法备忘](https://zh.cppreference.com)
 
 ## 大数据组件搭建
 
