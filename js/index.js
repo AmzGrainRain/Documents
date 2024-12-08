@@ -36,6 +36,20 @@ window.$docsify = {
     placeholder: '全局搜索',
     noData: '找不到结果',
     depth: 6
+  },
+  giscus:{
+    repo: "AmzGrainRain/Documents",
+    repoId: "R_kgDOIa0pUw",
+    category: "Announcements",
+    categoryId: "DIC_kwDOIa0pU84ClCRs",
+    mapping: "pathname",
+    reactionsEnabled: "1",
+    strict: "0",
+    emitMetadata: "0",
+    inputPosition: "top",
+    theme: "light",
+    lang: "zh-CN",
+    loading: "lazy"
   }
 }
 
