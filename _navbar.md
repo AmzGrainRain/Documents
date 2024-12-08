@@ -3,8 +3,8 @@
 - 语言相关
   - [SQL 基础文档](/lang/sql/README.md)
   - [SQL 进阶文档](/lang/sql_adv/README.md)
-  - [Scala 语法助记](/lang/scala/README.md)
-  - [C++11 新特性与规范](/lang/modern_cpp/README.md)
+  - [Scala 语法备忘](/lang/scala/README.md)
+  - [C++ 语法备忘](https://zh.cppreference.com)
 - 大数据
   - [Hadoop 搭建文档](/docs/hadoop/README.md)
   - [Zookeeper 搭建文档](/docs/zookeeper/README.md)
@@ -12,6 +12,7 @@
   - [Hive 搭建文档](/docs/hive/README.md)
   - [Sqoop 搭建文档](/docs/sqoop/README.md)
   - [HBase 搭建文档](/docs/hbase/README.md)
-  - [Scala & Spark 搭建文档](/docs/scala&spark/README.md)
+  - [Scala 安装](/docs/scala/README.md)
+  - [Spark 安装](/docs/spark/README.md)
   - [Flume 搭建文档](/docs/flume/README.md)
   - [Kafka 搭建文档](/docs/kafka/README.md)
