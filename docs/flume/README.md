@@ -1,6 +1,6 @@
 # Flume 搭建文档
 
-## 前提条件
+## 先决条件
 
 - hadoop 集群已经启动
 - apache-flume-1.9.0-bin.tar.gz（位于/opt/tar下）
@@ -150,9 +150,9 @@ test.sinks.testSink.type = logger
 ```
 
 启动 Flume Agent :
-> `-n` 任务名  
-> `-c` flume 配置文件目录  
-> `-f` agent 文件路径  
+> `-n` 任务名
+> `-c` flume 配置文件目录
+> `-f` agent 文件路径
 > `-Dflume.root.logger=INFO,console` 输出日志级别
 
 ```bash

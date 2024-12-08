@@ -1,121 +1,74 @@
-# MYSQL 搭建文档
+# MySQL 安装
 
-## 前提条件
+## 先决条件
 
-- mysql-5.7.28-1.el7.x86_64.rpm-bundle.tar（位于 /opt/tar/mysqlhome/）
-- mysql-community-client-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-common-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-devel-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-embedded-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-embedded-compat-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-embedded-devel-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-libs-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-libs-compat-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-server-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- mysql-community-test-5.7.28-1.el7.x86_64.rpm（位于 /opt/tar/mysqlhome/）
-- 非分布式搭建
+- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
+- [mysql-server_8.2.0-1debian12_amd64.deb-bundle.tar](https://dev.mysql.com/downloads/mysql/)（位于 `~/Downloads`）
+- 单机搭建
+
+**我的用户名是 khlee，所以下面出现的所有 khlee 字眼请全部根据自己的实际用户名填写。**
 
 ## 1.安装软件包
 
-进入 /opt/tar/MySQL/ 目录内：
-
 ```bash
-cd /opt/tar/mysqlhome/
+cd ~/Downloads
+tar -xf ./mysql-server_8.2.0-1debian12_amd64.deb-bundle.tar
+sudo dpkg -i ./libmysqlclient*.deb
+sudo dpkg -i ./mysql-*.deb
 ```
 
-查看当前目录内的文件：
+如果这一步出现意外，一般是因为依赖缺失导致的，可以通过这个命令修复一下：
 
 ```bash
-ls
+# 此命令需要网络
+sudo apt --fix-broken install
 ```
 
-![软件包列表](./images/2_1.png)
+过一会就会出现蓝色的界面提示设置 root 密码，记得设置一下。设置完之后会提示你选择默认的密码验证插件，这里我们选择第二个：
 
-使用 rpm 包管理器安装当前目录所有 .rpm 软件包：
+![Use Legacy Authentication Method](./images/1-1.png)
+
+清理安装包：
 
 ```bash
-rpm -ivh ./*.rpm --force --nodeps
+cd ~/Downloads
+rm ./libmysqlclient*.deb ./mysql-*.deb
 ```
 
-![安装结果](./images/2_2.png)
+## 2.启动 MySQL 并设置开机自启
 
-命令参数解释：  
-
-- -ivh：复合写法
-  - -i：安装
-  - -v：可视化安装
-  - -h：显示进度
-- --force：强制安装
-- --nodeps：不处理依赖问题（无网络环境下安装）
-
-## 2.启动MySQL & 设置开机自启
-
-查看 mysqld 守护进程状态：
+查看 mysql 守护进程状态：
 
 ```bash
-systemctl status mysqld.service
+sudo systemctl status mysql.service
 ```
 
 如果 mysqld 没有启动，则手动启动它：
 
 ```bash
-systemctl start mysqld.service
+sudo systemctl start mysql.service
 ```
 
-设置开机启动 mysqld 守护进程：
+默认情况下 mysql 会自动设置开机启动，如果没有则进行一个手动操作：
 
 ```bash
-systemctl enable mysqld.service
+sudo systemctl enable mysql.service
 ```
 
 再次查看 mysqld 守护进程状态：
 
 ```bash
-systemctl status mysqld.service
+sudo systemctl status mysql.service
 ```
 
-![操作结果](./images/3_1.png)
+![操作结果](./images/2-1.png)
 
 ## 3.配置 MySQL
 
-MySQL启动时，会在 /var/log/mysqld.log 输出日志。默认密码就在日志中。  
-
-使用 grep 命令查找日志中的密码：
-
-```bash
-grep 'temporary password' /var/log/mysqld.log
-
-# 或
-
-cat /var/log/mysqld.log | grep 'temporary password'
-```
-
-![操作结果](./images/4_1.png)
-
-复制临时密码，以 root 身份登录到 mysql：
+以 root 身份登录到 MySQL：
 
 ```bash
 mysql -u root -p
-```
-
-![操作结果](./images/4_2.png)
-
-密码强度限制调整为低级：
-
-```sql
-SET GLOBAL validate_password_policy=0;
-```
-
-调整密码最低长度限制：
-
-```sql
-SET GLOBAL validate_password_length=6;
-```
-
-修改 root@localhost（本地 root 登录） 的密码：
-
-```sql
-ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
 ```
 
 创建一个用于远程登陆的用户：
@@ -128,7 +81,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '新密码';
 CREATE USER 'root'@'%' IDENTIFIED BY '用户的密码';
 ```
 
-完全允许 root 远程连接：  
+完全允许 root 远程连接：
 命令解释：
 
 - GRANT：赋权命令
@@ -152,6 +105,18 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 ```
 
+不要忘了退出 MySQL：
+
+```bash
+\q
+```
+
 ## 快速跳转
 
-[回到顶部](#mysql-搭建文档)
+[回到顶部](#MySQL-安装)
+
+[MySQL 基础](../../lang/sql/README.md)
+
+[MySQL 进阶](../../lang/sql_adv/README.md)
+
+[Hive 安装](../hive/README.md)

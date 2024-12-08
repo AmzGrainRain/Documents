@@ -1,6 +1,5 @@
 const searchList = [
   '/lang/scala/README.md',
-  '/lang/modern_cpp/README.md',
   '/lang/sql/README.md',
   '/lang/sql_adv/README.md',
   '/docs/hadoop/README.md',
