@@ -13,11 +13,11 @@
 - [Zookeeper 安装](/docs/zookeeper/README.md)
 - [MySQL 安装](/docs/mysql/README.md)
 - [Hive 安装](/docs/hive/README.md)
-- [Sqoop 安装](/docs/sqoop/README.md)
 - [HBase 安装](/docs/hbase/README.md)
-- [Scala & Spark 安装](/docs/scala&spark/README.md)
-- [Flume 安装](/docs/flume/README.md)
-- [Kafka 安装](/docs/kafka/README.md)
+- [Scala 安装](/docs/scala/README.md)
+- [Spark 安装](/docs/spark/README.md)
+- [Flume 安装（未完成）](/docs/flume/README.md)
+- [Kafka 安装（未完成）](/docs/kafka/README.md)
 
 ## 转载说明
 
