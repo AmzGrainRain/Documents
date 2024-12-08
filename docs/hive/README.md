@@ -383,4 +383,6 @@ hdfs dfs -cat /user/hive/warehouse/test/test.txt
 
 [回到顶部](#hive-安装)
 
-[Sqoop 安装](../sqoop/README.md)
+[Sqoop 安装（已废弃的大数据组件）](../sqoop/README.md)
+
+[HBase 安装](../hbase/README.md)

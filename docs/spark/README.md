@@ -244,4 +244,4 @@ ssh node2 "~/zookeeper/bin/zkServer.sh start" &
 
 [回到顶部](#scala-安装)
 
-[Spark 安装](../spark/README.md)
+[Spark 安装](../flume/README.md)

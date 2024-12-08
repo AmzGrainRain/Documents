@@ -13,6 +13,7 @@
 - [Zookeeper 安装](/docs/zookeeper/README.md)
 - [MySQL 安装](/docs/mysql/README.md)
 - [Hive 安装](/docs/hive/README.md)
+- [Sqoop 安装（已废弃的大数据组件）](/docs/sqoop_Deprecated/README.md)
 - [HBase 安装](/docs/hbase/README.md)
 - [Scala 安装](/docs/scala/README.md)
 - [Spark 安装](/docs/spark/README.md)
