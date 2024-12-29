@@ -2,7 +2,6 @@
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
 - 确保 MySQL 8.2.0 已经启动
 - [apache-hive-3.1.3-bin.tar.gz](https://dlcdn.apache.org/hive/hive-3.1.3/)（位于 `~/Downloads`）

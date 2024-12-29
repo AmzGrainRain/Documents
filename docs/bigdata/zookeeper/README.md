@@ -2,7 +2,6 @@
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
 - [apache-zookeeper-3.8.3-bin.tar.gz](https://zookeeper.apache.org/releases.html)（位于 `~/Downloads`）
 - 分布式搭建

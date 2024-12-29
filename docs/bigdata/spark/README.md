@@ -2,7 +2,7 @@
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
+- 确保 Hadoop 集群已启动
 - [spark-3.5.0-bin-hadoop3.tgz](https://www.apache.org/dyn/closer.lua/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz)（位于 `~/Downloads`）
 - 分布式搭建/单机搭建
 

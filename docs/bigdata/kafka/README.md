@@ -2,8 +2,8 @@
 
 ## 先决条件
 
-- hadoop 集群已经启动
-- zookeeper 已经启动
+- 确保 Hadoop 集群已经启动
+- 确保 Zookeeper 已经启动
 - kafka_2.12-2.4.1.tgz（位于/opt/tar下）
 - 分布式搭建
 

@@ -1,18 +1,20 @@
 - [首页](/)
 - [文档清单](/README.md)
 - 语言相关
-  - [SQL 基础文档](/lang/sql/README.md)
-  - [SQL 进阶文档](/lang/sql_adv/README.md)
+  - [SQL 基础](/lang/sql/README.md)
+  - [SQL 进阶](/lang/sql_adv/README.md)
   - [Scala 语法备忘](/lang/scala/README.md)
   - [C++ 语法备忘](https://zh.cppreference.com)
-- 大数据
-  - [Hadoop 搭建文档](/docs/hadoop/README.md)
-  - [Zookeeper 搭建文档](/docs/zookeeper/README.md)
-  - [MySql 搭建文档](/docs/mysql/README.md)
-  - [Hive 搭建文档](/docs/hive/README.md)
-  - [Sqoop 搭建文档](/docs/sqoop/README.md)
-  - [HBase 搭建文档](/docs/hbase/README.md)
-  - [Scala 安装](/docs/scala/README.md)
-  - [Spark 安装](/docs/spark/README.md)
-  - [Flume 搭建文档](/docs/flume/README.md)
-  - [Kafka 搭建文档](/docs/kafka/README.md)
+- 数据库
+  - [MySql 部署](/docs/mysql/README.md)
+- 分布式组件
+  - [GlusterFS 部署](/docs/distribution/glusterfs/README.md)
+- 大数据组件
+  - [Hadoop 部署](/docs/bigdata/hadoop/README.md)
+  - [Zookeeper 部署](/docs/bigdata/zookeeper/README.md)
+  - [Hive 部署](/docs/bigdata/hive/README.md)
+  - [Sqoop 部署](/docs/bigdata/sqoop/README.md)
+  - [HBase 部署](/docs/bigdata/hbase/README.md)
+  - [Spark 部署](/docs/bigdata/spark/README.md)
+  - [Flume 部署](/docs/bigdata/flume/README.md)
+  - [Kafka 部署](/docs/bigdata/kafka/README.md)

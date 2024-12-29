@@ -2,7 +2,7 @@
 
 ## 先决条件
 
-- hadoop 集群已经启动
+- 确保 Hadoop 集群已经启动
 - apache-flume-1.9.0-bin.tar.gz（位于/opt/tar下）
 - 非分布式搭建
 

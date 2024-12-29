@@ -8,7 +8,6 @@
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
 - 确保 MySQL8.2.0 已经启动
 - 确保 Hive 已部署完毕

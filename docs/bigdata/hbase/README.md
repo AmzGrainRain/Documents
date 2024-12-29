@@ -2,7 +2,6 @@
 
 ## 先决条件
 
-- [Debian GNU/Linux 12 (bookworm) x86_64](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/12.4.0/amd64/iso-cd/)
 - 确保 Hadoop 集群已经启动
 - 确保 Zookeeper 已经启动
 - [hbase-2.5.7-hadoop3-bin.tar.gz](https://www.apache.org/dyn/closer.lua/hbase/2.5.7/hbase-2.5.7-hadoop3-bin.tar.gz)（位于 `~/Downloads`）
